@@ -21,6 +21,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role', // 'admin', 'supplier', 'manufacturer', 'retailer'
+        'status',
+        'phone',
+        'address',
     ];
 
     /**
@@ -42,4 +46,35 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function isAdmin()
+    {
+        return $this->role === 'administrator';
+    }
+
+    public function isSupplier()
+    {
+        return $this->role === 'supplier';
+    }
+
+    public function isManufacturer()
+    {
+        return $this->role === 'manufacturer';
+    }
+
+    public function isRetailer()
+    {
+        return $this->role === 'retailer';
+    }
+
+    public function getDashboardRoute()
+    {
+        return match($this->role) {
+            'administrator' => 'admin.dashboard',
+            'supplier' => 'supplier.dashboard',
+            'manufacturer' => 'manufacturer.dashboard',
+            'retailer' => 'retailer.dashboard',
+            default => 'home',
+        };
+    }
 }

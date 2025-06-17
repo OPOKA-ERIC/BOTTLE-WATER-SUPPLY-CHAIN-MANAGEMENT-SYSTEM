@@ -38,7 +38,7 @@
  
  
          <!-- Schema.org markup for Google+ -->
-         <meta itemprop="name" content="Light Bootstrap Dashboard Laravel by Creative Tim & UPDIVISION">
+         <meta itemprop="name" content="BWSCMS by Creative Tim & UPDIVISION">
          <meta itemprop="description" content="Start your development with a Bootstrap 4 Admin Dashboard built for Laravel Framework 5.5 and Up.">
  
          <meta itemprop="image" content="https://s3.amazonaws.com/creativetim_bucket/products/213/opt_lbd_laravel_thumbnail.jpg">
@@ -46,7 +46,7 @@
          <!-- Twitter Card data -->
          <meta name="twitter:card" content="product">
          <meta name="twitter:site" content="@creativetim">
-         <meta name="twitter:title" content="Light Bootstrap Dashboard Laravel by Creative Tim & UPDIVISION">
+         <meta name="twitter:title" content="BWSCMS by Creative Tim & UPDIVISION">
  
          <meta name="twitter:description" content="Start your development with a Bootstrap 4 Admin Dashboard built for Laravel Framework 5.5 and Up.">
          <meta name="twitter:creator" content="@creativetim">
@@ -54,7 +54,7 @@
  
          <!-- Open Graph data -->
          <meta property="fb:app_id" content="655968634437471">
-         <meta property="og:title" content="Light Bootstrap Dashboard Laravel by Creative Tim & UPDIVISION" />
+         <meta property="og:title" content="BWSCMS by Creative Tim & UPDIVISION" />
          <meta property="og:type" content="article" />
          <meta property="og:url" content="https://www.creative-tim.com/live/light-bootstrap-dashboard-laravel" />
          <meta property="og:image" content="https://s3.amazonaws.com/creativetim_bucket/products/213/opt_lbd_laravel_thumbnail.jpg"/>

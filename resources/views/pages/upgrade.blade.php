@@ -1,4 +1,4 @@
-@extends('layouts.app', ['activePage' => 'upgrade', 'title' => 'Light Bootstrap Dashboard Laravel by Creative Tim & UPDIVISION', 'navName' => 'Upgrade', 'activeButton' => 'laravel'])
+@extends('layouts.app', ['activePage' => 'upgrade', 'title' => 'BWSCMS by Creative Tim & UPDIVISION', 'navName' => 'Upgrade', 'activeButton' => 'laravel'])
 
 @section('content')
     <div class="content">
@@ -10,7 +10,7 @@
                             <div class="card">
                                 <div class="header text-center">
                                     <h4 class="title">{{ __('Light Bootstrap Dashboard')}}</h4>
-                                    <p class="category">{{ __('Are you looking for more components? Please check our Premium Version of Light Bootstrap Dashboard Laravel.')}}</p>
+                                    <p class="category">{{ __('Are you looking for more components? Please check our Premium Version of BWSCMS.')}}</p>
                                     <br>
                                 </div>
                                 <div class="content table-responsive table-upgrade">
