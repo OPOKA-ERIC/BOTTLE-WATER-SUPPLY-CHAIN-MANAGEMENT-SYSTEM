@@ -74,7 +74,23 @@ class User extends Authenticatable
             'supplier' => 'supplier.dashboard',
             'manufacturer' => 'manufacturer.dashboard',
             'retailer' => 'retailer.dashboard',
+            'vendor' => 'vendor.dashboard',
             default => 'home',
         };
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    public function unreadNotifications()
+    {
+        return $this->notifications()->unread();
+    }
+
+    public function readNotifications()
+    {
+        return $this->notifications()->read();
     }
 }

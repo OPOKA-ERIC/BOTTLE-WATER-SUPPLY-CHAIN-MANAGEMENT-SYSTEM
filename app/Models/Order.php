@@ -11,6 +11,7 @@ class Order extends Model
         'delivery_address',
         'delivery_date',
         'status',
+        'priority',
         'total_amount',
         'notes',
     ];

@@ -49,7 +49,10 @@ class DashboardController extends Controller
     public function materials()
     {
         $materials = RawMaterial::where('supplier_id', auth()->id())->paginate(10);
-        return view('supplier.materials.index', compact('materials'));
+        return view('supplier.materials.index', compact('materials'))
+            ->with('title', 'Supplier Materials - BWSCMS')
+            ->with('activePage', 'materials')
+            ->with('navName', 'Raw Materials');
     }
 
     public function updateMaterial(Request $request, $id)

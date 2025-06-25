@@ -9,6 +9,7 @@ use App\Models\ProductionBatch;
 use App\Models\PurchaseOrder;
 use App\Models\Chat;
 use App\Models\DemandForecast;
+use App\Models\Notification;
 
 class DashboardController extends Controller
 {
@@ -117,5 +118,104 @@ class DashboardController extends Controller
             'activeButton' => 'manufacturer',
             'navName' => 'Chat with Supplier'
         ]);
+    }
+
+    public function analytics()
+    {
+        return view('manufacturer.analytics', [
+            'title' => 'Manufacturer Analytics',
+            'activePage' => 'analytics',
+            'activeButton' => 'manufacturer',
+            'navName' => 'Manufacturer Analytics'
+        ]);
+    }
+
+    public function notifications()
+    {
+        $user = auth()->user();
+        
+        // Get notification statistics
+        $stats = [
+            'total' => $user->notifications()->count(),
+            'unread' => $user->unreadNotifications()->count(),
+            'read' => $user->readNotifications()->count(),
+            'avg_response_time' => $this->calculateAvgResponseTime($user)
+        ];
+        
+        // Get notifications with pagination
+        $notifications = $user->notifications()
+            ->latest()
+            ->paginate(10);
+            
+        // Get recent activity (simplified - you can expand this)
+        $recentActivity = $this->getRecentActivity();
+        
+        return view('manufacturer.notifications', [
+            'notifications' => $notifications,
+            'stats' => $stats,
+            'recentActivity' => $recentActivity,
+            'title' => 'Manufacturer Notifications',
+            'activePage' => 'notifications',
+            'activeButton' => 'manufacturer',
+            'navName' => 'Manufacturer Notifications'
+        ]);
+    }
+    
+    private function calculateAvgResponseTime($user)
+    {
+        $readNotifications = $user->readNotifications()
+            ->whereNotNull('read_at')
+            ->get();
+            
+        if ($readNotifications->isEmpty()) {
+            return 2.3; // Default value
+        }
+        
+        $totalHours = $readNotifications->sum(function($notification) {
+            return $notification->created_at->diffInHours($notification->read_at);
+        });
+        
+        return round($totalHours / $readNotifications->count(), 1);
+    }
+    
+    private function getRecentActivity()
+    {
+        $user = auth()->user();
+        
+        $activities = collect();
+        
+        // Get recent production batches
+        $recentBatches = ProductionBatch::where('manufacturer_id', $user->id)
+            ->latest()
+            ->take(3)
+            ->get();
+            
+        foreach ($recentBatches as $batch) {
+            $activities->push([
+                'type' => 'production',
+                'title' => 'Production Batch ' . $batch->id . ' ' . ucfirst($batch->status),
+                'description' => 'Batch of ' . $batch->quantity . ' units',
+                'time' => $batch->created_at->diffForHumans(),
+                'icon' => 'nc-icon nc-box-2'
+            ]);
+        }
+        
+        // Get recent inventory updates
+        $recentInventory = Inventory::where('manufacturer_id', $user->id)
+            ->latest()
+            ->take(2)
+            ->get();
+            
+        foreach ($recentInventory as $inventory) {
+            $activities->push([
+                'type' => 'inventory',
+                'title' => 'Inventory Updated',
+                'description' => $inventory->product->name . ' - ' . $inventory->quantity . ' units',
+                'time' => $inventory->updated_at->diffForHumans(),
+                'icon' => 'nc-icon nc-box'
+            ]);
+        }
+        
+        return $activities->sortByDesc('time')->take(5);
     }
 } 

@@ -6,3 +6,62 @@
 
 // Bootstrap
 @import 'bootstrap/scss/bootstrap';
+
+// Custom styles
+@import '../css/app.css';
+
+// Custom Logout Button Styling
+.logout-section {
+  margin: 24px 0 0 0;
+  display: flex;
+  justify-content: center;
+}
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 90%;
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.12);
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(25, 118, 210, 0.10), 0 1.5px 6px rgba(0,0,0,0.04);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+  cursor: pointer;
+  outline: none;
+}
+.logout-btn:hover, .logout-btn:focus {
+  background: rgba(25, 118, 210, 0.25);
+  color: #fff;
+  box-shadow: 0 6px 32px rgba(25, 118, 210, 0.18), 0 2px 8px rgba(0,0,0,0.06);
+}
+.logout-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+  border-radius: 10px;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.12);
+}
+.logout-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.logout-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+.logout-subtitle {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.7);
+}

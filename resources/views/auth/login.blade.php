@@ -1,22 +1,30 @@
-@extends('layouts/app', ['activePage' => 'login', 'title' => 'Login - Bottle Water Supply Chain Management'])
+@extends('layouts/app', ['activePage' => 'login', 'title' => 'Login - BWSCMS Management System'])
 
 @section('content')
-    <div class="full-page section-image" data-color="black" data-image="{{ asset('light-bootstrap/img/full-screen-image-2.jpg') }}">
-        <!-- Consistent overlay from welcome page -->
+    <div class="full-page section-image" data-color="blue" data-image="{{ asset('light-bootstrap/img/full-screen-image-2.jpg') }}">
+        <!-- Overlay for better text readability -->
         <div class="overlay" style="background: linear-gradient(135deg, rgba(25, 118, 210, 0.8) 0%, rgba(13, 71, 161, 0.9) 100%);"></div>
         
-        <div class="content pt-5 position-relative">
-            <div class="container mt-5">
-                <!-- Brand Header -->
-                <div class="row justify-content-center mb-4">
-                    <div class="col-md-6 text-center">
-                        <div class="brand-header mb-4">
-                            <div class="hero-icon mx-auto mb-3" style="width: 60px; height: 60px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
-                                <i class="nc-icon nc-drop text-white" style="font-size: 1.8rem;"></i>
+        <div class="content position-relative">
+            <div class="container">
+                <!-- Hero Section -->
+                <div class="row justify-content-center mb-5">
+                    <div class="col-lg-10 text-center">
+                        <!-- Logo/Icon Section -->
+                        <div class="mb-4">
+                            <div class="hero-icon mx-auto mb-3" style="width: 80px; height: 80px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                                <i class="nc-icon nc-drop text-white" style="font-size: 2.5rem;"></i>
                             </div>
-                            <h2 class="text-white font-weight-bold mb-2" style="letter-spacing: -0.5px;">Welcome Back</h2>
-                            <p class="text-white" style="opacity: 0.9;">Sign in to your supply chain dashboard</p>
                         </div>
+                        
+                        <h1 class="text-white display-4 mb-4 font-weight-bold" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3); letter-spacing: -1px;">
+                            Welcome Back to
+                            <span class="d-block text-primary" style="color: #64b5f6 !important;">BWSCMS</span>
+                        </h1>
+                        
+                        <p class="text-white lead mb-5" style="font-size: 1.25rem; opacity: 0.9; max-width: 600px; margin: 0 auto; line-height: 1.6;">
+                            Sign in to your supply chain dashboard and continue managing your operations
+                        </p>
                     </div>
                 </div>
                 
@@ -36,8 +44,8 @@
                                         <label for="email" class="form-label text-white font-weight-600 mb-2" style="font-size: 0.9rem; opacity: 0.9;">{{ __('E-Mail Address') }}</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-right: none;">
-                                                    <i class="nc-icon nc-email-85 text-white" style="opacity: 0.7;"></i>
+                                                <span class="input-group-text" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-right: none; padding: 16px 20px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; height: 60px; min-height: 60px;">
+                                                    <i class="nc-icon nc-email-85 text-white" style="opacity: 0.7; font-size: 1.2rem;"></i>
                                                 </span>
                                             </div>
                                             <input id="email" 
@@ -49,7 +57,7 @@
                                                    autocomplete="email" 
                                                    autofocus
                                                    placeholder="Enter your email"
-                                                   style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-left: none; color: white; padding: 12px 15px; border-radius: 0 10px 10px 0;">
+                                                   style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-left: none; color: white; padding: 16px 20px; border-radius: 0 10px 10px 0; font-size: 1.1rem; height: 60px; min-height: 60px;">
                                         </div>
                                         @error('email')
                                             <div class="invalid-feedback d-block" style="color: #ff6b6b; font-size: 0.85rem; margin-top: 0.5rem;">
@@ -63,8 +71,8 @@
                                         <label for="password" class="form-label text-white font-weight-600 mb-2" style="font-size: 0.9rem; opacity: 0.9;">{{ __('Password') }}</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
-                                                <span class="input-group-text" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-right: none;">
-                                                    <i class="nc-icon nc-key-25 text-white" style="opacity: 0.7;"></i>
+                                                <span class="input-group-text" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-right: none; padding: 16px 20px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; height: 60px; min-height: 60px;">
+                                                    <i class="nc-icon nc-key-25 text-white" style="opacity: 0.7; font-size: 1.2rem;"></i>
                                                 </span>
                                             </div>
                                             <input id="password" 
@@ -75,10 +83,10 @@
                                                    required 
                                                    autocomplete="current-password"
                                                    placeholder="Enter your password"
-                                                   style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-left: none; color: white; padding: 12px 15px; border-radius: 0 10px 10px 0;">
+                                                   style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-left: none; color: white; padding: 16px 20px; border-radius: 0 10px 10px 0; font-size: 1.1rem; height: 60px; min-height: 60px;">
                                             <div class="input-group-append">
-                                                <span class="input-group-text toggle-password" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-left: none; cursor: pointer;">
-                                                    <i class="nc-icon nc-zoom-split text-white" style="opacity: 0.7;"></i>
+                                                <span class="input-group-text toggle-password" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-left: none; cursor: pointer; padding: 16px 20px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; height: 60px; min-height: 60px;">
+                                                    <i class="nc-icon nc-zoom-split text-white" style="opacity: 0.7; font-size: 1.2rem;"></i>
                                                 </span>
                                             </div>
                                         </div>
@@ -184,7 +192,7 @@
         
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
+            50% { transform: translateY(-10px); }
         }
         
         .card-login {
@@ -267,8 +275,8 @@
                 padding: 1rem 1.5rem 1.5rem !important;
             }
             
-            .brand-header h2 {
-                font-size: 1.5rem !important;
+            .display-4 {
+                font-size: 2rem !important;
             }
         }
         

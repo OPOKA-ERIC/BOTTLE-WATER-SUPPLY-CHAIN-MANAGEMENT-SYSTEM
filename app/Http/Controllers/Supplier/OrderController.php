@@ -15,7 +15,10 @@ class OrderController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('supplier.orders.index', compact('orders'));
+        return view('supplier.orders.index', compact('orders'))
+            ->with('title', 'Supplier Orders - BWSCMS')
+            ->with('activePage', 'orders')
+            ->with('navName', 'Supplier Orders');
     }
 
     public function show($id)
@@ -24,7 +27,10 @@ class OrderController extends Controller
             ->with(['manufacturer', 'items.rawMaterial'])
             ->findOrFail($id);
 
-        return view('supplier.orders.show', compact('order'));
+        return view('supplier.orders.show', compact('order'))
+            ->with('title', 'Order Details - BWSCMS')
+            ->with('activePage', 'orders')
+            ->with('navName', 'Order Details');
     }
 
     public function updateStatus(Request $request, $id)

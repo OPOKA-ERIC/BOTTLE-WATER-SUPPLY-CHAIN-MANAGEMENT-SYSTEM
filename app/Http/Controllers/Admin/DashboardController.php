@@ -20,28 +20,47 @@ class DashboardController extends Controller
             'pending_vendor_applications' => VendorApplication::where('status', 'pending')->count(),
         ];
 
-        $recentOrders = Order::with('user')->latest()->take(5)->get();
+        $recentOrders = Order::with('retailer')->latest()->take(5)->get();
         $recentVendorApplications = VendorApplication::with('user')->latest()->take(5)->get();
 
         return view('admin.dashboard', [
             'stats' => $stats,
             'recentOrders' => $recentOrders,
             'recentVendorApplications' => $recentVendorApplications,
-            'title' => 'Admin Dashboard',
-            'activePage' => 'dashboard',
+            'title' => 'Admin Dashboard - BWSCMS',
+            'activePage' => 'dashboard-overview',
+            'navName' => 'Admin Dashboard'
         ]);
     }
 
     public function userManagement()
     {
         $users = User::paginate(10);
-        return view('admin.users.index', compact('users'));
+        return view('admin.users.index', compact('users'))
+            ->with('title', 'User Management - BWSCMS')
+            ->with('activePage', 'user-management')
+            ->with('navName', 'User Management');
+    }
+
+    public function orders()
+    {
+        $orders = Order::with('retailer')->paginate(10);
+        return view('admin.orders.index', compact('orders'))
+            ->with('title', 'Order Management - BWSCMS')
+            ->with('activePage', 'order-management')
+            ->with('navName', 'Order Management');
     }
 
     public function vendorApplications()
     {
         $applications = VendorApplication::with('user')->paginate(10);
-        return view('admin.vendors.applications', compact('applications'));
+        return view('admin.vendors.applications', [
+            'applications' => $applications,
+            'title' => 'Vendor Applications',
+            'activePage' => 'vendor-applications',
+            'activeButton' => 'laravel',
+            'navName' => 'Vendor Applications',
+        ]);
     }
 
     public function approveVendorApplication($id)
@@ -59,5 +78,14 @@ class DashboardController extends Controller
         $application->update(['status' => 'rejected']);
 
         return redirect()->back()->with('success', 'Vendor application rejected');
+    }
+
+    public function analytics()
+    {
+        return view('admin.analytics', [
+            'title' => 'Analytics - BWSCMS',
+            'activePage' => 'analytics',
+            'navName' => 'Analytics',
+        ]);
     }
 } 

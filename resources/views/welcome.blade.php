@@ -1,4 +1,4 @@
-@extends('layouts/app', ['activePage' => 'welcome', 'title' => 'Bottle Water Supply Chain Management System'])
+@extends('layouts/app', ['activePage' => 'welcome', 'title' => 'BWSCMS Management System'])
 
 @section('content')
     <div class="full-page section-image" data-color="blue" data-image="{{asset('light-bootstrap/img/full-screen-image-2.jpg')}}">
@@ -18,7 +18,7 @@
                         </div>
                         
                         <h1 class="text-white display-3 mb-4 font-weight-bold" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3); letter-spacing: -1px;">
-                            Bottle Water Supply Chain
+                            BWSCMS
                             <span class="d-block text-primary" style="color: #64b5f6 !important;">Management System</span>
                         </h1>
                         
@@ -26,14 +26,7 @@
                             Streamline your water bottle supply chain with our comprehensive, intelligent management system designed for modern businesses
                         </p>
                         
-                        <div class="mt-4">
-                            <a href="{{ route('login') }}" class="btn btn-primary btn-lg mr-3 px-5 py-3" style="background: linear-gradient(45deg, #2196F3, #21CBF3); border: none; border-radius: 50px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4); transition: all 0.3s ease;">
-                                <i class="nc-icon nc-key-25 mr-2"></i>Login
-                            </a>
-                            <a href="{{ route('register') }}" class="btn btn-outline-light btn-lg px-5 py-3" style="border: 2px solid rgba(255, 255, 255, 0.8); border-radius: 50px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; backdrop-filter: blur(10px); transition: all 0.3s ease;">
-                                <i class="nc-icon nc-single-02 mr-2"></i>Register
-                            </a>
-                        </div>
+                       
                     </div>
                 </div>
 
@@ -163,6 +156,31 @@
         
         .content {
             z-index: 2;
+        }
+        
+        /* Landing page nav-link styling to match navbar */
+        .content .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-weight: 500;
+            font-size: 1.1rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .content .nav-link:hover {
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+        
+        .content .nav-link i {
+            font-size: 1.2rem;
         }
         
         .feature-card:hover {

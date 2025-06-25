@@ -62,7 +62,10 @@ class DashboardController extends Controller
             ->with('products')
             ->latest()
             ->paginate(10);
-        return view('retailer.orders.index', compact('orders'));
+        return view('retailer.orders.index', compact('orders'))
+            ->with('title', 'Retailer Orders - BWSCMS')
+            ->with('activePage', 'orders')
+            ->with('navName', 'Retailer Orders');
     }
 
     public function createOrder(Request $request)
@@ -106,7 +109,10 @@ class DashboardController extends Controller
             ->with(['products', 'deliverySchedule'])
             ->findOrFail($id);
 
-        return view('retailer.orders.track', compact('order'));
+        return view('retailer.orders.track', compact('order'))
+            ->with('title', 'Track Order - BWSCMS')
+            ->with('activePage', 'orders')
+            ->with('navName', 'Track Order');
     }
 
     public function reports()
@@ -135,6 +141,9 @@ class DashboardController extends Controller
                 ];
             });
 
-        return view('retailer.reports.index', compact('salesReport', 'productReport'));
+        return view('retailer.reports.index', compact('salesReport', 'productReport'))
+            ->with('title', 'Retailer Reports - BWSCMS')
+            ->with('activePage', 'reports')
+            ->with('navName', 'Retailer Reports');
     }
 } 

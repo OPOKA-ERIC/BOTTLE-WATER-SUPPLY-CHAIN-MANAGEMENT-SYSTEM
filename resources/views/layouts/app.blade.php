@@ -20,7 +20,7 @@
         <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('light-bootstrap/img/apple-icon.png') }}">
         <link rel="icon" type="image/png" href="{{ asset('light-bootstrap/img/favicon.ico') }}">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-        <title>{{ $title }}</title>
+        <title>{{ $title ?? 'BWSCMS - Bottle Water Supply Chain Management System' }}</title>
         <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
         <!--     Fonts and icons     -->
         <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet" />
@@ -30,13 +30,77 @@
         <link href="{{ asset('light-bootstrap/css/light-bootstrap-dashboard.css?v=2.0.0') }} " rel="stylesheet" />
         <!-- CSS Just for demo purpose, don't include it in your project -->
         <link href="{{ asset('light-bootstrap/css/demo.css') }}" rel="stylesheet" />
+        <!-- Custom pagination styling -->
+        <style>
+            /* Custom pagination styling for admin vendor applications */
+            .pagination .page-link {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.875rem;
+                line-height: 1.5;
+            }
+
+            .pagination .page-item:first-child .page-link,
+            .pagination .page-item:last-child .page-link {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.875rem;
+            }
+
+            /* Make pagination arrows smaller */
+            .pagination .page-link[aria-label="Previous"],
+            .pagination .page-link[aria-label="Next"] {
+                font-size: 0.75rem;
+                padding: 0.375rem 0.5rem;
+            }
+
+            /* Ensure consistent sizing for all pagination elements */
+            .pagination-sm .page-link {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.875rem;
+                line-height: 1.5;
+            }
+
+            /* Fix scrollbar overlap issues */
+            body {
+                overflow-x: hidden;
+            }
+
+            .main-panel {
+                box-sizing: border-box;
+                overflow-x: hidden;
+            }
+
+            /* Ensure content doesn't get cut off by scrollbar */
+            .content {
+                padding-right: 0;
+                box-sizing: border-box;
+            }
+
+            /* Fix for fixed elements */
+            .admin-navbar,
+            .retailer-sidebar,
+            .admin-sidebar {
+                box-sizing: border-box;
+            }
+        </style>
     </head>
 
     <body>
         <div class="wrapper @if (!auth()->check() || request()->route()->getName() == "") wrapper-full-page @endif">
 
             @if (auth()->check() && request()->route()->getName() != "")
-                @include('layouts.navbars.sidebar')
+                @if(auth()->user()->role === 'admin')
+                    @include('layouts.navbars.admin-sidebar-simple')
+                @elseif(auth()->user()->role === 'manufacturer')
+                    @include('layouts.navbars.manufacturer-sidebar')
+                @elseif(auth()->user()->role === 'supplier')
+                    @include('layouts.navbars.supplier-sidebar')
+                @elseif(auth()->user()->role === 'retailer')
+                    @include('layouts.navbars.retailer-sidebar')
+                @elseif(auth()->user()->role === 'vendor')
+                    @include('layouts.navbars.vendor-sidebar')
+                @else
+                    @include('layouts.navbars.sidebar')
+                @endif
                 @include('pages/sidebarstyle')
             @endif
 

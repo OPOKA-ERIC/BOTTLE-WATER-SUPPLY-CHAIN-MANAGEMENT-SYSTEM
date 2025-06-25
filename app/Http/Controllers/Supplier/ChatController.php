@@ -15,7 +15,10 @@ class ChatController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('supplier.chats.index', compact('chats'));
+        return view('supplier.chats.index', compact('chats'))
+            ->with('title', 'Supplier Chats - BWSCMS')
+            ->with('activePage', 'chat')
+            ->with('navName', 'Chat Conversations');
     }
 
     public function show($id)
@@ -29,7 +32,10 @@ class ChatController extends Controller
             $chat->update(['is_read' => true]);
         }
 
-        return view('supplier.chats.show', compact('chat'));
+        return view('supplier.chats.show', compact('chat'))
+            ->with('title', 'Chat Details - BWSCMS')
+            ->with('activePage', 'chat')
+            ->with('navName', 'Chat Details');
     }
 
     public function store(Request $request)

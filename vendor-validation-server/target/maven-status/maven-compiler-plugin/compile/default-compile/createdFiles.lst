@@ -1,0 +1,4 @@
+com\scms\controller\VendorValidationController.class
+com\scms\model\VendorApplication.class
+com\scms\VendorValidationApplication.class
+com\scms\service\VendorValidationService.class
