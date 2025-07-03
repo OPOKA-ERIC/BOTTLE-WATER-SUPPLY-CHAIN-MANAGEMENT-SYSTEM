@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->enum('priority', ['low', 'medium', 'high'])->default('medium')->after('status');
+            if (!Schema::hasColumn('orders', 'priority')) {
+                $table->enum('priority', ['low', 'medium', 'high'])->default('medium')->after('status');
+            }
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('priority');
+            if (Schema::hasColumn('orders', 'priority')) {
+                $table->dropColumn('priority');
+            }
         });
     }
 };

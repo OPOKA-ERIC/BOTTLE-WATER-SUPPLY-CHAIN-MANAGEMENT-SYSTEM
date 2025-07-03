@@ -18,16 +18,19 @@ use App\Http\Controllers\Vendor\DashboardController as VendorDashboardController
 |
 */
 
+// Simple test route to verify routing works
+Route::get('/test-hello', function() {
+    return 'Hello, world!';
+});
+
 Route::get('/', function () {
     return view('welcome');
 });
 
+// Authentication Routes
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Auth::routes();
-
-Route::get('/home', 'App\Http\Controllers\HomeController@index')->name('dashboard');
 
 Route::group(['middleware' => 'auth'], function () {
 	Route::resource('user', 'App\Http\Controllers\UserController', ['except' => ['show']]);
@@ -37,15 +40,22 @@ Route::group(['middleware' => 'auth'], function () {
 });
 
 // Admin Routes
-Route::middleware(['auth', 'role:administrator', 'redirect.role'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    Route::get('/users', [AdminDashboardController::class, 'userManagement'])->name('admin.users.index');
-    Route::get('/orders', [AdminDashboardController::class, 'orders'])->name('admin.orders.index');
-    Route::get('/vendor-applications', [AdminDashboardController::class, 'vendorApplications'])->name('admin.vendors.applications');
-    Route::post('/vendor-applications/{id}/approve', [AdminDashboardController::class, 'approveVendorApplication'])->name('admin.vendors.approve');
-    Route::post('/vendor-applications/{id}/reject', [AdminDashboardController::class, 'rejectVendorApplication'])->name('admin.vendors.reject');
-    Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('admin.analytics');
-    Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'getAdminNotifications'])->name('admin.notifications');
+Route::middleware(['auth', 'role:administrator', 'redirect.role'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/users', [AdminDashboardController::class, 'userManagement'])->name('users.index');
+    Route::get('/orders', [AdminDashboardController::class, 'orders'])->name('orders.index');
+    Route::get('/vendor-applications', [AdminDashboardController::class, 'vendorApplications'])->name('vendors.applications');
+    Route::post('/vendor-applications/{id}/approve', [AdminDashboardController::class, 'approveVendorApplication'])->name('vendors.approve');
+    Route::post('/vendor-applications/{id}/reject', [AdminDashboardController::class, 'rejectVendorApplication'])->name('vendors.reject');
+    Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('analytics');
+    Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'getAdminNotifications'])->name('notifications');
+    Route::resource('tasks', App\Http\Controllers\Admin\TaskController::class);
+});
+
+// Admin Work Distribution Only
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    // Admin Work Distribution
+    Route::resource('work-distribution', App\Http\Controllers\Admin\WorkDistributionController::class)->only(['index', 'create', 'store']);
 });
 
 // Vendor Routes
@@ -118,7 +128,16 @@ Route::middleware(['auth', 'role:retailer', 'redirect.role'])->prefix('retailer'
     Route::get('/reports', [RetailerDashboardController::class, 'reports'])->name('retailer.reports.index');
 });
 
+Route::get('/test-report-view', function() {
+    return 'Route works!';
+});
+
+Route::get('/test-view', function() {
+    return view('test');
+});
+
+// This must be last! Catch-all route
 Route::group(['middleware' => 'auth'], function () {
-	Route::get('{page}', ['as' => 'page.index', 'uses' => 'App\Http\Controllers\PageController@index']);
+	Route::get('{page}', ['as' => 'page.index', 'uses' => 'App\\Http\\Controllers\\PageController@index']);
 });
 

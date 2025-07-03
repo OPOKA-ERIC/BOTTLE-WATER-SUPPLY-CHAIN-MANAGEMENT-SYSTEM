@@ -12,7 +12,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Schedule the automatic task scheduler to run daily at midnight
+        $schedule->command('tasks:auto-schedule')->dailyAt('00:00');
     }
 
     /**

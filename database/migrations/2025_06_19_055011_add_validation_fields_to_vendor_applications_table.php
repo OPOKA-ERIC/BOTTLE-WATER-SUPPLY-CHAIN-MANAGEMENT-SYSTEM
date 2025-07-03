@@ -53,9 +53,7 @@ return new class extends Migration
             $table->decimal('compliance_score', 5, 2)->nullable();
             $table->decimal('overall_score', 5, 2)->nullable();
             
-            // Reviewer Information
-            $table->foreignId('reviewed_by')->nullable()->constrained('users')->onDelete('set null');
-            $table->timestamp('reviewed_at')->nullable();
+            // Note: reviewed_by and reviewed_at columns already exist in the table
         });
     }
 
@@ -65,8 +63,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('vendor_applications', function (Blueprint $table) {
-            // Drop all added columns
-            $table->dropForeign(['reviewed_by']);
+            // Drop all added columns (excluding reviewed_by and reviewed_at which already exist)
             $table->dropColumn([
                 'annual_revenue', 'net_worth', 'years_in_business', 'credit_rating',
                 'has_bankruptcy', 'has_tax_liens', 'average_rating', 'total_reviews',
@@ -76,7 +73,7 @@ return new class extends Migration
                 'has_safety_certification', 'scheduled_visit_date', 'visit_status',
                 'visit_notes', 'visit_passed', 'pdf_document_path', 'submitted_at',
                 'validated_at', 'financial_score', 'reputation_score', 'compliance_score',
-                'overall_score', 'reviewed_by', 'reviewed_at'
+                'overall_score'
             ]);
         });
     }
