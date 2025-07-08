@@ -1,10 +1,8 @@
 @extends('layouts/app', ['activePage' => 'welcome', 'title' => 'BWSCMS Management System'])
 
 @section('content')
-    <div class="full-page section-image" data-color="blue" data-image="{{asset('light-bootstrap/img/full-screen-image-2.jpg')}}">
-        <!-- Overlay for better text readability -->
-        <div class="overlay" style="background: linear-gradient(135deg, rgba(25, 118, 210, 0.8) 0%, rgba(13, 71, 161, 0.9) 100%);"></div>
-        
+    <div class="full-page section-image" data-image="https://media.istockphoto.com/id/681814098/photo/beautiful-water-bottle-with-spray-on-background.jpg?s=1024x1024&w=is&k=20&c=GxkbN1WrDi16xev3bPZgqEQRaEMropNS5lh1M6qYpB4=">
+        <!-- Content without overlay for clean image display -->
         <div class="content position-relative">
             <div class="container">
                 <!-- Hero Section -->
@@ -18,15 +16,23 @@
                         </div>
                         
                         <h1 class="text-white display-3 mb-4 font-weight-bold" style="text-shadow: 0 2px 4px rgba(0,0,0,0.3); letter-spacing: -1px;">
-                            BWSCMS
-                            <span class="d-block text-primary" style="color: #64b5f6 !important;">Management System</span>
+                            Bottle Water Supply Chain
+                            <span class="d-block text-white" style="color: #ffffff !important;">Management System</span>
                         </h1>
                         
                         <p class="text-white lead mb-5" style="font-size: 1.25rem; opacity: 0.9; max-width: 600px; margin: 0 auto; line-height: 1.6;">
                             Streamline your water bottle supply chain with our comprehensive, intelligent management system designed for modern businesses
                         </p>
                         
-                       
+                        <!-- Login/Register Buttons -->
+                        <div class="mb-5">
+                            <a href="{{ route('login') }}" class="btn btn-primary btn-lg mr-3" style="background: linear-gradient(45deg, #FF6B6B, #FF8E53); border: none; padding: 12px 30px; border-radius: 25px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3); transition: all 0.3s ease;">
+                                <i class="nc-icon nc-mobile mr-2"></i> Login
+                            </a>
+                            <a href="{{ route('register') }}" class="btn btn-outline-light btn-lg" style="border: 2px solid rgba(255, 255, 255, 0.8); padding: 12px 30px; border-radius: 25px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease;">
+                                <i class="nc-icon nc-badge mr-2"></i> Register
+                            </a>
+                        </div>
                     </div>
                 </div>
 
@@ -200,8 +206,9 @@
         }
         
         .btn-outline-light:hover {
-            background: rgba(255, 255, 255, 0.1);
             transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.2) !important;
+            border-color: rgba(255, 255, 255, 1) !important;
         }
         
         .hero-icon {

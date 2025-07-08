@@ -23,6 +23,11 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
+// Simple test route to verify routing works
+Route::get('/test-hello', function() {
+    return 'Hello, world!';
+});
+
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
@@ -34,6 +39,7 @@ Route::get('/test', function () {
     return 'Test route is working!';
 });
 
+// Authentication Routes
 Auth::routes();
 
 // Restore GET logout route for compatibility with old behavior
@@ -60,9 +66,6 @@ Route::middleware(['auth', 'role:administrator', 'redirect.role'])->prefix('admi
     Route::post('/vendor-applications/{id}/approve', [AdminDashboardController::class, 'approveVendorApplication'])->name('admin.vendors.approve');
     Route::post('/vendor-applications/{id}/reject', [AdminDashboardController::class, 'rejectVendorApplication'])->name('admin.vendors.reject');
     Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('admin.analytics');
-    Route::get('/analytics/demand-forecast', [AdminDashboardController::class, 'demandForecast'])->name('admin.analytics.demand-forecast');
-    Route::get('/analytics/customer-segmentation', [AdminDashboardController::class, 'customerSegmentation'])->name('admin.analytics.customer-segmentation');
-    Route::get('/analytics/customer-segmentation/summary', [App\Http\Controllers\Admin\DashboardController::class, 'customerSegmentationAnalysis'])->name('admin.analytics.customer-segmentation.summary');
     Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'getAdminNotifications'])->name('admin.notifications');
 });
 
@@ -208,8 +211,17 @@ Route::middleware(['auth', 'role:retailer', 'redirect.role'])->prefix('retailer'
     Route::delete('/notifications/clear-all', [App\Http\Controllers\NotificationController::class, 'clearAll']);
 });
 
+Route::get('/test-report-view', function() {
+    return 'Route works!';
+});
+
+Route::get('/test-view', function() {
+    return view('test');
+});
+
+// This must be last! Catch-all route
 Route::group(['middleware' => 'auth'], function () {
-	Route::get('{page}', ['as' => 'page.index', 'uses' => 'App\Http\Controllers\PageController@index']);
+	Route::get('{page}', ['as' => 'page.index', 'uses' => 'App\\Http\\Controllers\\PageController@index']);
 });
 
 // Test route for debugging production batch creation

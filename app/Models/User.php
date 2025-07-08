@@ -25,6 +25,8 @@ class User extends Authenticatable
         'status',
         'phone',
         'address',
+        'skills',
+        'is_available',
     ];
 
     /**
@@ -45,6 +47,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'skills' => 'array',
+        'is_available' => 'boolean',
     ];
 
     public function isAdmin()
@@ -92,5 +96,68 @@ class User extends Authenticatable
     public function readNotifications()
     {
         return $this->notifications()->read();
+    }
+
+    // Task Management Relationships
+    public function assignedTasks()
+    {
+        return $this->hasMany(Task::class, 'assigned_to');
+    }
+
+    public function createdTasks()
+    {
+        return $this->hasMany(Task::class, 'assigned_by');
+    }
+
+    public function taskComments()
+    {
+        return $this->hasMany(TaskComment::class);
+    }
+
+    public function taskTimeLogs()
+    {
+        return $this->hasMany(TaskTimeLog::class);
+    }
+
+    public function tasksAssigned()
+    {
+        return $this->hasMany(Task::class, 'assigned_to');
+    }
+
+    // Task Management Methods
+    public function getActiveTasksCount()
+    {
+        return $this->assignedTasks()
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->count();
+    }
+
+    public function getOverdueTasksCount()
+    {
+        return $this->assignedTasks()
+            ->where('due_date', '<', now())
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->count();
+    }
+
+    public function getTodayTasksCount()
+    {
+        return $this->assignedTasks()
+            ->whereDate('due_date', today())
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->count();
+    }
+
+    public function getWorkloadPercentage()
+    {
+        $totalTasks = $this->assignedTasks()
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->count();
+        
+        $inProgressTasks = $this->assignedTasks()
+            ->where('status', 'in_progress')
+            ->count();
+        
+        return $totalTasks > 0 ? ($inProgressTasks / $totalTasks) * 100 : 0;
     }
 }

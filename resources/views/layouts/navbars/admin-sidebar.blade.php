@@ -31,6 +31,7 @@
                     </a>
                 </li>
 
+<<<<<<< HEAD
                 <!-- User Management -->
                 <li class="nav-item @if($activePage == 'user-management') active @endif">
                     <a class="nav-link" href="{{route('admin.users.index')}}">
@@ -42,6 +43,78 @@
                                 <span class="nav-subtitle">Manage users</span>
                             </div>
                             <div class="nav-indicator"></div>
+=======
+                <!-- Task Management -->
+                <li class="nav-item @if($activePage == 'work-distribution') active @endif">
+                    <a class="nav-link" href="{{ route('admin.work-distribution.index') }}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-briefcase-24"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">{{ __("Work Distribution") }}</span>
+                            <span class="nav-subtitle">Manage work assignments</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
+
+                <!-- Task Scheduling -->
+                <li class="nav-item @if($activePage == 'task-scheduling') active @endif">
+                    <a class="nav-link" href="{{ route('admin.tasks.index') }}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-calendar-60"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">{{ __("Task Scheduling") }}</span>
+                            <span class="nav-subtitle">Schedule and track tasks</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
+
+                <!-- Quick Actions -->
+                <li class="nav-section">
+                    <span class="nav-section-title">Quick Actions</span>
+                </li>
+                <!-- Notifications -->
+                <li class="nav-item @if($activePage == 'notifications') active @endif">
+                    <a class="nav-link" href="{{ route('admin.notifications') }}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-bell-55"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">{{ __("Notifications") }}</span>
+                            <span class="nav-subtitle">System alerts</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
+                <!-- Task Reports -->
+                <li class="nav-item @if($activePage == 'task-reports') active @endif">
+                    <a class="nav-link" href="{{ route('admin.tasks.reports') }}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-chart-bar-32"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">{{ __("Task Reports") }}</span>
+                            <span class="nav-subtitle">View task analytics</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
+
+                <!-- Analytics -->
+                <li class="nav-item @if($activePage == 'analytics') active @endif">
+                    <a class="nav-link" href="{{ route('admin.analytics') }}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-chart-bar-32"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">{{ __("Analytics") }}</span>
+                            <span class="nav-subtitle">Data insights</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+>>>>>>> 7f70518c631fbc42ad89ee760eefde5382a63c08
                     </a>
                 </li>
 
@@ -59,6 +132,7 @@
                         </a>
                     </li>
 
+<<<<<<< HEAD
                 <!-- Demand Forecast -->
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('admin.analytics.demand-forecast') }}">
@@ -75,9 +149,27 @@
                     </a>
                 </li>
             </ul>
+=======
+            <!-- Dashboard -->
+            <li class="nav-item @if($activePage == 'dashboard') active @endif">
+                <a class="nav-link" href="{{route('dashboard')}}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-chart-pie-35"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">{{ __("Dashboard") }}</span>
+                            <span class="nav-subtitle">Main dashboard</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                </a>
+            </li>
+        </ul>
+>>>>>>> 7f70518c631fbc42ad89ee760eefde5382a63c08
         </div>
     </div>
-</div> 
+</div>
+
+<div style="color: blue; font-weight: bold;">TEST: admin-sidebar.blade.php</div>
 
 <style>
 .admin-sidebar {

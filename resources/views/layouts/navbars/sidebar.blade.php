@@ -32,6 +32,7 @@
                     </li>
                 @endif
 
+<<<<<<< HEAD
                 <!-- Main Dashboard -->
                 <li class="nav-item @if($activePage == 'dashboard') active @endif">
                     <a class="nav-link" href="@if(Auth::user() && Auth::user()->role == 'administrator'){{ route('admin.dashboard') }}@elseif(Auth::user() && Auth::user()->role == 'manufacturer'){{ route('manufacturer.dashboard') }}@elseif(Auth::user() && Auth::user()->role == 'supplier'){{ route('supplier.dashboard') }}@elseif(Auth::user() && Auth::user()->role == 'retailer'){{ route('retailer.dashboard') }}@else#@endif">
@@ -45,6 +46,67 @@
                         <div class="nav-indicator"></div>
                     </a>
                 </li>
+=======
+                @if(auth()->check() && auth()->user()->role === 'vendor')
+                    <li class="nav-item @if($activePage == 'dashboard') active @endif">
+                        <a class="nav-link" href="{{route('dashboard')}}">
+                            <div class="nav-icon">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-title">{{ __("Vendor Dashboard") }}</span>
+                                <span class="nav-subtitle">Vendor overview</span>
+                            </div>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                @endif
+
+                @if(auth()->check() && auth()->user()->role === 'supplier')
+                    <li class="nav-item @if($activePage == 'dashboard') active @endif">
+                        <a class="nav-link" href="{{route('dashboard')}}">
+                            <div class="nav-icon">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-title">{{ __("Supplier Dashboard") }}</span>
+                                <span class="nav-subtitle">Supplier overview</span>
+                            </div>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                @endif
+
+                @if(auth()->check() && auth()->user()->role === 'manufacturer')
+                    <li class="nav-item @if($activePage == 'dashboard') active @endif">
+                        <a class="nav-link" href="{{route('manufacturer.dashboard')}}">
+                            <div class="nav-icon">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-title">{{ __("Manufacturer Dashboard") }}</span>
+                                <span class="nav-subtitle">Manufacturer overview</span>
+                            </div>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                @endif
+
+                @if(auth()->check() && auth()->user()->role === 'retailer')
+                    <li class="nav-item @if($activePage == 'dashboard') active @endif">
+                        <a class="nav-link" href="{{route('retailer.dashboard')}}">
+                            <div class="nav-icon">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-title">{{ __("Retailer Dashboard") }}</span>
+                                <span class="nav-subtitle">Retailer overview</span>
+                            </div>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                @endif
+>>>>>>> 7f70518c631fbc42ad89ee760eefde5382a63c08
 
                 <!-- Section Divider -->
                 <li class="nav-divider">
@@ -53,6 +115,36 @@
 
                 <!-- Additional Admin Menu Items -->
                 @if(auth()->check() && auth()->user()->role === 'admin')
+                    <!-- Quick Actions Section -->
+                    <li class="nav-section">
+                        <span class="nav-section-title">Quick Actions</span>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('admin.notifications') }}">
+                            <div class="nav-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-title">Notifications</span>
+                                <span class="nav-subtitle">System alerts</span>
+                            </div>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('admin.tasks.reports') }}">
+                            <div class="nav-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-title">Task Reports</span>
+                                <span class="nav-subtitle">View task analytics</span>
+                            </div>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('admin.vendors.applications') }}">
                             <div class="nav-icon">
@@ -79,6 +171,74 @@
                         </a>
                     </li>
                 @endif
+                @if(auth()->check() && auth()->user()->role === 'vendor')
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('reports') }}">
+                            <div class="nav-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-title">Reports</span>
+                                <span class="nav-subtitle">Vendor reports</span>
+                            </div>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                @endif
+                @if(auth()->check() && auth()->user()->role === 'supplier')
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('supplier.notifications') }}">
+                            <div class="nav-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-title">Notifications</span>
+                                <span class="nav-subtitle">Supplier alerts</span>
+                            </div>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                @endif
+                @if(auth()->check() && auth()->user()->role === 'manufacturer')
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('manufacturer.notifications') }}">
+                            <div class="nav-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-title">Notifications</span>
+                                <span class="nav-subtitle">Manufacturer alerts</span>
+                            </div>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('manufacturer.analytics') }}">
+                            <div class="nav-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-title">Analytics</span>
+                                <span class="nav-subtitle">Production analytics</span>
+                            </div>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                @endif
+                @if(auth()->check() && auth()->user()->role === 'retailer')
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('retailer.reports.index') }}">
+                            <div class="nav-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-title">Reports</span>
+                                <span class="nav-subtitle">Retailer reports</span>
+                            </div>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
+                @endif
             </ul>
         </nav>
 
@@ -89,6 +249,8 @@
         {{-- Logout/Sign out removed --}}
     </div>
 </div>
+
+<div style="color: green; font-weight: bold;">TEST: sidebar.blade.php</div>
 
 <style>
 /* Modern Sidebar Styles */

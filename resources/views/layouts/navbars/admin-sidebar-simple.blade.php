@@ -13,6 +13,8 @@
                 </div>
             </div>
         </div>
+        <div style="color: red; font-weight: bold;">TEST: admin-sidebar-simple.blade.php</div>
+        <div style="color: orange; font-weight: bold;">TEST: admin-sidebar-simple.blade.php - QUICK ACTIONS SHOULD BE VISIBLE</div>
 
         <!-- Navigation Menu -->
         <div class="sidebar-nav">
@@ -54,6 +56,50 @@
                         <div class="nav-content">
                             <span class="nav-title">{{ __("Vendor Applications") }}</span>
                             <span class="nav-subtitle">Review applications</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
+
+                <!-- Task Scheduling -->
+                <li class="nav-item @if($activePage == 'task-scheduling') active @endif">
+                    <a class="nav-link" href="{{ route('admin.tasks.index') }}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-calendar-60"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">{{ __("Task Scheduling") }}</span>
+                            <span class="nav-subtitle">Schedule and track tasks</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
+                <!-- Quick Actions -->
+                <li class="nav-section">
+                    <span class="nav-section-title">Quick Actions</span>
+                </li>
+                <!-- Notifications -->
+                <li class="nav-item @if($activePage == 'notifications') active @endif">
+                    <a class="nav-link" href="{{ route('admin.notifications') }}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-bell-55"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">{{ __("Notifications") }}</span>
+                            <span class="nav-subtitle">System alerts</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
+                <!-- Task Reports -->
+                <li class="nav-item @if($activePage == 'task-reports') active @endif">
+                    <a class="nav-link" href="{{ route('admin.tasks.reports') }}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-chart-bar-32"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">{{ __("Task Reports") }}</span>
+                            <span class="nav-subtitle">View task analytics</span>
                         </div>
                         <div class="nav-indicator"></div>
                     </a>
