@@ -18,107 +18,63 @@
         <div class="sidebar-nav">
             <ul class="nav-menu">
                 <!-- Dashboard Overview -->
-            <li class="nav-item @if($activePage == 'dashboard-overview') active @endif">
-                <a class="nav-link" href="{{route('admin.dashboard')}}">
-                        <div class="nav-icon">
-                    <i class="nc-icon nc-chart-pie-35"></i>
-                        </div>
-                        <div class="nav-content">
-                            <span class="nav-title">{{ __("Dashboard Overview") }}</span>
-                            <span class="nav-subtitle">System overview</span>
-                        </div>
-                        <div class="nav-indicator"></div>
-                </a>
-            </li>
-
-            <!-- User Management -->
-            <li class="nav-item @if($activePage == 'user-management') active @endif">
-                <a class="nav-link" href="{{route('admin.users.index')}}">
-                        <div class="nav-icon">
-                    <i class="nc-icon nc-circle-09"></i>
-                        </div>
-                        <div class="nav-content">
-                            <span class="nav-title">{{ __("User Management") }}</span>
-                            <span class="nav-subtitle">Manage users</span>
-                        </div>
-                        <div class="nav-indicator"></div>
-                </a>
-            </li>
-
-            <!-- Vendor Applications -->
-            <li class="nav-item @if($activePage == 'vendor-applications') active @endif">
-                <a class="nav-link" href="{{route('admin.vendors.applications')}}">
-                        <div class="nav-icon">
-                    <i class="nc-icon nc-paper"></i>
-                        </div>
-                        <div class="nav-content">
-                            <span class="nav-title">{{ __("Vendor Applications") }}</span>
-                            <span class="nav-subtitle">Review applications</span>
-                        </div>
-                        <div class="nav-indicator"></div>
+                <li class="nav-item @if($activePage == 'dashboard-overview') active @endif">
+                    <a class="nav-link" href="{{route('admin.dashboard')}}">
+                            <div class="nav-icon">
+                        <i class="nc-icon nc-chart-pie-35"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-title">{{ __("Dashboard Overview") }}</span>
+                                <span class="nav-subtitle">System overview</span>
+                            </div>
+                            <div class="nav-indicator"></div>
                     </a>
                 </li>
 
-                <!-- Analytics -->
-                <li class="nav-item @if($activePage == 'analytics') active @endif">
-                    <a class="nav-link" href="{{ route('admin.analytics') }}">
-                        <div class="nav-icon">
-                            <i class="nc-icon nc-chart-bar-32"></i>
-                        </div>
-                        <div class="nav-content">
-                            <span class="nav-title">{{ __("Analytics") }}</span>
-                            <span class="nav-subtitle">Data insights</span>
-                        </div>
-                        <div class="nav-indicator"></div>
+                <!-- User Management -->
+                <li class="nav-item @if($activePage == 'user-management') active @endif">
+                    <a class="nav-link" href="{{route('admin.users.index')}}">
+                            <div class="nav-icon">
+                        <i class="nc-icon nc-circle-09"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-title">{{ __("User Management") }}</span>
+                                <span class="nav-subtitle">Manage users</span>
+                            </div>
+                            <div class="nav-indicator"></div>
                     </a>
                 </li>
 
-                <!-- Settings -->
-                <li class="nav-item @if($activePage == 'settings') active @endif">
-                    <a class="nav-link" href="#">
-                        <div class="nav-icon">
-                            <i class="nc-icon nc-settings-gear-64"></i>
-                        </div>
-                        <div class="nav-content">
-                            <span class="nav-title">{{ __("Settings") }}</span>
-                            <span class="nav-subtitle">System configuration</span>
-                        </div>
-                        <div class="nav-indicator"></div>
-                </a>
-            </li>
+                <!-- Vendor Applications -->
+                <li class="nav-item @if($activePage == 'vendor-applications') active @endif">
+                    <a class="nav-link" href="{{route('admin.vendors.applications')}}">
+                            <div class="nav-icon">
+                        <i class="nc-icon nc-paper"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-title">{{ __("Vendor Applications") }}</span>
+                                <span class="nav-subtitle">Review applications</span>
+                            </div>
+                            <div class="nav-indicator"></div>
+                        </a>
+                    </li>
 
-            <!-- Dashboard -->
-            <li class="nav-item @if($activePage == 'dashboard') active @endif">
-                <a class="nav-link" href="{{route('dashboard')}}">
-                        <div class="nav-icon">
-                            <i class="nc-icon nc-chart-pie-35"></i>
-                        </div>
-                        <div class="nav-content">
-                            <span class="nav-title">{{ __("Dashboard") }}</span>
-                            <span class="nav-subtitle">Main dashboard</span>
-                        </div>
-                        <div class="nav-indicator"></div>
-                </a>
-            </li>
+                <!-- Demand Forecast -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.analytics.demand-forecast') }}">
+                        <i class="nc-icon nc-chart-bar-32"></i>
+                        <p>Demand Forecast</p>
+                    </a>
+                </li>
 
-            
-
-            <!-- Notifications -->
-            <li class="nav-item @if($activePage == 'notifications') active @endif">
-                <a class="nav-link" href="{{route('page.index', 'notifications')}}">
-                        <div class="nav-icon">
-                    <i class="nc-icon nc-bell-55"></i>
-                        </div>
-                        <div class="nav-content">
-                            <span class="nav-title">{{ __("Notifications") }}</span>
-                            <span class="nav-subtitle">System alerts</span>
-                        </div>
-                        <div class="nav-indicator"></div>
-                </a>
-            </li>
-
-            
-        </ul>
+                <!-- Customer Segmentation -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('admin.analytics.customer-segmentation') }}">
+                        <i class="nc-icon nc-single-02"></i>
+                        <p>Customer Segmentation</p>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 </div> 

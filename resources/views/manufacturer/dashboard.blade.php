@@ -195,15 +195,6 @@
                                     <span class="action-subtitle">Update stock levels</span>
                                 </div>
                             </a>
-                            <a href="{{ route('page.index', 'notifications') }}" class="quick-action-btn">
-                                <div class="action-icon">
-                                    <i class="nc-icon nc-bell-55"></i>
-                                </div>
-                                <div class="action-content">
-                                    <span class="action-title">View Notifications</span>
-                                    <span class="action-subtitle">Check system alerts</span>
-                                </div>
-                            </a>
                         </div>
                     </div>
                 </div>

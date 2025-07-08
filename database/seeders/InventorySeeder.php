@@ -22,6 +22,10 @@ class InventorySeeder extends Seeder
                 Inventory::create([
                     'manufacturer_id' => $manufacturer->id,
                     'product_id' => $product->id,
+                    'current_stock' => rand(100, 1000),
+                    'minimum_stock' => rand(50, 200),
+                    'unit' => 'pieces',
+                    'notes' => 'Initial inventory setup',
                     'quantity' => rand(100, 1000),
                     'expiry_date' => now()->addMonths(6),
                     'status' => 'available'

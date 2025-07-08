@@ -22,6 +22,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <title>{{ $title ?? 'BWSCMS - Bottle Water Supply Chain Management System' }}</title>
         <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <!--     Fonts and icons     -->
         <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet" />
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
@@ -60,19 +61,16 @@
             }
 
             /* Fix scrollbar overlap issues */
-            body {
-                overflow-x: hidden;
+            body, html {
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+                height: auto !important;
             }
 
-            .main-panel {
-                box-sizing: border-box;
-                overflow-x: hidden;
-            }
-
-            /* Ensure content doesn't get cut off by scrollbar */
-            .content {
-                padding-right: 0;
-                box-sizing: border-box;
+            .main-panel, .content {
+                overflow: visible !important;
+                height: auto !important;
+                max-height: none !important;
             }
 
             /* Fix for fixed elements */
@@ -88,8 +86,8 @@
         <div class="wrapper @if (!auth()->check() || request()->route()->getName() == "") wrapper-full-page @endif">
 
             @if (auth()->check() && request()->route()->getName() != "")
-                @if(auth()->user()->role === 'admin')
-                    @include('layouts.navbars.admin-sidebar-simple')
+                @if(auth()->user()->role === 'administrator')
+                    @include('layouts.navbars.admin-sidebar')
                 @elseif(auth()->user()->role === 'manufacturer')
                     @include('layouts.navbars.manufacturer-sidebar')
                 @elseif(auth()->user()->role === 'supplier')
@@ -112,19 +110,17 @@
 
         </div>
        
-
-
+        <!-- Ensure jQuery is loaded before any custom scripts -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        @stack('js')
     </body>
         <!--   Core JS Files   -->
-    <script src="{{ asset('light-bootstrap/js/core/jquery.3.2.1.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('light-bootstrap/js/core/popper.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('light-bootstrap/js/core/bootstrap.min.js') }}" type="text/javascript"></script>
 
     <script src="{{ asset('light-bootstrap/js/plugins/jquery.sharrre.js') }}"></script>
     <!--  Plugin for Switches, full documentation here: http://www.jque.re/plugins/version3/bootstrap.switch/ -->
     <script src="{{ asset('light-bootstrap/js/plugins/bootstrap-switch.js') }}"></script>
-    <!--  Google Maps Plugin    -->
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
     <!--  Chartist Plugin  -->
     <script src="{{ asset('light-bootstrap/js/plugins/chartist.min.js') }}"></script>
     <!--  Notifications Plugin    -->
@@ -133,7 +129,6 @@
     <script src="{{ asset('light-bootstrap/js/light-bootstrap-dashboard.js?v=2.0.0') }}" type="text/javascript"></script>
     <!-- Light Bootstrap Dashboard DEMO methods, don't include it in your project! -->
     <script src="{{ asset('light-bootstrap/js/demo.js') }}"></script>
-    @stack('js')
     <script>
       $(document).ready(function () {
         

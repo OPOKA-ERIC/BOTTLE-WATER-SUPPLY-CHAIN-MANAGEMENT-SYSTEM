@@ -16,7 +16,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->integer('quantity_available');
             $table->string('unit_of_measure');
-            $table->string('category');
+            // $table->string('category'); // Removed: use 'name' only. See new migration for dropping this column.
             $table->string('status')->default('active');
             $table->string('image_path')->nullable();
             $table->timestamps();

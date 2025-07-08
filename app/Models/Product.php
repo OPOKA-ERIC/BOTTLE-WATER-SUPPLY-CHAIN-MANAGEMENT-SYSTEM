@@ -19,6 +19,11 @@ class Product extends Model
         return $this->belongsToMany(Order::class)->withPivot('quantity', 'price')->withTimestamps();
     }
 
+    public function inventory()
+    {
+        return $this->hasMany(Inventory::class);
+    }
+
     // Placeholder for customerSegments relationship
     public function customerSegments()
     {

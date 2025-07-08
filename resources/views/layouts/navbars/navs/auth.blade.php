@@ -46,13 +46,8 @@
                         <i class="nc-icon nc-single-02"></i>
                     </div>
                     <div class="user-info">
-                        @if(auth()->user()->role === 'administrator')
-                        <span class="user-name">Administrator</span>
-                        <span class="user-role">System Admin</span>
-                        @else
                         <span class="user-name">{{ auth()->user()->name }}</span>
                         <span class="user-role">{{ ucfirst(auth()->user()->role) }}</span>
-                        @endif
                     </div>
                     <i class="nc-icon nc-minimal-down dropdown-arrow"></i>
         </button>
@@ -63,13 +58,8 @@
                                 <i class="nc-icon nc-single-02"></i>
                             </div>
                             <div class="profile-info">
-                                @if(auth()->user()->role === 'administrator')
-                                <div class="profile-name">Administrator</div>
-                                <div class="profile-email">admin@bwscms.com</div>
-                                @else
                                 <div class="profile-name">{{ auth()->user()->name }}</div>
                                 <div class="profile-email">{{ auth()->user()->email }}</div>
-                                @endif
                             </div>
                         </div>
                     </div>

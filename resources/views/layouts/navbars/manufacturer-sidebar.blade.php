@@ -59,6 +59,34 @@
                     </a>
                 </li>
 
+                <!-- Raw Material Orders -->
+                <li class="nav-item @if($activePage == 'raw-material-orders') active @endif">
+                    <a class="nav-link" href="{{route('manufacturer.raw-material-orders')}}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-cart-simple"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">{{ __("Raw Material Orders") }}</span>
+                            <span class="nav-subtitle">Order from suppliers</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
+
+                <!-- Orders -->
+                <li class="nav-item @if($activePage == 'orders') active @endif">
+                    <a class="nav-link" href="{{route('manufacturer.orders')}}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-cart-simple"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">{{ __("Orders") }}</span>
+                            <span class="nav-subtitle">Process & track orders</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
+
                 <!-- Analytics -->
                 <li class="nav-item @if($activePage == 'analytics') active @endif">
                     <a class="nav-link" href="{{route('manufacturer.analytics')}}">
@@ -68,20 +96,6 @@
                         <div class="nav-content">
                             <span class="nav-title">{{ __("Analytics") }}</span>
                             <span class="nav-subtitle">Reports & insights</span>
-                        </div>
-                        <div class="nav-indicator"></div>
-                    </a>
-                </li>
-
-                <!-- Settings -->
-                <li class="nav-item @if($activePage == 'settings') active @endif">
-                    <a class="nav-link" href="{{route('profile.edit')}}">
-                        <div class="nav-icon">
-                            <i class="nc-icon nc-settings-gear-65"></i>
-                        </div>
-                        <div class="nav-content">
-                            <span class="nav-title">{{ __("Settings") }}</span>
-                            <span class="nav-subtitle">Configuration</span>
                         </div>
                         <div class="nav-indicator"></div>
                     </a>
@@ -100,37 +114,21 @@
                         <div class="nav-indicator"></div>
                     </a>
                 </li>
+
+                <!-- Static Chat Page -->
+                <li class="nav-item @if($activePage == 'static-chat') active @endif">
+                    <a class="nav-link" href="/manufacturer/static-chat">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-chat-33"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">{{ __("Chat") }}</span>
+                            <span class="nav-subtitle">Raw materials</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
             </ul>
-        </div>
-
-        <!-- Sidebar Footer -->
-        <div class="sidebar-footer">
-            <!-- Logout Button -->
-            <div class="logout-section">
-                <form id="logout-form" action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="logout-btn">
-                        <div class="logout-icon">
-                            <i class="nc-icon nc-button-power"></i>
-                        </div>
-                        <div class="logout-content">
-                            <span class="logout-title">{{ __("Logout") }}</span>
-                            <span class="logout-subtitle">Sign out</span>
-                        </div>
-                    </button>
-                </form>
-            </div>
-
-            <!-- Manufacturer Info -->
-            <div class="manufacturer-info">
-                <div class="manufacturer-avatar">
-                    <i class="nc-icon nc-single-02"></i>
-                </div>
-                <div class="manufacturer-details">
-                    <span class="manufacturer-name">Manufacturer</span>
-                    <span class="manufacturer-role">Production Manager</span>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -317,122 +315,6 @@
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 
-/* Sidebar Footer */
-.sidebar-footer {
-    padding: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-}
-
-.logout-section {
-    margin-bottom: 20px;
-}
-
-.logout-btn {
-    width: 100%;
-    background: rgba(231, 76, 60, 0.1);
-    border: 1px solid rgba(231, 76, 60, 0.2);
-    border-radius: 12px;
-    padding: 15px 20px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    color: white;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.logout-btn:hover {
-    background: rgba(231, 76, 60, 0.2);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
-}
-
-.logout-icon {
-    width: 40px;
-    height: 40px;
-    background: rgba(231, 76, 60, 0.2);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.logout-icon i {
-    font-size: 18px;
-    color: white;
-}
-
-.logout-content {
-    flex: 1;
-    text-align: left;
-}
-
-.logout-title {
-    display: block;
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: white;
-    margin-bottom: 2px;
-}
-
-.logout-subtitle {
-    display: block;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 400;
-}
-
-/* Manufacturer Info */
-.manufacturer-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    backdrop-filter: blur(10px);
-}
-
-.manufacturer-avatar {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.manufacturer-avatar i {
-    font-size: 18px;
-    color: white;
-}
-
-.manufacturer-details {
-    flex: 1;
-    min-width: 0;
-}
-
-.manufacturer-name {
-    display: block;
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: white;
-    margin-bottom: 2px;
-}
-
-.manufacturer-role {
-    display: block;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.7);
-    font-weight: 400;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
     .manufacturer-sidebar {
@@ -459,10 +341,6 @@
     
     .nav-link {
         padding: 12px 15px;
-    }
-    
-    .sidebar-footer {
-        padding: 15px;
     }
 }
 </style> 

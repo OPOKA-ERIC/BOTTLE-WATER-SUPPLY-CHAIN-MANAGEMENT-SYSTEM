@@ -56,48 +56,9 @@
                         <div class="nav-indicator"></div>
                     </a>
                 </li>
-                <!-- Analytics -->
-                <li class="nav-item @if($activePage == 'analytics') active @endif">
-                    <a class="nav-link" href="#">
-                        <div class="nav-icon">
-                            <i class="nc-icon nc-chart-bar-32"></i>
-                        </div>
-                        <div class="nav-content">
-                            <span class="nav-title">{{ __("Analytics") }}</span>
-                            <span class="nav-subtitle">Data insights</span>
-                        </div>
-                        <div class="nav-indicator"></div>
-                    </a>
-                </li>
-                <!-- Settings -->
-                <li class="nav-item @if($activePage == 'settings') active @endif">
-                    <a class="nav-link" href="#">
-                        <div class="nav-icon">
-                            <i class="nc-icon nc-settings-gear-64"></i>
-                        </div>
-                        <div class="nav-content">
-                            <span class="nav-title">{{ __("Settings") }}</span>
-                            <span class="nav-subtitle">System configuration</span>
-                        </div>
-                        <div class="nav-indicator"></div>
-                    </a>
-                </li>
-                <!-- User Profile -->
-                <li class="nav-item @if($activePage == 'user') active @endif">
-                    <a class="nav-link" href="{{route('profile.edit')}}">
-                        <div class="nav-icon">
-                            <i class="nc-icon nc-single-02"></i>
-                        </div>
-                        <div class="nav-content">
-                            <span class="nav-title">{{ __("User Profile") }}</span>
-                            <span class="nav-subtitle">Your profile</span>
-                        </div>
-                        <div class="nav-indicator"></div>
-                    </a>
-                </li>
                 <!-- Notifications -->
                 <li class="nav-item @if($activePage == 'notifications') active @endif">
-                    <a class="nav-link" href="{{route('page.index', 'notifications')}}">
+                    <a class="nav-link" href="{{route('retailer.notifications')}}">
                         <div class="nav-icon">
                             <i class="nc-icon nc-bell-55"></i>
                         </div>
@@ -109,35 +70,6 @@
                     </a>
                 </li>
             </ul>
-        </div>
-
-        <!-- Sidebar Footer -->
-        <div class="sidebar-footer">
-            <!-- Logout Button -->
-            <div class="logout-section">
-                <form id="logout-form" action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="logout-btn">
-                        <div class="logout-icon">
-                            <i class="nc-icon nc-button-power"></i>
-                        </div>
-                        <div class="logout-content">
-                            <span class="logout-title">{{ __("Logout") }}</span>
-                            <span class="logout-subtitle">Sign out</span>
-                        </div>
-                    </button>
-                </form>
-            </div>
-            <!-- Retailer Info -->
-            <div class="admin-info retailer-info">
-                <div class="admin-avatar retailer-avatar">
-                    <i class="nc-icon nc-single-02"></i>
-                </div>
-                <div class="admin-details retailer-details">
-                    <span class="admin-name retailer-name">Retailer</span>
-                    <span class="admin-role retailer-role">Store Manager</span>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -317,116 +249,6 @@
 .nav-item.active .nav-indicator {
     background: white;
     height: 30px;
-}
-
-/* Footer Section */
-.sidebar-footer {
-    margin-top: auto;
-    padding: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Logout Section */
-.logout-section {
-    margin-bottom: 15px;
-}
-
-.logout-btn {
-    width: 100%;
-    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-    border: none;
-    border-radius: 12px;
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-}
-
-.logout-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
-    background: linear-gradient(135deg, #ff5252, #d32f2f);
-}
-
-.logout-icon {
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
-    color: white;
-}
-
-.logout-icon i {
-    font-size: 14px;
-}
-
-.logout-content {
-    flex: 1;
-    text-align: left;
-}
-
-.logout-title {
-    display: block;
-    color: white;
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 1.2;
-}
-
-.logout-subtitle {
-    display: block;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 11px;
-    line-height: 1.2;
-}
-
-/* Retailer Info */
-.admin-info.retailer-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.admin-avatar.retailer-avatar {
-    width: 36px;
-    height: 36px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 16px;
-}
-
-.admin-details.retailer-details {
-    flex: 1;
-}
-
-.admin-name.retailer-name {
-    display: block;
-    color: white;
-    font-weight: 600;
-    font-size: 13px;
-    line-height: 1.2;
-}
-
-.admin-role.retailer-role {
-    display: block;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 11px;
-    line-height: 1.2;
 }
 
 /* Responsive Design */

@@ -1,4 +1,4 @@
-@extends('layouts.app', ['activePage' => 'chats', 'title' => 'Chat Management'])
+@extends('layouts.app', ['activePage' => 'chat', 'title' => 'Chat with Manufacturers'])
 
 @section('content')
 <div class="content">
@@ -8,8 +8,8 @@
             <div class="col-12">
                 <div class="welcome-card">
                     <div class="welcome-content">
-                        <h1 class="welcome-title">Chat Management</h1>
-                        <p class="welcome-subtitle">Communicate with manufacturers, manage conversations, and stay connected</p>
+                        <h1 class="welcome-title">Chat with Manufacturers</h1>
+                        <p class="welcome-subtitle">Communicate about raw materials and orders</p>
                     </div>
                     <div class="welcome-icon">
                         <i class="nc-icon nc-chat-33"></i>
@@ -18,428 +18,217 @@
             </div>
         </div>
 
-        <!-- Statistics Cards -->
+        <!-- Chat Interface -->
         <div class="row">
-            <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                <div class="stats-card">
-                    <div class="stats-icon">
-                        <i class="nc-icon nc-chat-33"></i>
+            <!-- Manufacturers List -->
+            <div class="col-lg-4 col-md-5">
+                <div class="manufacturers-list-card">
+                    <div class="card-header">
+                        <h5 class="card-title">
+                            <i class="nc-icon nc-settings-gear-65"></i>
+                            Manufacturers
+                        </h5>
                     </div>
-                    <div class="stats-content">
-                        <h3 class="stats-number">{{ $chats->count() }}</h3>
-                        <p class="stats-label">Total Conversations</p>
-                        <div class="stats-footer">
-                            <i class="nc-icon nc-refresh-69"></i>
-                            <span>All time</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                <div class="stats-card">
-                    <div class="stats-icon">
-                        <i class="nc-icon nc-time-alarm"></i>
-                    </div>
-                    <div class="stats-content">
-                        <h3 class="stats-number">{{ $chats->where('is_read', false)->count() }}</h3>
-                        <p class="stats-label">Unread Messages</p>
-                        <div class="stats-footer">
-                            <i class="nc-icon nc-refresh-69"></i>
-                            <span>Need attention</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                <div class="stats-card">
-                    <div class="stats-icon">
-                        <i class="nc-icon nc-check-2"></i>
-                    </div>
-                    <div class="stats-content">
-                        <h3 class="stats-number">{{ $chats->where('is_read', true)->count() }}</h3>
-                        <p class="stats-label">Read Messages</p>
-                        <div class="stats-footer">
-                            <i class="nc-icon nc-refresh-69"></i>
-                            <span>Already viewed</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                <div class="stats-card">
-                    <div class="stats-icon">
-                        <i class="nc-icon nc-single-02"></i>
-                    </div>
-                    <div class="stats-content">
-                        <h3 class="stats-number">{{ $chats->unique('manufacturer_id')->count() }}</h3>
-                        <p class="stats-label">Active Manufacturers</p>
-                        <div class="stats-footer">
-                            <i class="nc-icon nc-refresh-69"></i>
-                            <span>In conversations</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chat Conversations -->
-    <div class="row">
-        <div class="col-md-12">
-                <div class="content-card">
-                <div class="card-header">
-                        <div class="header-content">
-                    <h4 class="card-title">Chat Conversations</h4>
-                            <p class="card-subtitle">Manage your conversations with manufacturers and track message status</p>
-                        </div>
-                        <div class="header-actions">
-                            <button class="action-btn primary" data-toggle="modal" data-target="#newChatModal">
-                                <i class="nc-icon nc-simple-add"></i>
-                                <span>New Chat</span>
-                            </button>
-                            <div class="header-icon">
-                                <i class="nc-icon nc-chat-33"></i>
+                    <div class="manufacturers-list" id="manufacturersList">
+                        @forelse($manufacturersWithChats as $chatData)
+                            @php
+                                $manufacturer = $chatData['manufacturer'];
+                                $unreadCount = $chatData['unreadCount'];
+                                $recentMessage = $chatData['recentMessage'];
+                                $totalMessages = $chatData['totalMessages'];
+                            @endphp
+                            <div class="manufacturer-item" onclick="openChat({{ $manufacturer->id }}, '{{ $manufacturer->name }}')">
+                                <div class="manufacturer-avatar">
+                                    <i class="nc-icon nc-settings-gear-65"></i>
+                                </div>
+                                <div class="manufacturer-info">
+                                    <div class="manufacturer-header">
+                                        <span class="manufacturer-name">{{ $manufacturer->name }}</span>
+                                        @if($unreadCount > 0)
+                                            <span class="unread-badge">{{ $unreadCount }}</span>
+                                        @endif
+                                    </div>
+                                    <span class="manufacturer-email">{{ $manufacturer->email }}</span>
+                                    @if($recentMessage)
+                                        <span class="last-message">{{ Str::limit($recentMessage->message, 50) }}</span>
+                                        <span class="message-time">{{ $recentMessage->created_at->diffForHumans() }}</span>
+                                    @else
+                                        <span class="no-messages">No messages yet</span>
+                                    @endif
+                                </div>
                             </div>
-                        </div>
+                        @empty
+                            <div class="no-manufacturers">
+                                <i class="nc-icon nc-settings-gear-65"></i>
+                                <p>No manufacturers available</p>
+                            </div>
+                        @endforelse
+                    </div>
                 </div>
-                <div class="card-body">
-                    @if($chats->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Manufacturer</th>
-                                        <th>Last Message</th>
-                                        <th>Status</th>
-                                        <th>Last Updated</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($chats as $chat)
-                                        <tr>
-                                            <td>
-                                                    <div class="manufacturer-info">
-                                                        <div class="avatar">
-                                                            <span class="avatar-text">
-                                                            {{ substr($chat->manufacturer->name ?? 'N/A', 0, 1) }}
-                                                        </span>
-                                                    </div>
-                                                        <div class="manufacturer-details">
-                                                            <span class="manufacturer-name">{{ $chat->manufacturer->name ?? 'N/A' }}</span>
-                                                            <span class="manufacturer-email">{{ $chat->manufacturer->email ?? 'N/A' }}</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                    <div class="message-preview">
-                                                        <span class="message-text">{{ Str::limit($chat->message, 50) }}</span>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                    <span class="status-badge status-{{ $chat->is_read ? 'read' : 'unread' }}">
-                                                        <i class="nc-icon {{ $chat->is_read ? 'nc-check-2' : 'nc-time-alarm' }}"></i>
-                                                        {{ $chat->is_read ? 'Read' : 'Unread' }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span class="date-label">{{ $chat->updated_at->format('M d, Y H:i') }}</span>
-                                            </td>
-                                            <td>
-                                                    <a href="{{ route('supplier.chats.show', $chat->id) }}" class="action-btn primary">
-                                                        <i class="nc-icon nc-zoom-split-in"></i>
-                                                        <span>View</span>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <!-- Pagination -->
-                            <div class="pagination-section">
-                            {{ $chats->links() }}
-                        </div>
-                    @else
-                            <div class="empty-state">
-                                <div class="empty-icon">
+            </div>
+
+            <!-- Chat Area -->
+            <div class="col-lg-8 col-md-7">
+                <div class="chat-area-card">
+                    <div class="card-body">
+                        <!-- Welcome Message -->
+                        <div id="welcomeMessage" class="welcome-chat">
+                            <div class="welcome-chat-content">
+                                <div class="welcome-chat-icon">
                                     <i class="nc-icon nc-chat-33"></i>
                                 </div>
-                                <h5 class="empty-title">No Chat Conversations</h5>
-                                <p class="empty-subtitle">You don't have any chat conversations with manufacturers yet</p>
-                                <div class="empty-actions">
-                                    <button class="action-btn primary" data-toggle="modal" data-target="#newChatModal">
-                                        <i class="nc-icon nc-simple-add"></i>
-                                        <span>Start New Conversation</span>
-                            </button>
+                                <h3 class="welcome-chat-title">Welcome to Chat</h3>
+                                <p class="welcome-chat-subtitle">Select a manufacturer from the list to start communicating about raw materials, orders, and other business matters.</p>
+                                <div class="welcome-chat-features">
+                                    <div class="feature-item">
+                                        <i class="nc-icon nc-single-copy-04"></i>
+                                        <span>Send text messages</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="nc-icon nc-image"></i>
+                                        <span>Share images and files</span>
+                                    </div>
+                                    <div class="feature-item">
+                                        <i class="nc-icon nc-time-alarm"></i>
+                                        <span>Real-time updates</span>
+                                    </div>
                                 </div>
+                            </div>
                         </div>
-                    @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- New Chat Modal -->
-<div class="modal fade" id="newChatModal" tabindex="-1" role="dialog" aria-labelledby="newChatModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="newChatModalLabel">
-                    <i class="nc-icon nc-chat-33"></i>
-                    Start New Conversation
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                        <!-- Active Chat (Hidden by default) -->
+                        <div id="activeChat" class="active-chat" style="display: none;">
+                            <!-- Chat Header -->
+                            <div class="chat-header">
+                                <div class="chat-user-info">
+                                    <div class="chat-user-avatar">
+                                        <i class="nc-icon nc-settings-gear-65"></i>
+                                    </div>
+                                    <div class="chat-user-details">
+                                        <h5 class="chat-user-name" id="chatUserName">Manufacturer Name</h5>
+                                        <span class="chat-user-status">Online</span>
+                                    </div>
+                                </div>
+                                <div class="chat-actions">
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="closeChat()">
+                                        <i class="nc-icon nc-minimal-left"></i>
+                                        Back
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Messages Container -->
+                            <div class="messages-container position-relative" id="messagesContainer">
+                                <div id="loadingSpinner" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                </div>
+                                <!-- Messages will be loaded here -->
+                            </div>
+
+                            <!-- Message Input -->
+                            <div class="message-input-container">
+                                <form id="messageForm" class="message-form">
+                                    @csrf
+                                    <input type="hidden" id="currentManufacturerId" name="manufacturer_id">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="messageInput" name="message" placeholder="Type your message..." required>
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="nc-icon nc-send"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <form action="{{ route('supplier.chats.store') }}" method="POST">
-                @csrf
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="manufacturer_id">Select Manufacturer</label>
-                        <select class="form-control" id="manufacturer_id" name="manufacturer_id" required>
-                            <option value="">Choose a manufacturer...</option>
-                            <!-- Add your manufacturers here -->
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="message">Initial Message</label>
-                        <textarea class="form-control" id="message" name="message" rows="4" placeholder="Type your message here..." required></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="nc-icon nc-send"></i>
-                        Send Message
-                    </button>
-                </div>
-            </form>
         </div>
     </div>
 </div>
 
 <style>
-/* Main Content Adjustments */
+/* Welcome Card */
 .content {
     padding-top: 100px !important;
-    margin-top: 0;
 }
-
-/* Welcome Section */
 .welcome-card {
-    background: linear-gradient(135deg, rgba(25, 118, 210, 0.95) 0%, rgba(13, 71, 161, 0.95) 100%);
-    border-radius: 20px;
-    padding: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 30px;
     color: white;
-    box-shadow: 0 8px 32px rgba(25, 118, 210, 0.3);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
 }
 
-.welcome-content {
-    flex: 1;
-}
-
-.welcome-title {
+.welcome-content h1 {
+    margin: 0;
     font-size: 2.5rem;
     font-weight: 700;
-    margin: 0 0 10px 0;
-    line-height: 1.2;
 }
 
-.welcome-subtitle {
-    font-size: 1.1rem;
-    margin: 0;
+.welcome-content p {
+    margin: 10px 0 0 0;
     opacity: 0.9;
-    font-weight: 400;
-}
-
-.welcome-icon {
-    width: 80px;
-    height: 80px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 30px;
+    font-size: 1.1rem;
 }
 
 .welcome-icon i {
-    font-size: 40px;
-    color: white;
+    font-size: 4rem;
+    opacity: 0.8;
 }
 
-/* Statistics Cards */
-.stats-card {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    padding: 30px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    transition: all 0.3s ease;
-    height: 100%;
-}
-
-.stats-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-}
-
-.stats-icon {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+/* Manufacturers List */
+.manufacturers-list-card {
+    background: white;
     border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.stats-icon i {
-    font-size: 28px;
-    color: white;
-}
-
-.stats-content {
-    flex: 1;
-}
-
-.stats-number {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #333;
-    margin: 0 0 5px 0;
-    line-height: 1.2;
-}
-
-.stats-label {
-    font-size: 1rem;
-    color: #666;
-    margin: 0 0 10px 0;
-    font-weight: 500;
-}
-
-.stats-footer {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.85rem;
-    color: #888;
-}
-
-.stats-footer i {
-    font-size: 14px;
-}
-
-/* Content Cards */
-.content-card {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    height: 600px;
     overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    height: 100%;
 }
 
-.card-header {
-    background: linear-gradient(135deg, rgba(25, 118, 210, 0.95) 0%, rgba(13, 71, 161, 0.95) 100%);
-    padding: 25px 30px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: white;
+.manufacturers-list-card .card-header {
+    background: #f8f9fa;
+    padding: 20px;
+    border-bottom: 1px solid #e9ecef;
 }
 
-.header-content {
-    flex: 1;
-}
-
-.card-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0 0 5px 0;
-    line-height: 1.2;
-}
-
-.card-subtitle {
-    font-size: 0.95rem;
+.manufacturers-list-card .card-title {
     margin: 0;
-    opacity: 0.9;
-    font-weight: 400;
-}
-
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
-
-.header-icon {
-    width: 50px;
-    height: 50px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.header-icon i {
-    font-size: 24px;
-    color: white;
-}
-
-.card-body {
-    padding: 30px;
-}
-
-/* Table Styling */
-.table {
-    margin: 0;
-}
-
-.table thead th {
-    background: rgba(25, 118, 210, 0.1);
     color: #333;
     font-weight: 600;
-    border: none;
-    padding: 15px;
-    font-size: 0.9rem;
 }
 
-.table tbody td {
-    padding: 15px;
-    border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    vertical-align: middle;
+.manufacturers-list {
+    height: calc(100% - 80px);
+    overflow-y: auto;
+    padding: 0;
 }
 
-.table tbody tr:hover {
-    background: rgba(25, 118, 210, 0.05);
-}
-
-/* Manufacturer Info */
-.manufacturer-info {
+.manufacturer-item {
     display: flex;
     align-items: center;
-    gap: 15px;
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.avatar {
+.manufacturer-item:hover {
+    background: #f8f9fa;
+}
+
+.manufacturer-item.active {
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+}
+
+.manufacturer-avatar {
     width: 50px;
     height: 50px;
     background: linear-gradient(135deg, #667eea, #764ba2);
@@ -447,20 +236,23 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+    margin-right: 15px;
 }
 
-.avatar-text {
+.manufacturer-avatar i {
     color: white;
-    font-weight: 700;
-    font-size: 1.2rem;
-    text-transform: uppercase;
+    font-size: 20px;
 }
 
-.manufacturer-details {
+.manufacturer-info {
+    flex: 1;
+}
+
+.manufacturer-header {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
 }
 
 .manufacturer-name {
@@ -469,291 +261,408 @@
     font-size: 1rem;
 }
 
+.unread-badge {
+    background: #ff5722;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
 .manufacturer-email {
     color: #666;
     font-size: 0.85rem;
+    display: block;
+    margin-bottom: 5px;
 }
 
-/* Message Preview */
-.message-preview {
-    max-width: 300px;
-}
-
-.message-text {
-    color: #666;
-    font-style: italic;
-    font-size: 0.9rem;
-}
-
-/* Status Badges */
-.status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.status-read {
-    background: rgba(46, 125, 50, 0.1);
-    color: #2e7d32;
-}
-
-.status-unread {
-    background: rgba(237, 108, 2, 0.1);
-    color: #ed6c02;
-}
-
-.status-badge i {
-    font-size: 12px;
-}
-
-.date-label {
-    font-weight: 500;
-    color: #666;
-    font-size: 0.9rem;
-}
-
-/* Action Buttons */
-.action-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-}
-
-.action-btn.primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-}
-
-.action-btn.primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-}
-
-.action-btn i {
-    font-size: 14px;
-}
-
-/* Pagination Section */
-.pagination-section {
-    margin-top: 30px;
-    display: flex;
-    justify-content: center;
-}
-
-.pagination {
-    display: flex;
-    gap: 5px;
-}
-
-.page-link {
-    padding: 8px 12px;
-    border: 1px solid rgba(25, 118, 210, 0.2);
-    background: rgba(255, 255, 255, 0.8);
-    color: #1976d2;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.page-link:hover {
-    background: rgba(25, 118, 210, 0.1);
-    border-color: #1976d2;
-    color: #1976d2;
-    transform: translateY(-2px);
-}
-
-.page-item.active .page-link {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-color: transparent;
-    color: white;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-}
-
-/* Empty State */
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-}
-
-.empty-icon {
-    width: 80px;
-    height: 80px;
-    background: rgba(25, 118, 210, 0.1);
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-}
-
-.empty-icon i {
-    font-size: 40px;
-    color: #1976d2;
-}
-
-.empty-title {
-    font-size: 1.5rem;
-    font-weight: 600;
+.last-message {
     color: #333;
-    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 2px;
 }
 
-.empty-subtitle {
-    font-size: 1rem;
-    color: #666;
-    margin: 0 0 30px 0;
+.message-time {
+    color: #999;
+    font-size: 0.8rem;
 }
 
-.empty-actions {
+.no-messages {
+    color: #999;
+    font-style: italic;
+    font-size: 0.85rem;
+}
+
+.no-manufacturers {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+}
+
+.no-manufacturers i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    display: block;
+}
+
+/* Chat Area */
+.chat-area-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    height: 600px;
     display: flex;
-    justify-content: center;
-    gap: 15px;
+    flex-direction: column;
 }
 
-/* Modal Styling */
-.modal-content {
-    border-radius: 20px;
-    border: none;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+.chat-area-card .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
 }
 
-.modal-header {
-    background: linear-gradient(135deg, rgba(25, 118, 210, 0.95) 0%, rgba(13, 71, 161, 0.95) 100%);
-    color: white;
-    border-radius: 20px 20px 0 0;
-    border: none;
-    padding: 20px 30px;
-}
-
-.modal-title {
+/* Welcome Chat */
+.welcome-chat {
+    flex: 1;
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-weight: 600;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
 }
 
-.modal-title i {
-    font-size: 20px;
-}
-
-.modal-body {
-    padding: 30px;
-}
-
-.form-group {
+.welcome-chat-icon i {
+    font-size: 4rem;
+    color: #667eea;
     margin-bottom: 20px;
 }
 
-.form-control {
-    border-radius: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    padding: 12px 15px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
+.welcome-chat-title {
+    color: #333;
+    margin-bottom: 15px;
 }
 
-.form-control:focus {
-    border-color: #1976d2;
-    box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25);
+.welcome-chat-subtitle {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 1.1rem;
 }
 
-.modal-footer {
-    border: none;
-    padding: 20px 30px;
-    background: rgba(0, 0, 0, 0.02);
+.welcome-chat-features {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
 }
 
-.btn {
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-weight: 500;
-    transition: all 0.3s ease;
+.feature-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
 
-.btn-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border: none;
+.feature-item i {
+    font-size: 1.5rem;
+    color: #667eea;
+}
+
+.feature-item span {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Active Chat */
+.active-chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #e9ecef;
+    background: #f8f9fa;
+}
+
+.chat-user-info {
     display: flex;
     align-items: center;
-    gap: 8px;
 }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+.chat-user-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .content {
-        padding-top: 120px !important;
-    }
-    
-    .welcome-card {
-        flex-direction: column;
-        text-align: center;
-        padding: 30px 20px;
-    }
-    
-    .welcome-title {
-        font-size: 2rem;
-    }
-    
-    .welcome-icon {
-        margin: 20px 0 0 0;
-    }
-    
-    .stats-card {
-        padding: 20px;
-    }
-    
-    .stats-number {
-        font-size: 1.5rem;
-    }
-    
-    .card-header {
-        flex-direction: column;
-        text-align: center;
-        gap: 15px;
-    }
-    
-    .header-actions {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .header-icon {
-        margin: 0;
-    }
-    
-    .manufacturer-info {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-    
-    .message-preview {
-        max-width: 200px;
-    }
-    
-    .empty-actions {
-        flex-direction: column;
-        align-items: center;
-    }
+.chat-user-avatar i {
+    color: white;
+    font-size: 16px;
+}
+
+.chat-user-name {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.chat-user-status {
+    color: #28a745;
+    font-size: 0.85rem;
+}
+
+.messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #f8f9fa;
+}
+
+.message {
+    display: flex;
+    margin-bottom: 15px;
+    align-items: flex-start;
+}
+
+.message.sent {
+    justify-content: flex-end;
+}
+
+.message.received {
+    justify-content: flex-start;
+}
+
+.message-avatar {
+    width: 35px;
+    height: 35px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 10px;
+}
+
+.message-avatar i {
+    color: white;
+    font-size: 14px;
+}
+
+.message-content {
+    max-width: 70%;
+}
+
+.message.sent .message-content {
+    order: -1;
+}
+
+.message-text {
+    background: white;
+    padding: 12px 16px;
+    border-radius: 18px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 5px;
+    word-wrap: break-word;
+}
+
+.message.sent .message-text {
+    background: #667eea;
+    color: #fff;
+}
+
+.message.received .message-text {
+    background: #f1f1f1;
+    color: #222;
+    border: 1px solid #e0e0e0;
+}
+
+.message-time {
+    font-size: 0.75rem;
+    color: #999;
+    text-align: center;
+}
+
+.message-input-container {
+    padding: 20px;
+    border-top: 1px solid #e9ecef;
+    background: white;
+}
+
+.message-form {
+    display: flex;
+    gap: 10px;
+}
+
+.message-form .input-group {
+    flex: 1;
+}
+
+.message-form .form-control {
+    border-radius: 25px;
+    border: 1px solid #e9ecef;
+    padding: 12px 20px;
+}
+
+.message-form .btn {
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 </style>
+
+@push('js')
+<script>
+$(document).ready(function() {
+    let currentManufacturerId = null;
+    let messagePollingInterval = null;
+
+    // Show feedback
+    function showFeedback(type, message) {
+        const feedback = $(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>`);
+        $('.chat-area-card .card-body').prepend(feedback);
+        setTimeout(() => feedback.alert('close'), 3000);
+    }
+
+    // Make openChat function globally accessible
+    window.openChat = function(manufacturerId, manufacturerName) {
+        currentManufacturerId = manufacturerId;
+        $('#chatUserName').text(manufacturerName);
+        $('#currentManufacturerId').val(manufacturerId);
+        $('#welcomeMessage').hide();
+        $('#activeChat').show();
+        loadMessages(manufacturerId);
+        startMessagePolling();
+        $('.manufacturer-item').removeClass('active');
+        $(`.manufacturer-item[onclick*="${manufacturerId}"]`).addClass('active');
+    };
+
+    function closeChat() {
+        currentManufacturerId = null;
+        stopMessagePolling();
+        $('#activeChat').hide();
+        $('#welcomeMessage').show();
+        $('.manufacturer-item').removeClass('active');
+    }
+
+    function loadMessages(manufacturerId) {
+        $('#loadingSpinner').show();
+        $.ajax({
+            url: `/supplier/chats/${manufacturerId}/messages`,
+            method: 'GET',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                $('#loadingSpinner').hide();
+                if (response.success) {
+                    displayMessages(response.messages);
+                } else {
+                    showFeedback('danger', 'Failed to load messages.');
+                }
+            },
+            error: function(xhr) {
+                $('#loadingSpinner').hide();
+                showFeedback('danger', 'Error loading messages.');
+            }
+        });
+    }
+
+    function displayMessages(messages) {
+        const container = $('#messagesContainer');
+        container.find('.message').remove();
+        messages.forEach(message => {
+            const isSent = message.supplier_id == {{ auth()->id() }};
+            const messageHtml = `
+                <div class="message ${isSent ? 'sent' : 'received'}">
+                    <div class="message-avatar">
+                        <i class="nc-icon nc-single-02"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-text">${message.message}</div>
+                        <div class="message-time">${new Date(message.created_at).toLocaleTimeString()}</div>
+                    </div>
+                </div>
+            `;
+            container.append(messageHtml);
+        });
+        // Auto-scroll to bottom
+        container.scrollTop(container[0].scrollHeight);
+    }
+
+    // Send message
+    $('#messageForm').on('submit', function(e) {
+        e.preventDefault();
+        const message = $('#messageInput').val().trim();
+        const manufacturerId = $('#currentManufacturerId').val();
+        if (!message || !manufacturerId) return;
+        $('#messageForm button[type="submit"]').prop('disabled', true);
+        $.ajax({
+            url: '/supplier/chats',
+            method: 'POST',
+            data: {
+                manufacturer_id: manufacturerId,
+                message: message,
+                type: 'text',
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                $('#messageForm button[type="submit"]').prop('disabled', false);
+                if (response.success) {
+                    $('#messageInput').val('');
+                    loadMessages(manufacturerId);
+                    showFeedback('success', 'Message sent!');
+                } else {
+                    showFeedback('danger', 'Failed to send message.');
+                }
+            },
+            error: function(xhr) {
+                $('#messageForm button[type="submit"]').prop('disabled', false);
+                showFeedback('danger', 'Error sending message. Please try again.');
+            }
+        });
+    });
+
+    function startMessagePolling() {
+        if (messagePollingInterval) {
+            clearInterval(messagePollingInterval);
+        }
+        messagePollingInterval = setInterval(function() {
+            if (currentManufacturerId) {
+                loadMessages(currentManufacturerId);
+            }
+        }, 3000); // Poll every 3 seconds
+    }
+
+    function stopMessagePolling() {
+        if (messagePollingInterval) {
+            clearInterval(messagePollingInterval);
+            messagePollingInterval = null;
+        }
+    }
+
+    window.closeChat = closeChat;
+    setInterval(function() { location.reload(); }, 30000);
+});
+</script>
+@endpush
 @endsection 

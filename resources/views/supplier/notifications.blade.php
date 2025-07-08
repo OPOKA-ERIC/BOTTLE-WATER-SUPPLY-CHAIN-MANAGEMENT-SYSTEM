@@ -1,6 +1,11 @@
 @extends('layouts.app', ['activePage' => 'notifications', 'title' => 'Supplier Notifications'])
 
 @section('content')
+<!-- Real-time Indicator -->
+<div class="real-time-indicator" id="real-time-indicator">
+    <i class="nc-icon nc-refresh-69"></i>
+    <span>Live Updates</span>
+</div>
 <div class="content">
     <div class="container-fluid">
         <!-- Welcome Section -->
@@ -26,11 +31,11 @@
                         <i class="nc-icon nc-bell-55"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number" id="total-notifications">8</h3>
+                        <h3 class="stats-number" id="total-notifications">{{ $stats['total'] ?? 0 }}</h3>
                         <p class="stats-label">Total Notifications</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
-                            <span>Updated just now</span>
+                            <span id="last-updated">Updated just now</span>
                         </div>
                     </div>
                 </div>
@@ -41,7 +46,7 @@
                         <i class="nc-icon nc-cart-simple"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number" id="order-notifications">3</h3>
+                        <h3 class="stats-number" id="order-notifications">{{ $stats['orders'] ?? 0 }}</h3>
                         <p class="stats-label">Order Updates</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
@@ -56,7 +61,7 @@
                         <i class="nc-icon nc-box-2"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number" id="material-notifications">2</h3>
+                        <h3 class="stats-number" id="material-notifications">{{ $stats['materials'] ?? 0 }}</h3>
                         <p class="stats-label">Material Alerts</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
@@ -71,7 +76,7 @@
                         <i class="nc-icon nc-alert-circle-i"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number" id="system-notifications">3</h3>
+                        <h3 class="stats-number" id="system-notifications">{{ $stats['system'] ?? 0 }}</h3>
                         <p class="stats-label">System Alerts</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
@@ -101,11 +106,11 @@
                                 <i class="nc-icon nc-bell-55"></i>
                                 <span>All</span>
                             </button>
-                            <button class="filter-btn" data-filter="orders">
+                            <button class="filter-btn" data-filter="order">
                                 <i class="nc-icon nc-cart-simple"></i>
                                 <span>Orders</span>
                             </button>
-                            <button class="filter-btn" data-filter="materials">
+                            <button class="filter-btn" data-filter="material">
                                 <i class="nc-icon nc-box-2"></i>
                                 <span>Materials</span>
                             </button>
@@ -116,6 +121,21 @@
                             <button class="filter-btn" data-filter="unread">
                                 <i class="nc-icon nc-badge"></i>
                                 <span>Unread</span>
+                            </button>
+                        </div>
+                        
+                        <div class="bulk-actions">
+                            <button class="action-btn secondary" id="mark-all-read">
+                                <i class="nc-icon nc-check-2"></i>
+                                <span>Mark All Read</span>
+                            </button>
+                            <button class="action-btn danger" id="clear-all">
+                                <i class="nc-icon nc-simple-remove"></i>
+                                <span>Clear All</span>
+                            </button>
+                            <button class="action-btn primary" id="refresh-notifications">
+                                <i class="nc-icon nc-refresh-69"></i>
+                                <span>Refresh</span>
                             </button>
                         </div>
                     </div>
@@ -138,163 +158,62 @@
                     </div>
                     <div class="card-body">
                         <div class="notifications-list" id="notifications-container">
-                            <!-- Order Notification -->
-                            <div class="notification-item unread" data-type="orders">
-                                <div class="notification-icon order">
-                                    <i class="nc-icon nc-cart-simple"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-header">
-                                        <h6 class="notification-title">New Purchase Order Received</h6>
-                                        <span class="notification-time">5 minutes ago</span>
+                            @if(isset($notifications) && $notifications->count() > 0)
+                                @foreach($notifications as $notification)
+                                    <div class="notification-item {{ $notification->is_read ? '' : 'unread' }}" data-type="{{ $notification->type }}" data-id="{{ $notification->id }}">
+                                        <div class="notification-icon {{ $notification->type }}">
+                                            <i class="nc-icon {{ $notification->type === 'order' ? 'nc-cart-simple' : ($notification->type === 'material' ? 'nc-box-2' : 'nc-alert-circle-i') }}"></i>
+                                        </div>
+                                        <div class="notification-content">
+                                            <div class="notification-header">
+                                                <h6 class="notification-title">{{ $notification->title }}</h6>
+                                                <span class="notification-time">{{ $notification->created_at->diffForHumans() }}</span>
+                                            </div>
+                                            <p class="notification-message">{{ $notification->message }}</p>
+                                            <div class="notification-actions">
+                                                @if($notification->type === 'order' && isset($notification->data['order_id']))
+                                                    <a href="{{ route('supplier.orders.show', $notification->data['order_id']) }}" class="action-btn primary">
+                                                        <i class="nc-icon nc-zoom-split-in"></i>
+                                                        <span>View Order</span>
+                                                    </a>
+                                                @endif
+                                                @if($notification->type === 'material')
+                                                    <a href="{{ route('supplier.materials') }}" class="action-btn primary">
+                                                        <i class="nc-icon nc-zoom-split-in"></i>
+                                                        <span>View Materials</span>
+                                                    </a>
+                                                @endif
+                                                @if(!$notification->is_read)
+                                                    <button class="action-btn secondary mark-read" data-id="{{ $notification->id }}">
+                                                        <i class="nc-icon nc-check-2"></i>
+                                                        <span>Mark Read</span>
+                                                    </button>
+                                                @endif
+                                                <button class="action-btn danger delete-notification" data-id="{{ $notification->id }}">
+                                                    <i class="nc-icon nc-simple-remove"></i>
+                                                    <span>Delete</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="notification-status">
+                                            <span class="status-dot {{ $notification->is_read ? 'read' : 'unread' }}"></span>
+                                        </div>
                                     </div>
-                                    <p class="notification-message">Manufacturer ABC has placed a new order for 500 bottles. Please review and confirm.</p>
-                                    <div class="notification-actions">
-                                        <button class="action-btn primary">
-                                            <i class="nc-icon nc-zoom-split-in"></i>
-                                            <span>View Order</span>
-                                        </button>
-                                        <button class="action-btn secondary mark-read">
-                                            <i class="nc-icon nc-check-2"></i>
-                                            <span>Mark Read</span>
-                                        </button>
+                                @endforeach
+                                
+                                <!-- Pagination -->
+                                <div class="pagination-section">
+                                    {{ $notifications->links() }}
+                                </div>
+                            @else
+                                <div class="empty-state">
+                                    <div class="empty-icon">
+                                        <i class="nc-icon nc-bell-55"></i>
                                     </div>
+                                    <h5 class="empty-title">No Notifications</h5>
+                                    <p class="empty-subtitle">You're all caught up! No new notifications at the moment.</p>
                                 </div>
-                                <div class="notification-status">
-                                    <span class="status-dot unread"></span>
-                                </div>
-                            </div>
-
-                            <!-- Material Notification -->
-                            <div class="notification-item unread" data-type="materials">
-                                <div class="notification-icon material">
-                                    <i class="nc-icon nc-box-2"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-header">
-                                        <h6 class="notification-title">Low Inventory Alert</h6>
-                                        <span class="notification-time">1 hour ago</span>
-                                    </div>
-                                    <p class="notification-message">Your plastic bottle inventory is running low. Consider restocking soon.</p>
-                                    <div class="notification-actions">
-                                        <button class="action-btn primary">
-                                            <i class="nc-icon nc-zoom-split-in"></i>
-                                            <span>View Inventory</span>
-                                        </button>
-                                        <button class="action-btn secondary mark-read">
-                                            <i class="nc-icon nc-check-2"></i>
-                                            <span>Mark Read</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="notification-status">
-                                    <span class="status-dot unread"></span>
-                                </div>
-                            </div>
-
-                            <!-- System Notification -->
-                            <div class="notification-item" data-type="system">
-                                <div class="notification-icon system">
-                                    <i class="nc-icon nc-alert-circle-i"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-header">
-                                        <h6 class="notification-title">System Maintenance</h6>
-                                        <span class="notification-time">2 hours ago</span>
-                                    </div>
-                                    <p class="notification-message">Scheduled maintenance will occur tonight from 2 AM to 4 AM. Some features may be temporarily unavailable.</p>
-                                    <div class="notification-actions">
-                                        <button class="action-btn secondary mark-read">
-                                            <i class="nc-icon nc-check-2"></i>
-                                            <span>Mark Read</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="notification-status">
-                                    <span class="status-dot read"></span>
-                                </div>
-                            </div>
-
-                            <!-- Order Status Update -->
-                            <div class="notification-item" data-type="orders">
-                                <div class="notification-icon order">
-                                    <i class="nc-icon nc-cart-simple"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-header">
-                                        <h6 class="notification-title">Order Status Updated</h6>
-                                        <span class="notification-time">3 hours ago</span>
-                                    </div>
-                                    <p class="notification-message">Order #PO-2024-001 has been marked as 'In Production' by the manufacturer.</p>
-                                    <div class="notification-actions">
-                                        <button class="action-btn primary">
-                                            <i class="nc-icon nc-zoom-split-in"></i>
-                                            <span>View Order</span>
-                                        </button>
-                                        <button class="action-btn secondary mark-read">
-                                            <i class="nc-icon nc-check-2"></i>
-                                            <span>Mark Read</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="notification-status">
-                                    <span class="status-dot read"></span>
-                                </div>
-                            </div>
-
-                            <!-- Material Delivery -->
-                            <div class="notification-item" data-type="materials">
-                                <div class="notification-icon material">
-                                    <i class="nc-icon nc-box-2"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-header">
-                                        <h6 class="notification-title">Material Delivery Confirmed</h6>
-                                        <span class="notification-time">1 day ago</span>
-                                    </div>
-                                    <p class="notification-message">Your shipment of 1000 plastic bottles has been delivered and added to inventory.</p>
-                                    <div class="notification-actions">
-                                        <button class="action-btn primary">
-                                            <i class="nc-icon nc-zoom-split-in"></i>
-                                            <span>View Inventory</span>
-                                        </button>
-                                        <button class="action-btn secondary mark-read">
-                                            <i class="nc-icon nc-check-2"></i>
-                                            <span>Mark Read</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="notification-status">
-                                    <span class="status-dot read"></span>
-                                </div>
-                            </div>
-
-                            <!-- Payment Notification -->
-                            <div class="notification-item" data-type="orders">
-                                <div class="notification-icon order">
-                                    <i class="nc-icon nc-money-coins"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-header">
-                                        <h6 class="notification-title">Payment Received</h6>
-                                        <span class="notification-time">2 days ago</span>
-                                    </div>
-                                    <p class="notification-message">Payment of $2,500 has been received for Order #PO-2024-002.</p>
-                                    <div class="notification-actions">
-                                        <button class="action-btn primary">
-                                            <i class="nc-icon nc-zoom-split-in"></i>
-                                            <span>View Details</span>
-                                        </button>
-                                        <button class="action-btn secondary mark-read">
-                                            <i class="nc-icon nc-check-2"></i>
-                                            <span>Mark Read</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="notification-status">
-                                    <span class="status-dot read"></span>
-                                </div>
-                            </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -608,6 +527,89 @@
     transform: translateY(-2px);
 }
 
+.action-btn.danger {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+.action-btn.danger:hover {
+    background: rgba(220, 53, 69, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Bulk Actions */
+.bulk-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    flex-wrap: wrap;
+}
+
+.bulk-actions .action-btn {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #495057;
+}
+
+.empty-subtitle {
+    font-size: 1rem;
+    opacity: 0.7;
+    margin: 0;
+}
+
+/* Pagination */
+.pagination-section {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Real-time indicator */
+.real-time-indicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(40, 167, 69, 0.9);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
 .notification-status {
     position: absolute;
     top: 25px;
@@ -711,6 +713,12 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    let refreshInterval;
+    const REFRESH_INTERVAL = 30000; // 30 seconds
+
+    // Initialize real-time updates
+    initRealTimeUpdates();
+
     // Filter functionality
     const filterButtons = document.querySelectorAll('.filter-btn');
     const notificationItems = document.querySelectorAll('.notification-item');
@@ -740,30 +748,299 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Mark as read functionality
-    const markReadButtons = document.querySelectorAll('.mark-read');
-    markReadButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const notificationItem = this.closest('.notification-item');
-            const statusDot = notificationItem.querySelector('.status-dot');
-            
-            notificationItem.classList.remove('unread');
-            statusDot.classList.remove('unread');
-            statusDot.classList.add('read');
-            
-            // Update counters
-            updateNotificationCounters();
-        });
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.mark-read')) {
+            const button = e.target.closest('.mark-read');
+            const notificationId = button.getAttribute('data-id');
+            markAsRead(notificationId);
+        }
     });
 
-    function updateNotificationCounters() {
-        const unreadCount = document.querySelectorAll('.notification-item.unread').length;
-        const totalCount = document.querySelectorAll('.notification-item').length;
+    // Delete notification functionality
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.delete-notification')) {
+            const button = e.target.closest('.delete-notification');
+            const notificationId = button.getAttribute('data-id');
+            deleteNotification(notificationId);
+        }
+    });
+
+    // Bulk actions
+    document.getElementById('mark-all-read').addEventListener('click', markAllAsRead);
+    document.getElementById('clear-all').addEventListener('click', clearAllNotifications);
+    document.getElementById('refresh-notifications').addEventListener('click', refreshNotifications);
+
+    // Real-time update functions
+    function initRealTimeUpdates() {
+        // Start periodic refresh
+        refreshInterval = setInterval(refreshNotifications, REFRESH_INTERVAL);
         
-        // Update total notifications
-        document.getElementById('total-notifications').textContent = totalCount;
-        
-        // You can add more counter updates here based on your needs
+        // Update last updated time
+        updateLastUpdatedTime();
     }
+
+    function refreshNotifications() {
+        fetch('{{ route("supplier.notifications.api") }}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateNotificationsList(data.notifications);
+                    updateStats();
+                }
+            })
+            .catch(error => {
+                console.error('Error refreshing notifications:', error);
+            });
+    }
+
+    function updateNotificationsList(notifications) {
+        const container = document.getElementById('notifications-container');
+        
+        if (notifications.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="nc-icon nc-bell-55"></i>
+                    </div>
+                    <h5 class="empty-title">No Notifications</h5>
+                    <p class="empty-subtitle">You're all caught up! No new notifications at the moment.</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '';
+        notifications.forEach(notification => {
+            const isUnread = !notification.is_read;
+            const typeIcon = notification.type === 'order' ? 'nc-cart-simple' : 
+                           (notification.type === 'material' ? 'nc-box-2' : 'nc-alert-circle-i');
+            
+            html += `
+                <div class="notification-item ${isUnread ? 'unread' : ''}" data-type="${notification.type}" data-id="${notification.id}">
+                    <div class="notification-icon ${notification.type}">
+                        <i class="nc-icon ${typeIcon}"></i>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-header">
+                            <h6 class="notification-title">${notification.title}</h6>
+                            <span class="notification-time">${notification.created_at}</span>
+                        </div>
+                        <p class="notification-message">${notification.message}</p>
+                        <div class="notification-actions">
+                            ${notification.type === 'order' && notification.data && notification.data.order_id ? 
+                                `<a href="/supplier/orders/${notification.data.order_id}" class="action-btn primary">
+                                    <i class="nc-icon nc-zoom-split-in"></i>
+                                    <span>View Order</span>
+                                </a>` : ''
+                            }
+                            ${notification.type === 'material' ? 
+                                `<a href="{{ route('supplier.materials') }}" class="action-btn primary">
+                                    <i class="nc-icon nc-zoom-split-in"></i>
+                                    <span>View Materials</span>
+                                </a>` : ''
+                            }
+                            ${isUnread ? 
+                                `<button class="action-btn secondary mark-read" data-id="${notification.id}">
+                                    <i class="nc-icon nc-check-2"></i>
+                                    <span>Mark Read</span>
+                                </button>` : ''
+                            }
+                            <button class="action-btn danger delete-notification" data-id="${notification.id}">
+                                <i class="nc-icon nc-simple-remove"></i>
+                                <span>Delete</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="notification-status">
+                        <span class="status-dot ${isUnread ? 'unread' : 'read'}"></span>
+                    </div>
+                </div>
+            `;
+        });
+
+        container.innerHTML = html;
+    }
+
+    function updateStats() {
+        fetch('{{ route("supplier.notifications.stats") }}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const stats = data.stats;
+                    document.getElementById('total-notifications').textContent = stats.total;
+                    document.getElementById('order-notifications').textContent = stats.orders;
+                    document.getElementById('material-notifications').textContent = stats.materials;
+                    document.getElementById('system-notifications').textContent = stats.system;
+                    updateLastUpdatedTime();
+                }
+            })
+            .catch(error => {
+                console.error('Error updating stats:', error);
+            });
+    }
+
+    function markAsRead(notificationId) {
+        fetch(`{{ route('supplier.notifications.read', '') }}/${notificationId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const notificationItem = document.querySelector(`[data-id="${notificationId}"]`);
+                if (notificationItem) {
+                    notificationItem.classList.remove('unread');
+                    const statusDot = notificationItem.querySelector('.status-dot');
+                    statusDot.classList.remove('unread');
+                    statusDot.classList.add('read');
+                    
+                    // Remove mark read button
+                    const markReadBtn = notificationItem.querySelector('.mark-read');
+                    if (markReadBtn) {
+                        markReadBtn.remove();
+                    }
+                }
+                updateStats();
+            }
+        })
+        .catch(error => {
+            console.error('Error marking as read:', error);
+        });
+    }
+
+    function markAllAsRead() {
+        fetch('{{ route("supplier.notifications.mark-all-read") }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.querySelectorAll('.notification-item.unread').forEach(item => {
+                    item.classList.remove('unread');
+                    const statusDot = item.querySelector('.status-dot');
+                    statusDot.classList.remove('unread');
+                    statusDot.classList.add('read');
+                    
+                    // Remove mark read button
+                    const markReadBtn = item.querySelector('.mark-read');
+                    if (markReadBtn) {
+                        markReadBtn.remove();
+                    }
+                });
+                updateStats();
+            }
+        })
+        .catch(error => {
+            console.error('Error marking all as read:', error);
+        });
+    }
+
+    function deleteNotification(notificationId) {
+        if (confirm('Are you sure you want to delete this notification?')) {
+            fetch(`{{ route('supplier.notifications.delete', '') }}/${notificationId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const notificationItem = document.querySelector(`[data-id="${notificationId}"]`);
+                    if (notificationItem) {
+                        notificationItem.remove();
+                    }
+                    updateStats();
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting notification:', error);
+            });
+        }
+    }
+
+    function clearAllNotifications() {
+        if (confirm('Are you sure you want to clear all notifications? This action cannot be undone.')) {
+            fetch('{{ route("supplier.notifications.clear-all") }}', {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('notifications-container').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="nc-icon nc-bell-55"></i>
+                            </div>
+                            <h5 class="empty-title">No Notifications</h5>
+                            <p class="empty-subtitle">You're all caught up! No new notifications at the moment.</p>
+                        </div>
+                    `;
+                    updateStats();
+                }
+            })
+            .catch(error => {
+                console.error('Error clearing notifications:', error);
+            });
+        }
+    }
+
+    function updateLastUpdatedTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString();
+        document.getElementById('last-updated').textContent = `Updated at ${timeString}`;
+    }
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', function() {
+        if (refreshInterval) {
+            clearInterval(refreshInterval);
+        }
+    });
 });
+</script>
+
+<!-- Real-time notifications with Laravel Echo -->
+<script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/laravel-echo/1.15.0/echo.iife.js"></script>
+<script>
+    // Get the authenticated supplier's user ID from backend
+    const supplierUserId = {{ auth()->id() }};
+    // Setup Echo instance
+    window.Echo = new window.Echo({
+        broadcaster: 'pusher',
+        key: '{{ env('PUSHER_APP_KEY') }}',
+        cluster: '{{ env('PUSHER_APP_CLUSTER') }}',
+        forceTLS: true,
+        encrypted: true,
+    });
+    // Listen for real-time notifications
+    window.Echo.private('supplier.notifications.' + supplierUserId)
+        .listen('SupplierNotificationCreated', (e) => {
+            // Prepend the new notification to the list
+            fetchNotifications();
+            updateStats();
+            // Optionally, show a toast or highlight
+            showRealTimeIndicator();
+        });
+    function showRealTimeIndicator() {
+        const indicator = document.getElementById('real-time-indicator');
+        if (indicator) {
+            indicator.classList.add('active');
+            setTimeout(() => indicator.classList.remove('active'), 2000);
+        }
+    }
 </script>
 @endsection 
