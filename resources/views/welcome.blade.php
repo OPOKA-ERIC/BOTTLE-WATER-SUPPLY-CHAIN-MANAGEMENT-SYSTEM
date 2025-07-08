@@ -24,15 +24,7 @@
                             Streamline your water bottle supply chain with our comprehensive, intelligent management system designed for modern businesses
                         </p>
                         
-                        <!-- Login/Register Buttons -->
-                        <div class="mb-5">
-                            <a href="{{ route('login') }}" class="btn btn-primary btn-lg mr-3" style="background: linear-gradient(45deg, #FF6B6B, #FF8E53); border: none; padding: 12px 30px; border-radius: 25px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3); transition: all 0.3s ease;">
-                                <i class="nc-icon nc-mobile mr-2"></i> Login
-                            </a>
-                            <a href="{{ route('register') }}" class="btn btn-outline-light btn-lg" style="border: 2px solid rgba(255, 255, 255, 0.8); padding: 12px 30px; border-radius: 25px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease;">
-                                <i class="nc-icon nc-badge mr-2"></i> Register
-                            </a>
-                        </div>
+                        
                     </div>
                 </div>
 
@@ -303,7 +295,6 @@
         
         // Route validation (optional - for debugging)
         console.log('Routes configured:');
-        console.log('Login route: {{ route("login") }}');
         console.log('Register route: {{ route("register") }}');
     </script>
 @endpush

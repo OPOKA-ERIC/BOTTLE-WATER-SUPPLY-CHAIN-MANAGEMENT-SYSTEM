@@ -246,4 +246,54 @@ class DashboardController extends Controller
             'activePage' => 'analytics-customer-segmentation-summary'
         ]);
     }
+
+    public function customerSegmentationSummary()
+    {
+        $segmentsData = [];
+        $csvPath = storage_path('app/analytics/customer_segments.csv');
+        if (file_exists($csvPath)) {
+            if (($handle = fopen($csvPath, 'r')) !== false) {
+                $header = fgetcsv($handle);
+                while (($row = fgetcsv($handle)) !== false) {
+                    $segmentsData[] = array_combine($header, $row);
+                }
+                fclose($handle);
+            }
+        }
+
+        // Calculate summary
+        $summary = [];
+        foreach ($segmentsData as $row) {
+            $segment = $row['Segment'];
+            if (!isset($summary[$segment])) {
+                $summary[$segment] = [
+                    'count' => 0,
+                    'total_quantity' => 0,
+                    'total_amount' => 0,
+                    'total_age' => 0,
+                    'genders' => [],
+                ];
+            }
+            $summary[$segment]['count'] += 1;
+            $summary[$segment]['total_quantity'] += (int)$row['Quantity'];
+            $summary[$segment]['total_amount'] += (float)$row['Total Amount'];
+            $summary[$segment]['total_age'] += (int)$row['Age'];
+            $summary[$segment]['genders'][] = $row['Gender'];
+        }
+
+        // Finalize averages and most common gender
+        foreach ($summary as $segment => &$data) {
+            $data['avg_quantity'] = $data['count'] ? $data['total_quantity'] / $data['count'] : 0;
+            $data['avg_amount'] = $data['count'] ? $data['total_amount'] / $data['count'] : 0;
+            $data['avg_age'] = $data['count'] ? $data['total_age'] / $data['count'] : 0;
+            $genderCounts = array_count_values($data['genders']);
+            $data['most_common_gender'] = $genderCounts ? array_search(max($genderCounts), $genderCounts) : '';
+            unset($data['genders'], $data['total_quantity'], $data['total_amount'], $data['total_age']);
+        }
+
+        return view('admin.analytics.customer-segmentation-analysis', [
+            'summary' => $summary,
+            'activePage' => 'analytics-customer-segmentation-summary'
+        ]);
+    }
 } 

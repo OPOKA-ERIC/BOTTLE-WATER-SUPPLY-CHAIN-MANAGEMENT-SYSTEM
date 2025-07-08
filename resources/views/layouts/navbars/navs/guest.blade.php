@@ -10,14 +10,6 @@
         </div>
         <div class="collapse navbar-collapse justify-content-end" id="navbar">
             <ul class="navbar-nav">
-<<<<<<< HEAD
-=======
-                {{-- <li class="nav-item">
-                    <a href="{{ route('dashboard') }}" class="nav-link">
-                        <i class="nc-icon nc-chart-pie-35"></i> {{ __('Dashboard') }}
-                    </a>
-                </li> --}}
->>>>>>> 7f70518c631fbc42ad89ee760eefde5382a63c08
                 <li class="nav-item @if($activePage == 'register') active @endif">
                     <a href="{{ route('register') }}" class="nav-link">
                         <i class="nc-icon nc-badge"></i> {{ __('Register') }}

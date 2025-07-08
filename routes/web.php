@@ -66,7 +66,15 @@ Route::middleware(['auth', 'role:administrator', 'redirect.role'])->prefix('admi
     Route::post('/vendor-applications/{id}/approve', [AdminDashboardController::class, 'approveVendorApplication'])->name('admin.vendors.approve');
     Route::post('/vendor-applications/{id}/reject', [AdminDashboardController::class, 'rejectVendorApplication'])->name('admin.vendors.reject');
     Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('admin.analytics');
+    Route::get('/analytics/demand-forecast', [AdminDashboardController::class, 'demandForecast'])->name('admin.analytics.demand-forecast');
+    Route::get('/analytics/customer-segmentation', [AdminDashboardController::class, 'customerSegmentation'])->name('admin.analytics.customer-segmentation');
+    Route::get('/analytics/customer-segmentation/summary', [AdminDashboardController::class, 'customerSegmentationSummary'])->name('admin.analytics.customer-segmentation.summary');
     Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'getAdminNotifications'])->name('admin.notifications');
+    Route::get('/work-distribution', [App\Http\Controllers\Admin\WorkDistributionController::class, 'index'])->name('admin.work-distribution.index');
+    Route::get('/work-distribution/create', [App\Http\Controllers\Admin\WorkDistributionController::class, 'create'])->name('admin.work-distribution.create');
+    Route::get('/tasks', [App\Http\Controllers\Admin\TaskController::class, 'index'])->name('admin.tasks.index');
+    Route::get('/tasks/reports', [App\Http\Controllers\Admin\TaskController::class, 'reports'])->name('admin.tasks.reports');
+    Route::get('/tasks/create', [App\Http\Controllers\Admin\TaskController::class, 'create'])->name('admin.tasks.create');
 });
 
 // Vendor Routes
