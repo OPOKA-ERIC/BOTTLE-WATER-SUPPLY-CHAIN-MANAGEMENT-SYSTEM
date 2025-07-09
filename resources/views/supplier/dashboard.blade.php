@@ -143,7 +143,7 @@
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th>Manufacturer</th>
+                                        <th>Participant</th>
                                         <th>Message</th>
                                         <th>Type</th>
                                         <th>Status</th>
@@ -154,7 +154,15 @@
                                 <tbody>
                                     @forelse($recentChats as $chat)
                                     <tr>
-                                        <td><span class="manufacturer-name">{{ $chat->manufacturer->name }}</span></td>
+                                        <td>
+                                            @if($chat->manufacturer)
+                                                <span class="manufacturer-name">{{ $chat->manufacturer->name }}</span>
+                                            @elseif($chat->admin)
+                                                <span class="admin-name">{{ $chat->admin->name }} (Admin)</span>
+                                            @else
+                                                <span class="unknown-name">Unknown</span>
+                                            @endif
+                                        </td>
                                         <td><span class="message-preview">{{ Str::limit($chat->message, 50) }}</span></td>
                                         <td>
                                             <span class="type-badge type-{{ $chat->type }}">
@@ -504,38 +512,38 @@
     .content {
         padding-top: 120px !important;
     }
-    
+
     .welcome-card {
         flex-direction: column;
         text-align: center;
         padding: 30px 20px;
     }
-    
+
     .welcome-title {
         font-size: 2rem;
     }
-    
+
     .welcome-icon {
         margin: 20px 0 0 0;
     }
-    
+
     .stats-card {
         padding: 20px;
     }
-    
+
     .stats-number {
         font-size: 1.5rem;
     }
-    
+
     .card-header {
         flex-direction: column;
         text-align: center;
         gap: 15px;
     }
-    
+
     .header-icon {
         margin: 0;
     }
 }
 </style>
-@endsection 
+@endsection

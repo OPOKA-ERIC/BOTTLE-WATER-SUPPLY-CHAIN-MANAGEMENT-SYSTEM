@@ -9,7 +9,7 @@
                 <div class="welcome-card">
                     <div class="welcome-content">
                         <h1 class="welcome-title">Chat Management</h1>
-                        <p class="welcome-subtitle">Communicate with manufacturers, manage conversations, and stay connected</p>
+                        <p class="welcome-subtitle">Communicate with manufacturers and administrators, manage conversations, and stay connected</p>
                     </div>
                     <div class="welcome-icon">
                         <i class="nc-icon nc-chat-33"></i>
@@ -26,7 +26,7 @@
                         <i class="nc-icon nc-chat-33"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number">{{ $chats->count() }}</h3>
+                        <h3 class="stats-number">{{ $conversations->count() }}</h3>
                         <p class="stats-label">Total Conversations</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
@@ -41,7 +41,7 @@
                         <i class="nc-icon nc-time-alarm"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number">{{ $chats->where('is_read', false)->count() }}</h3>
+                        <h3 class="stats-number">{{ $conversations->where('is_read', false)->count() }}</h3>
                         <p class="stats-label">Unread Messages</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
@@ -56,7 +56,7 @@
                         <i class="nc-icon nc-check-2"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number">{{ $chats->where('is_read', true)->count() }}</h3>
+                        <h3 class="stats-number">{{ $conversations->where('is_read', true)->count() }}</h3>
                         <p class="stats-label">Read Messages</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
@@ -71,8 +71,8 @@
                         <i class="nc-icon nc-single-02"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number">{{ $chats->unique('manufacturer_id')->count() }}</h3>
-                        <p class="stats-label">Active Manufacturers</p>
+                        <h3 class="stats-number">{{ $conversations->where('manufacturer_id', '!=', null)->count() + $conversations->where('admin_id', '!=', null)->count() }}</h3>
+                        <p class="stats-label">Active Participants</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
                             <span>In conversations</span>
@@ -89,7 +89,7 @@
                 <div class="card-header">
                         <div class="header-content">
                     <h4 class="card-title">Chat Conversations</h4>
-                            <p class="card-subtitle">Manage your conversations with manufacturers and track message status</p>
+                            <p class="card-subtitle">Manage your conversations with manufacturers and administrators</p>
                         </div>
                         <div class="header-actions">
                             <button class="action-btn primary" data-toggle="modal" data-target="#newChatModal">
@@ -102,12 +102,12 @@
                         </div>
                 </div>
                 <div class="card-body">
-                    @if($chats->count() > 0)
+                    @if($conversations->count() > 0)
                         <div class="table-responsive">
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th>Manufacturer</th>
+                                        <th>Recipient</th>
                                         <th>Last Message</th>
                                         <th>Status</th>
                                         <th>Last Updated</th>
@@ -115,20 +115,36 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($chats as $chat)
+                                    @foreach($conversations as $chat)
                                         <tr>
                                             <td>
+                                                @if($chat->manufacturer)
                                                     <div class="manufacturer-info">
-                                                        <div class="avatar">
+                                                        <div class="avatar bg-primary">
                                                             <span class="avatar-text">
-                                                            {{ substr($chat->manufacturer->name ?? 'N/A', 0, 1) }}
-                                                        </span>
-                                                    </div>
+                                                                {{ substr($chat->manufacturer->name ?? 'N/A', 0, 1) }}
+                                                            </span>
+                                                        </div>
                                                         <div class="manufacturer-details">
                                                             <span class="manufacturer-name">{{ $chat->manufacturer->name ?? 'N/A' }}</span>
+                                                            <span class="manufacturer-role">Manufacturer</span>
                                                             <span class="manufacturer-email">{{ $chat->manufacturer->email ?? 'N/A' }}</span>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                @elseif($chat->admin)
+                                                    <div class="admin-info">
+                                                        <div class="avatar bg-warning">
+                                                            <span class="avatar-text">
+                                                                {{ substr($chat->admin->name ?? 'A', 0, 1) }}
+                                                            </span>
+                                                        </div>
+                                                        <div class="admin-details">
+                                                            <span class="admin-name">{{ $chat->admin->name ?? 'Admin' }}</span>
+                                                            <span class="admin-role">Administrator</span>
+                                                            <span class="admin-email">{{ $chat->admin->email ?? 'N/A' }}</span>
+                                                        </div>
+                                                    </div>
+                                                @endif
                                             </td>
                                             <td>
                                                     <div class="message-preview">
@@ -155,10 +171,10 @@
                                 </tbody>
                             </table>
                         </div>
-                        
+
                         <!-- Pagination -->
                             <div class="pagination-section">
-                            {{ $chats->links() }}
+                            {{ $conversations->links() }}
                         </div>
                     @else
                             <div class="empty-state">
@@ -166,7 +182,7 @@
                                     <i class="nc-icon nc-chat-33"></i>
                                 </div>
                                 <h5 class="empty-title">No Chat Conversations</h5>
-                                <p class="empty-subtitle">You don't have any chat conversations with manufacturers yet</p>
+                                <p class="empty-subtitle">You don't have any chat conversations with manufacturers or administrators yet</p>
                                 <div class="empty-actions">
                                     <button class="action-btn primary" data-toggle="modal" data-target="#newChatModal">
                                         <i class="nc-icon nc-simple-add"></i>
@@ -199,16 +215,39 @@
                 @csrf
                 <div class="modal-body">
                     <div class="form-group">
+                        <label for="recipient_type">Recipient Type</label>
+                        <select class="form-control" id="recipient_type" name="recipient_type" required onchange="toggleRecipientSelect()">
+                            <option value="">Choose recipient type...</option>
+                            <option value="manufacturer">Manufacturer</option>
+                            <option value="admin">Administrator</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="manufacturer_select" style="display:none;">
                         <label for="manufacturer_id">Select Manufacturer</label>
-                        <select class="form-control" id="manufacturer_id" name="manufacturer_id" required>
+                        <select class="form-control" id="manufacturer_id" name="recipient_id">
                             <option value="">Choose a manufacturer...</option>
-                            <!-- Add your manufacturers here -->
+                            @foreach($manufacturers as $manufacturer)
+                                <option value="{{ $manufacturer->id }}">{{ $manufacturer->name }} ({{ $manufacturer->email }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group" id="admin_select" style="display:none;">
+                        <label for="admin_id">Select Administrator</label>
+                        <select class="form-control" id="admin_id" name="recipient_id">
+                            <option value="">Choose an administrator...</option>
+                            @foreach($admins as $admin)
+                                <option value="{{ $admin->id }}">{{ $admin->name }} ({{ $admin->email }})</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="message">Initial Message</label>
-                        <textarea class="form-control" id="message" name="message" rows="4" placeholder="Type your message here..." required></textarea>
+                        <textarea class="form-control" id="message" name="message" rows="4" placeholder="Type your message here..." required maxlength="1000"></textarea>
+                        <small class="text-muted">
+                            <span id="modalCharCount">0</span>/1000 characters
+                        </small>
                     </div>
+                    <input type="hidden" name="type" value="text">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -221,6 +260,23 @@
         </div>
     </div>
 </div>
+
+<script>
+function toggleRecipientSelect() {
+    var type = document.getElementById('recipient_type').value;
+    document.getElementById('manufacturer_select').style.display = (type === 'manufacturer') ? 'block' : 'none';
+    document.getElementById('admin_select').style.display = (type === 'admin') ? 'block' : 'none';
+    // Clear the other select
+    if(type === 'manufacturer') document.getElementById('admin_id').value = '';
+    if(type === 'admin') document.getElementById('manufacturer_id').value = '';
+}
+
+// Character counter for modal
+document.getElementById('message').addEventListener('input', function() {
+    const charCount = this.value.length;
+    document.getElementById('modalCharCount').textContent = charCount;
+});
+</script>
 
 <style>
 /* Main Content Adjustments */
@@ -356,12 +412,13 @@
 }
 
 .card-header {
-    background: linear-gradient(135deg, rgba(25, 118, 210, 0.95) 0%, rgba(13, 71, 161, 0.95) 100%);
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
     padding: 25px 30px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    color: white;
+    border-bottom: none;
 }
 
 .header-content {
@@ -372,27 +429,27 @@
     font-size: 1.5rem;
     font-weight: 700;
     margin: 0 0 5px 0;
-    line-height: 1.2;
+    color: white;
 }
 
 .card-subtitle {
-    font-size: 0.95rem;
+    font-size: 1rem;
     margin: 0;
     opacity: 0.9;
-    font-weight: 400;
+    color: white;
 }
 
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
 }
 
 .header-icon {
     width: 50px;
     height: 50px;
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
+    border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -407,33 +464,30 @@
     padding: 30px;
 }
 
-/* Table Styling */
+/* Table Styles */
 .table {
     margin: 0;
 }
 
-.table thead th {
-    background: rgba(25, 118, 210, 0.1);
-    color: #333;
+.table th {
+    border-top: none;
+    border-bottom: 2px solid #e9ecef;
     font-weight: 600;
-    border: none;
-    padding: 15px;
-    font-size: 0.9rem;
+    color: #333;
+    padding: 15px 10px;
+    background: #f8f9fa;
 }
 
-.table tbody td {
-    padding: 15px;
-    border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+.table td {
+    border-top: none;
+    border-bottom: 1px solid #e9ecef;
+    padding: 20px 10px;
     vertical-align: middle;
 }
 
-.table tbody tr:hover {
-    background: rgba(25, 118, 210, 0.05);
-}
-
-/* Manufacturer Info */
-.manufacturer-info {
+/* Recipient Info */
+.manufacturer-info,
+.admin-info {
     display: flex;
     align-items: center;
     gap: 15px;
@@ -442,7 +496,6 @@
 .avatar {
     width: 50px;
     height: 50px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -451,27 +504,36 @@
 }
 
 .avatar-text {
-    color: white;
+    font-size: 18px;
     font-weight: 700;
-    font-size: 1.2rem;
-    text-transform: uppercase;
+    color: white;
 }
 
-.manufacturer-details {
+.manufacturer-details,
+.admin-details {
     display: flex;
     flex-direction: column;
     gap: 2px;
 }
 
-.manufacturer-name {
+.manufacturer-name,
+.admin-name {
     font-weight: 600;
     color: #333;
     font-size: 1rem;
 }
 
-.manufacturer-email {
+.manufacturer-role,
+.admin-role {
+    font-size: 0.8rem;
     color: #666;
+    font-weight: 500;
+}
+
+.manufacturer-email,
+.admin-email {
     font-size: 0.85rem;
+    color: #888;
 }
 
 /* Message Preview */
@@ -480,57 +542,55 @@
 }
 
 .message-text {
-    color: #666;
-    font-style: italic;
+    color: #333;
     font-size: 0.9rem;
+    line-height: 1.4;
 }
 
 /* Status Badges */
 .status-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     padding: 6px 12px;
     border-radius: 20px;
     font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-weight: 500;
 }
 
 .status-read {
-    background: rgba(46, 125, 50, 0.1);
-    color: #2e7d32;
+    background: #d4edda;
+    color: #155724;
 }
 
 .status-unread {
-    background: rgba(237, 108, 2, 0.1);
-    color: #ed6c02;
+    background: #fff3cd;
+    color: #856404;
 }
 
 .status-badge i {
     font-size: 12px;
 }
 
+/* Date Labels */
 .date-label {
-    font-weight: 500;
+    font-size: 0.85rem;
     color: #666;
-    font-size: 0.9rem;
 }
 
 /* Action Buttons */
 .action-btn {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     padding: 8px 16px;
-    border: none;
     border-radius: 8px;
+    text-decoration: none;
     font-size: 0.85rem;
     font-weight: 500;
-    cursor: pointer;
     transition: all 0.3s ease;
-    text-decoration: none;
+    border: none;
+    cursor: pointer;
 }
 
 .action-btn.primary {
@@ -540,47 +600,13 @@
 
 .action-btn.primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    color: white;
+    text-decoration: none;
 }
 
 .action-btn i {
     font-size: 14px;
-}
-
-/* Pagination Section */
-.pagination-section {
-    margin-top: 30px;
-    display: flex;
-    justify-content: center;
-}
-
-.pagination {
-    display: flex;
-    gap: 5px;
-}
-
-.page-link {
-    padding: 8px 12px;
-    border: 1px solid rgba(25, 118, 210, 0.2);
-    background: rgba(255, 255, 255, 0.8);
-    color: #1976d2;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.page-link:hover {
-    background: rgba(25, 118, 210, 0.1);
-    border-color: #1976d2;
-    color: #1976d2;
-    transform: translateY(-2px);
-}
-
-.page-item.active .page-link {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border-color: transparent;
-    color: white;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 /* Empty State */
@@ -592,8 +618,8 @@
 .empty-icon {
     width: 80px;
     height: 80px;
-    background: rgba(25, 118, 210, 0.1);
-    border-radius: 20px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -602,7 +628,7 @@
 
 .empty-icon i {
     font-size: 40px;
-    color: #1976d2;
+    color: white;
 }
 
 .empty-title {
@@ -624,136 +650,79 @@
     gap: 15px;
 }
 
-/* Modal Styling */
+/* Pagination */
+.pagination-section {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Modal Styles */
 .modal-content {
-    border-radius: 20px;
+    border-radius: 15px;
     border: none;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
 .modal-header {
-    background: linear-gradient(135deg, rgba(25, 118, 210, 0.95) 0%, rgba(13, 71, 161, 0.95) 100%);
+    background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
-    border-radius: 20px 20px 0 0;
-    border: none;
-    padding: 20px 30px;
+    border-radius: 15px 15px 0 0;
+    border-bottom: none;
 }
 
 .modal-title {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    color: white;
     font-weight: 600;
 }
 
 .modal-title i {
-    font-size: 20px;
+    margin-right: 10px;
 }
 
 .modal-body {
     padding: 30px;
 }
 
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-control {
-    border-radius: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    padding: 12px 15px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-
-.form-control:focus {
-    border-color: #1976d2;
-    box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25);
-}
-
 .modal-footer {
-    border: none;
+    border-top: 1px solid #e9ecef;
     padding: 20px 30px;
-    background: rgba(0, 0, 0, 0.02);
-}
-
-.btn {
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    border: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .content {
-        padding-top: 120px !important;
-    }
-    
-    .welcome-card {
-        flex-direction: column;
-        text-align: center;
-        padding: 30px 20px;
-    }
-    
     .welcome-title {
         font-size: 2rem;
     }
-    
-    .welcome-icon {
-        margin: 20px 0 0 0;
-    }
-    
+
     .stats-card {
         padding: 20px;
     }
-    
+
     .stats-number {
         font-size: 1.5rem;
     }
-    
+
     .card-header {
         flex-direction: column;
-        text-align: center;
         gap: 15px;
+        text-align: center;
     }
-    
+
     .header-actions {
+        justify-content: center;
+    }
+
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+
+    .manufacturer-info,
+    .admin-info {
         flex-direction: column;
+        text-align: center;
         gap: 10px;
-    }
-    
-    .header-icon {
-        margin: 0;
-    }
-    
-    .manufacturer-info {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-    
-    .message-preview {
-        max-width: 200px;
-    }
-    
-    .empty-actions {
-        flex-direction: column;
-        align-items: center;
     }
 }
 </style>
-@endsection 
+@endsection

@@ -32,6 +32,11 @@ class Chat extends Model
         return $this->belongsTo(User::class, 'supplier_id');
     }
 
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'admin_id');
+    }
+
     public function markAsRead()
     {
         $this->update([
@@ -39,4 +44,4 @@ class Chat extends Model
             'read_at' => now(),
         ]);
     }
-} 
+}

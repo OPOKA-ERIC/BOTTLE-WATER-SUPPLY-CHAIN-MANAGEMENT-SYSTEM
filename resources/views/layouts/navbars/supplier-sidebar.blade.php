@@ -64,6 +64,7 @@
                     <a class="nav-link" href="{{route('supplier.chats.index')}}">
                         <div class="nav-icon">
                             <i class="nc-icon nc-chat-33"></i>
+                            <span class="notification-badge" id="chatNotificationBadge" style="display: none;">0</span>
                         </div>
                         <div class="nav-content">
                             <span class="nav-title">{{ __("Chat") }}</span>
@@ -445,23 +446,23 @@
         width: 100%;
         transform: translateX(-100%);
     }
-    
+
     .supplier-sidebar.show {
         transform: translateX(0);
     }
-    
+
     .sidebar-header {
         padding: 20px 15px;
     }
-    
+
     .nav-item {
         margin: 3px 10px;
     }
-    
+
     .nav-link {
         padding: 12px 15px;
     }
-    
+
     .sidebar-footer {
         padding: 15px;
     }
@@ -483,4 +484,74 @@
         box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
     }
 }
-</style> 
+
+/* Notification Badge */
+.nav-icon {
+    position: relative;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff4757;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border: 2px solid rgba(25, 118, 210, 0.95);
+    animation: notification-pulse 2s infinite;
+}
+
+@keyframes notification-pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+    50% {
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.6);
+    }
+    100% {
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+}
+</style>
+
+<script>
+// Update chat notification badge
+function updateChatNotificationBadge() {
+    fetch('{{ route("supplier.chats.unread-count") }}')
+        .then(response => response.json())
+        .then(data => {
+            const badge = document.getElementById('chatNotificationBadge');
+            if (data.unread_count > 0) {
+                badge.textContent = data.unread_count;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching unread count:', error);
+        });
+}
+
+// Update badge on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateChatNotificationBadge();
+
+    // Update badge every 30 seconds
+    setInterval(updateChatNotificationBadge, 30000);
+});
+</script>

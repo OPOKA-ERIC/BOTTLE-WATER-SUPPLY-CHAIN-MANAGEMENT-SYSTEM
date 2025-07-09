@@ -61,18 +61,18 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 // Vendor Routes
 Route::middleware(['auth', 'role:vendor', 'redirect.role'])->prefix('vendor')->name('vendor.')->group(function () {
     Route::get('/dashboard', [VendorDashboardController::class, 'index'])->name('dashboard');
-    
+
     // Applications Routes
     Route::get('/applications', [VendorDashboardController::class, 'applications'])->name('applications.index');
     Route::get('/applications/create', [VendorDashboardController::class, 'createApplication'])->name('applications.create');
     Route::post('/applications', [VendorDashboardController::class, 'storeApplication'])->name('applications.store');
     Route::get('/applications/{id}', [VendorDashboardController::class, 'showApplication'])->name('applications.show');
     Route::get('/applications/{id}/download', [VendorDashboardController::class, 'downloadPdf'])->name('applications.download');
-    
+
     // Visit Management Routes
     Route::get('/applications/{id}/schedule-visit', [VendorDashboardController::class, 'scheduleVisit'])->name('applications.schedule-visit');
     Route::post('/applications/{id}/visit-result', [VendorDashboardController::class, 'storeVisitResult'])->name('applications.visit-result');
-    
+
     // Reports Routes
     Route::get('/reports', [VendorDashboardController::class, 'reports'])->name('reports');
 });
@@ -83,21 +83,25 @@ Route::middleware(['auth', 'role:supplier'])->prefix('supplier')->name('supplier
     Route::get('/notifications', function () {
         return view('supplier.notifications');
     })->name('notifications');
-    
+
     // Materials Routes
     Route::get('/materials', [App\Http\Controllers\Supplier\DashboardController::class, 'materials'])->name('materials');
     Route::put('/materials/{id}', [App\Http\Controllers\Supplier\DashboardController::class, 'updateMaterial'])->name('materials.update');
-    
+
     // Orders Routes
     Route::get('/orders', [App\Http\Controllers\Supplier\OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{id}', [App\Http\Controllers\Supplier\OrderController::class, 'show'])->name('orders.show');
     Route::put('/orders/{id}/status', [App\Http\Controllers\Supplier\OrderController::class, 'updateStatus'])->name('orders.status');
-    
+
     // Chat Routes
     Route::get('/chats', [App\Http\Controllers\Supplier\ChatController::class, 'index'])->name('chats.index');
-    Route::get('/chats/{id}', [App\Http\Controllers\Supplier\ChatController::class, 'show'])->name('chats.show');
-    Route::post('/chats', [App\Http\Controllers\Supplier\ChatController::class, 'store'])->name('chats.store');
-    Route::put('/chats/{id}/read', [App\Http\Controllers\Supplier\ChatController::class, 'markAsRead'])->name('chats.read');
+Route::get('/chats/{id}', [App\Http\Controllers\Supplier\ChatController::class, 'show'])->name('chats.show');
+Route::post('/chats', [App\Http\Controllers\Supplier\ChatController::class, 'store'])->name('chats.store');
+Route::put('/chats/{id}/read', [App\Http\Controllers\Supplier\ChatController::class, 'markAsRead'])->name('chats.read');
+Route::get('/chats/conversation/{recipientType}/{recipientId}', [App\Http\Controllers\Supplier\ChatController::class, 'getConversation'])->name('chats.conversation');
+Route::post('/chats/send', [App\Http\Controllers\Supplier\ChatController::class, 'sendMessage'])->name('chats.send');
+Route::get('/chats/recipients', [App\Http\Controllers\Supplier\ChatController::class, 'getAvailableRecipients'])->name('chats.recipients');
+Route::get('/chats/unread-count', [App\Http\Controllers\Supplier\ChatController::class, 'getUnreadCount'])->name('chats.unread-count');
 });
 
 // Manufacturer Routes
@@ -110,7 +114,7 @@ Route::middleware(['auth', 'role:manufacturer', 'redirect.role'])->prefix('manuf
     Route::get('/production-batches', [ManufacturerDashboardController::class, 'productionBatches'])->name('manufacturer.production.batches');
     Route::post('/production-batches', [ManufacturerDashboardController::class, 'createProductionBatch'])->name('manufacturer.production.create');
     Route::get('/chat/{supplierId}', [ManufacturerDashboardController::class, 'chatWithSupplier'])->name('manufacturer.chat');
-    
+
     // Notification routes
     Route::post('/notifications/{id}/mark-read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('manufacturer.notifications.mark-read');
     Route::post('/notifications/mark-all-read', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('manufacturer.notifications.mark-all-read');
