@@ -130,6 +130,77 @@ The PDF should contain the following information in a readable format:
 - Environmental compliance status
 - Safety certifications
 
+## Recommended Document Template
+
+```
+VENDOR APPLICATION DOCUMENT
+=====================================
+
+COMPANY INFORMATION
+-------------------
+Business Name: [Company Name]
+Business Type: [Type of Business]
+Years in Business: [X] years
+Business License: Yes - License #[Number]
+Tax Registration: Yes - EIN: [Number]
+
+FINANCIAL INFORMATION
+---------------------
+Annual Revenue: $[Amount] (minimum $10,000,000)
+Net Worth: $[Amount] (minimum $100,000,000)
+Credit Rating: [A+, A, B+, etc.]
+Bankruptcy History: None
+Tax Liens: None
+
+REPUTATION & REVIEWS
+-------------------
+Average Rating: [X.X] out of 5
+Total Reviews: [Number]
+Legal Issues: None
+Customer Complaints: None
+
+COMPLIANCE & CERTIFICATIONS
+--------------------------
+Business License: Active - [Details]
+Tax Registration: Current - [Details]
+Insurance Coverage: [Type] - [Coverage amount]
+Environmental Compliance: [EPA/Environmental details]
+Safety Certification: [OSHA/Safety details] - [Certification name]
+
+[Additional sections as needed]
+
+DECLARATION
+-----------
+I, [Name], [Title] of [Company], hereby declare that all information provided in this document is true and accurate to the best of my knowledge.
+
+Signature: _________________________
+Date: _____________________________
+Title: [Title]
+```
+
+## Validation Keywords
+
+The system looks for these specific keywords:
+
+### Financial Keywords:
+- "annual revenue", "revenue", "annual income"
+- "net worth", "net value", "total assets"
+- "years in business", "established", "founded"
+- "credit rating", "credit score", "rating"
+
+### Compliance Keywords:
+- "business license", "operating license", "license"
+- "tax registration", "tax id", "ein", "employer identification"
+- "insurance", "liability coverage", "coverage"
+- "environmental", "epa", "green", "environmental compliance"
+- "safety", "osha", "certification", "safety excellence", "ohsas", "occupational health"
+
+### Reputation Keywords:
+- "rating", "out of 5", "stars"
+- "reviews", "customer reviews"
+- "legal issue", "lawsuit", "litigation"
+- "complaint", "dispute", "customer complaint"
+
 ## Integration with Laravel Application
 
 The Java server is designed to integrate with the Laravel SCMS application. The Laravel application can:

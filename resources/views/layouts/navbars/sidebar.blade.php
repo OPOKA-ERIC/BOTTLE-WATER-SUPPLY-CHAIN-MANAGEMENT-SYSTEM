@@ -32,6 +32,21 @@
                     </li>
                 @endif
 
+<<<<<<< HEAD
+                <!-- Main Dashboard -->
+                <li class="nav-item @if($activePage == 'dashboard') active @endif">
+                    <a class="nav-link" href="@if(Auth::user() && Auth::user()->role == 'administrator'){{ route('admin.dashboard') }}@elseif(Auth::user() && Auth::user()->role == 'manufacturer'){{ route('manufacturer.dashboard') }}@elseif(Auth::user() && Auth::user()->role == 'supplier'){{ route('supplier.dashboard') }}@elseif(Auth::user() && Auth::user()->role == 'retailer'){{ route('retailer.dashboard') }}@else#@endif">
+                        <div class="nav-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">{{ __("Dashboard") }}</span>
+                            <span class="nav-subtitle">Main overview</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
+=======
                 @if(auth()->check() && auth()->user()->role === 'vendor')
                     <li class="nav-item @if($activePage == 'dashboard') active @endif">
                         <a class="nav-link" href="{{route('dashboard')}}">
@@ -91,6 +106,7 @@
                         </a>
                     </li>
                 @endif
+>>>>>>> 7f70518c631fbc42ad89ee760eefde5382a63c08
 
                 <!-- Section Divider -->
                 <li class="nav-divider">

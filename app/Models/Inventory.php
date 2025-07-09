@@ -9,6 +9,10 @@ class Inventory extends Model
     protected $fillable = [
         'manufacturer_id',
         'product_id',
+        'current_stock',
+        'minimum_stock',
+        'unit',
+        'notes',
         'quantity',
         'expiry_date',
         'status',

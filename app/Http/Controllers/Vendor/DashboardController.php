@@ -8,6 +8,7 @@ use App\Models\VendorApplication;
 use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use App\Rules\ValidPdfFile;
 
 class DashboardController extends Controller
 {
@@ -82,8 +83,13 @@ class DashboardController extends Controller
         $request->validate([
             'business_name' => 'required|string|max:255',
             'business_type' => 'required|string|max:255',
-            'description' => 'required|string',
-            'pdf_file' => 'required|file|mimes:pdf|max:10240', // 10MB max
+            'description' => 'required|string|min:10',
+            'pdf_file' => ['required', 'file', new ValidPdfFile, 'max:10240'], // 10MB max, PDF only
+        ], [
+            'pdf_file.required' => 'A PDF document is required for vendor validation.',
+            'pdf_file.file' => 'The uploaded file must be a valid file.',
+            'pdf_file.max' => 'The PDF file size must not exceed 10MB.',
+            'description.min' => 'Please provide a detailed business description (minimum 10 characters).',
         ]);
 
         try {
@@ -102,24 +108,35 @@ class DashboardController extends Controller
             ]);
 
             // Send to Java validation server
-            $this->sendToValidationServer($application, $request->file('pdf_file'));
+            $validationResult = $this->sendToValidationServer($application, $request->file('pdf_file'));
+            
+            if (!$validationResult) {
+                // If validation server is not available, still save the application but mark it for manual review
+                $application->update([
+                    'status' => 'pending_manual_review',
+                    'rejection_reason' => 'Automatic validation server unavailable. Application will be reviewed manually.'
+                ]);
+                
+                return redirect()->route('vendor.applications.show', $application->id)
+                    ->with('warning', 'Vendor application submitted successfully. Automatic validation is currently unavailable. Your application will be reviewed manually.');
+            }
 
             return redirect()->route('vendor.applications.show', $application->id)
                 ->with('success', 'Vendor application submitted successfully and sent for validation.');
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error submitting application: ' . $e->getMessage());
+            return back()->with('error', 'Error submitting application: ' . $e->getMessage())->withInput();
         }
     }
 
     private function sendToValidationServer($application, $pdfFile)
     {
         try {
-            $response = Http::attach(
+            $response = Http::timeout(30)->attach(
                 'pdfFile',
                 file_get_contents($pdfFile->getRealPath()),
                 $pdfFile->getClientOriginalName()
-            )->post('http://localhost:8081/vendor-validation/api/vendor-validation/validate', [
+            )->post('http://localhost:8082/vendor-validation/api/vendor-validation/validate', [
                 'businessName' => $application->business_name,
                 'businessType' => $application->business_type,
                 'description' => $application->description,
@@ -144,10 +161,17 @@ class DashboardController extends Controller
 
                     // Extract and store detailed validation data
                     $this->extractValidationData($application, $validatedApp);
+                    
+                    return true; // Validation successful
                 }
             }
+            
+            \Log::error('Validation server response not successful: ' . $response->body());
+            return false; // Validation failed
+            
         } catch (\Exception $e) {
             \Log::error('Error sending to validation server: ' . $e->getMessage());
+            return false; // Validation failed due to exception
         }
     }
 

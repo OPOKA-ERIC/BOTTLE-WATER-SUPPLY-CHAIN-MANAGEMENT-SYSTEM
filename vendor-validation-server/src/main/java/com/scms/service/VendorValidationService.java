@@ -21,27 +21,40 @@ public class VendorValidationService {
     private static final double COMPLIANCE_WEIGHT = 0.35;
 
     public VendorApplication validateVendorApplication(MultipartFile pdfFile, VendorApplication application) {
+        System.out.println("=== STARTING VENDOR VALIDATION ===");
+        System.out.println("PDF File Name: " + pdfFile.getOriginalFilename());
+        System.out.println("PDF File Size: " + pdfFile.getSize() + " bytes");
+        
         try {
             // Save PDF file
             String pdfPath = savePdfFile(pdfFile);
+            System.out.println("PDF saved to: " + pdfPath);
             application.setPdfDocumentPath(pdfPath);
             application.setSubmittedAt(LocalDateTime.now());
 
             // Extract data from PDF
+            System.out.println("Starting PDF text extraction...");
             extractDataFromPdf(pdfPath, application);
+            System.out.println("PDF text extraction completed.");
 
             // Perform validation
+            System.out.println("Starting validation...");
             performValidation(application);
+            System.out.println("Validation completed. Status: " + application.getStatus());
 
             // Schedule facility visit if validation passes
-            if (application.getOverallScore() >= 70.0) {
+            if (application.getOverallScore() != null && application.getOverallScore() >= 70.0) {
+                System.out.println("Scheduling facility visit...");
                 scheduleFacilityVisit(application);
             }
 
             application.setValidatedAt(LocalDateTime.now());
+            System.out.println("=== VENDOR VALIDATION COMPLETED ===");
             return application;
 
         } catch (Exception e) {
+            System.out.println("ERROR during validation: " + e.getMessage());
+            e.printStackTrace();
             application.setStatus("rejected");
             application.setRejectionReason("Error during validation: " + e.getMessage());
             return application;
@@ -61,29 +74,57 @@ public class VendorValidationService {
         return filePath;
     }
 
-    private void extractDataFromPdf(String pdfPath, VendorApplication application) throws IOException {
+    private void extractDataFromPdf(String pdfPath, VendorApplication application) {
+        System.out.println("=== EXTRACTING DATA FROM PDF ===");
+        System.out.println("PDF Path: " + pdfPath);
+        
         try (PDDocument document = PDDocument.load(new File(pdfPath))) {
             PDFTextStripper stripper = new PDFTextStripper();
             String text = stripper.getText(document);
+            
+            System.out.println("Extracted text length: " + text.length());
+            System.out.println("First 500 characters of extracted text:");
+            System.out.println(text.substring(0, Math.min(500, text.length())));
+            
+            if (text.trim().isEmpty()) {
+                System.out.println("WARNING: No text extracted from PDF!");
+                application.setRejectionReason("Unable to extract text from PDF document");
+                return;
+            }
 
             // Extract financial data
+            System.out.println("Extracting financial data...");
             extractFinancialData(text, application);
 
             // Extract reputation data
+            System.out.println("Extracting reputation data...");
             extractReputationData(text, application);
 
             // Extract compliance data
+            System.out.println("Extracting compliance data...");
             extractComplianceData(text, application);
+            
+            System.out.println("=== DATA EXTRACTION COMPLETED ===");
+            
+        } catch (Exception e) {
+            System.out.println("ERROR extracting data from PDF: " + e.getMessage());
+            e.printStackTrace();
+            application.setRejectionReason("Error extracting data from PDF: " + e.getMessage());
         }
     }
 
     private void extractFinancialData(String text, VendorApplication application) {
+        System.out.println("=== EXTRACTING FINANCIAL DATA ===");
+        
         // Extract annual revenue
         Pattern revenuePattern = Pattern.compile("(?i)annual\\s+revenue[\\s:]*\\$?([\\d,]+(?:\\.\\d{2})?)");
         Matcher revenueMatcher = revenuePattern.matcher(text);
         if (revenueMatcher.find()) {
             String revenueStr = revenueMatcher.group(1).replace(",", "");
             application.setAnnualRevenue(Double.parseDouble(revenueStr));
+            System.out.println("Found Annual Revenue: " + application.getAnnualRevenue());
+        } else {
+            System.out.println("NO ANNUAL REVENUE FOUND");
         }
 
         // Extract net worth
@@ -92,6 +133,9 @@ public class VendorValidationService {
         if (netWorthMatcher.find()) {
             String netWorthStr = netWorthMatcher.group(1).replace(",", "");
             application.setNetWorth(Double.parseDouble(netWorthStr));
+            System.out.println("Found Net Worth: " + application.getNetWorth());
+        } else {
+            System.out.println("NO NET WORTH FOUND");
         }
 
         // Extract years in business
@@ -99,6 +143,9 @@ public class VendorValidationService {
         Matcher yearsMatcher = yearsPattern.matcher(text);
         if (yearsMatcher.find()) {
             application.setYearsInBusiness(Integer.parseInt(yearsMatcher.group(1)));
+            System.out.println("Found Years in Business: " + application.getYearsInBusiness());
+        } else {
+            System.out.println("NO YEARS IN BUSINESS FOUND");
         }
 
         // Extract credit rating
@@ -106,13 +153,20 @@ public class VendorValidationService {
         Matcher creditMatcher = creditPattern.matcher(text);
         if (creditMatcher.find()) {
             application.setCreditRating(creditMatcher.group(1));
+            System.out.println("Found Credit Rating: " + application.getCreditRating());
+        } else {
+            System.out.println("NO CREDIT RATING FOUND");
         }
 
         // Check for bankruptcy
         application.setHasBankruptcy(text.toLowerCase().contains("bankruptcy"));
+        System.out.println("Has Bankruptcy: " + application.getHasBankruptcy());
 
         // Check for tax liens
         application.setHasTaxLiens(text.toLowerCase().contains("tax lien"));
+        System.out.println("Has Tax Liens: " + application.getHasTaxLiens());
+        
+        System.out.println("=== FINANCIAL DATA EXTRACTION COMPLETE ===");
     }
 
     private void extractReputationData(String text, VendorApplication application) {
@@ -141,33 +195,64 @@ public class VendorValidationService {
     }
 
     private void extractComplianceData(String text, VendorApplication application) {
+        System.out.println("=== EXTRACTING COMPLIANCE DATA ===");
+        
         // Check for business license
-        application.setHasBusinessLicense(text.toLowerCase().contains("business license") ||
-                                         text.toLowerCase().contains("operating license"));
+        boolean hasBusinessLicense = text.toLowerCase().contains("business license") ||
+                                   text.toLowerCase().contains("operating license");
+        application.setHasBusinessLicense(hasBusinessLicense);
+        System.out.println("Has Business License: " + hasBusinessLicense);
 
         // Check for tax registration
-        application.setHasTaxRegistration(text.toLowerCase().contains("tax registration") ||
+        boolean hasTaxRegistration = text.toLowerCase().contains("tax registration") ||
                                          text.toLowerCase().contains("tax id") ||
-                                         text.toLowerCase().contains("ein"));
+                                   text.toLowerCase().contains("ein");
+        application.setHasTaxRegistration(hasTaxRegistration);
+        System.out.println("Has Tax Registration: " + hasTaxRegistration);
 
         // Check for insurance
-        application.setHasInsurance(text.toLowerCase().contains("insurance") ||
-                                  text.toLowerCase().contains("liability coverage"));
+        boolean hasInsurance = text.toLowerCase().contains("insurance") ||
+                             text.toLowerCase().contains("liability coverage");
+        application.setHasInsurance(hasInsurance);
+        System.out.println("Has Insurance: " + hasInsurance);
 
         // Check for environmental compliance
-        application.setHasEnvironmentalCompliance(text.toLowerCase().contains("environmental") ||
+        boolean hasEnvironmentalCompliance = text.toLowerCase().contains("environmental") ||
                                                  text.toLowerCase().contains("epa") ||
-                                                 text.toLowerCase().contains("green"));
+                                           text.toLowerCase().contains("green");
+        application.setHasEnvironmentalCompliance(hasEnvironmentalCompliance);
+        System.out.println("Has Environmental Compliance: " + hasEnvironmentalCompliance);
 
         // Check for safety certification
-        application.setHasSafetyCertification(text.toLowerCase().contains("safety") ||
+        boolean hasSafetyCertification = text.toLowerCase().contains("safety") ||
                                              text.toLowerCase().contains("osha") ||
-                                             text.toLowerCase().contains("certification"));
+                                       text.toLowerCase().contains("certification") ||
+                                       text.toLowerCase().contains("safety excellence") ||
+                                       text.toLowerCase().contains("ohsas") ||
+                                       text.toLowerCase().contains("occupational health");
+        application.setHasSafetyCertification(hasSafetyCertification);
+        System.out.println("Has Safety Certification: " + hasSafetyCertification);
+        
+        System.out.println("=== COMPLIANCE DATA EXTRACTION COMPLETE ===");
     }
 
     private void performValidation(VendorApplication application) {
         StringBuilder rejectionReasons = new StringBuilder();
         boolean passed = true;
+
+        // Log extracted data for debugging
+        System.out.println("=== VALIDATION DEBUG ===");
+        System.out.println("Annual Revenue: " + application.getAnnualRevenue());
+        System.out.println("Net Worth: " + application.getNetWorth());
+        System.out.println("Years in Business: " + application.getYearsInBusiness());
+        System.out.println("Has Business License: " + application.getHasBusinessLicense());
+        System.out.println("Has Tax Registration: " + application.getHasTaxRegistration());
+        System.out.println("Has Insurance: " + application.getHasInsurance());
+        System.out.println("Has Environmental Compliance: " + application.getHasEnvironmentalCompliance());
+        System.out.println("Has Safety Certification: " + application.getHasSafetyCertification());
+        System.out.println("Has Legal Issues: " + application.getHasLegalIssues());
+        System.out.println("Has Complaints: " + application.getHasComplaints());
+        System.out.println("========================");
 
         // Financial stability
         if (application.getAnnualRevenue() == null || application.getAnnualRevenue() < 10000000) {
@@ -208,6 +293,10 @@ public class VendorValidationService {
         }
         if (!Boolean.TRUE.equals(application.getHasEnvironmentalCompliance())) {
             rejectionReasons.append("Environmental compliance is required. ");
+            passed = false;
+        }
+        if (!Boolean.TRUE.equals(application.getHasSafetyCertification())) {
+            rejectionReasons.append("Safety certification is required. ");
             passed = false;
         }
 

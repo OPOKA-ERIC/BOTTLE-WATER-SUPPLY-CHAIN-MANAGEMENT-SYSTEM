@@ -74,20 +74,6 @@
                     </a>
                 </li>
 
-                <!-- User Profile -->
-                <li class="nav-item @if($activePage == 'user') active @endif">
-                    <a class="nav-link" href="{{route('profile.edit')}}">
-                        <div class="nav-icon">
-                            <i class="nc-icon nc-single-02"></i>
-                        </div>
-                        <div class="nav-content">
-                            <span class="nav-title">{{ __("User Profile") }}</span>
-                            <span class="nav-subtitle">Your profile</span>
-                        </div>
-                        <div class="nav-indicator"></div>
-                    </a>
-                </li>
-
                 <!-- Notifications -->
                 <li class="nav-item @if($activePage == 'notifications') active @endif">
                     <a class="nav-link" href="{{ route('supplier.notifications') }}">
@@ -106,32 +92,7 @@
 
         <!-- Sidebar Footer -->
         <div class="sidebar-footer">
-            <!-- Logout Button -->
-            <div class="logout-section">
-                <form id="logout-form" action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="logout-btn">
-                        <div class="logout-icon">
-                            <i class="nc-icon nc-button-power"></i>
-                        </div>
-                        <div class="logout-content">
-                            <span class="logout-title">{{ __("Logout") }}</span>
-                            <span class="logout-subtitle">Sign out</span>
-                        </div>
-                    </button>
-                </form>
-            </div>
-
-            <!-- Supplier Info -->
-            <div class="supplier-info">
-                <div class="supplier-avatar">
-                    <i class="nc-icon nc-single-02"></i>
-                </div>
-                <div class="supplier-details">
-                    <span class="supplier-name">Supplier</span>
-                    <span class="supplier-role">Material Provider</span>
-                </div>
-            </div>
+            <!-- Empty footer for spacing -->
         </div>
     </div>
 </div>

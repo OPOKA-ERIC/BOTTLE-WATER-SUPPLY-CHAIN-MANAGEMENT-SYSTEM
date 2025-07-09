@@ -51,11 +51,29 @@
                             </div>
                             <div class="form-group">
                                 <label for="pdf_file">Application PDF <span class="text-danger">*</span></label>
+                                <div class="pdf-upload-container">
                                 <input type="file" name="pdf_file" id="pdf_file" class="form-control-file @error('pdf_file') is-invalid @enderror" accept="application/pdf" required>
+                                    <div class="pdf-upload-info">
+                                        <i class="nc-icon nc-paper"></i>
+                                        <p class="upload-text">Upload your business documentation in PDF format</p>
+                                        <p class="upload-requirements">
+                                            <strong>Required Information:</strong><br>
+                                            • Financial statements and revenue data<br>
+                                            • Business license and compliance certificates<br>
+                                            • Insurance and safety documentation<br>
+                                            • Years in business and credit rating<br>
+                                            • Any legal issues or complaints history
+                                        </p>
+                                        <p class="upload-note">Maximum file size: 10MB | Format: PDF only</p>
+                                    </div>
+                                </div>
                                 @error('pdf_file')
                                     <span class="invalid-feedback d-block" role="alert"><strong>{{ $message }}</strong></span>
                                 @enderror
-                                <small class="form-text text-muted">Upload a PDF document with your business and compliance details. Max size: 10MB.</small>
+                                <small class="form-text text-muted">
+                                    <strong>Note:</strong> This PDF document is mandatory for vendor validation. 
+                                    The document will be automatically analyzed for compliance and financial verification.
+                                </small>
                             </div>
                             <button type="submit" class="btn btn-primary">Submit Application</button>
                             <a href="{{ route('vendor.dashboard') }}" class="btn btn-secondary">Cancel</a>
@@ -270,5 +288,150 @@ body .content,
         padding-top: 180px !important;
     }
 }
+
+/* PDF Upload styling improvements */
+.pdf-upload-container {
+    border: 2px dashed rgba(25, 118, 210, 0.3) !important;
+    border-radius: 12px !important;
+    padding: 25px !important;
+    text-align: center !important;
+    background: rgba(25, 118, 210, 0.05) !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+}
+
+.pdf-upload-container:hover {
+    border-color: #1976d2 !important;
+    background: rgba(25, 118, 210, 0.1) !important;
+}
+
+.pdf-upload-info {
+    margin-top: 15px !important;
+}
+
+.pdf-upload-info i {
+    font-size: 3rem !important;
+    color: #1976d2 !important;
+    margin-bottom: 15px !important;
+}
+
+.upload-text {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    color: #333 !important;
+    margin-bottom: 15px !important;
+}
+
+.upload-requirements {
+    text-align: left !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    padding: 15px !important;
+    border-radius: 8px !important;
+    margin: 15px 0 !important;
+    font-size: 0.9rem !important;
+    line-height: 1.6 !important;
+}
+
+.upload-note {
+    font-size: 0.85rem !important;
+    color: #666 !important;
+    font-style: italic !important;
+    margin-top: 10px !important;
+}
+
+.form-control-file {
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+}
+
+.form-control-file:focus {
+    box-shadow: none !important;
+}
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const pdfFileInput = document.getElementById('pdf_file');
+        const form = document.querySelector('form');
+        
+        // Client-side PDF validation
+        pdfFileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+            
+            if (file) {
+                // Check file type
+                if (file.type !== 'application/pdf') {
+                    alert('Please select a PDF file only.');
+                    this.value = '';
+                    return;
+                }
+                
+                // Check file size
+                if (file.size > maxSize) {
+                    alert('File size must be less than 10MB.');
+                    this.value = '';
+                    return;
+                }
+                
+                // Check PDF header
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const arr = new Uint8Array(e.target.result);
+                    const header = String.fromCharCode.apply(null, arr.subarray(0, 4));
+                    
+                    if (header !== '%PDF') {
+                        alert('The selected file does not appear to be a valid PDF document.');
+                        pdfFileInput.value = '';
+                        return;
+                    }
+                    
+                    // Show success message
+                    showFileValidationMessage('PDF file selected successfully!', 'success');
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        });
+        
+        // Form submission validation
+        form.addEventListener('submit', function(e) {
+            const pdfFile = pdfFileInput.files[0];
+            
+            if (!pdfFile) {
+                e.preventDefault();
+                alert('Please select a PDF file before submitting.');
+                return;
+            }
+            
+            // Show loading message
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="nc-icon nc-refresh-69"></i> Processing...';
+            submitBtn.disabled = true;
+        });
+        
+        function showFileValidationMessage(message, type) {
+            // Remove existing messages
+            const existingMsg = document.querySelector('.file-validation-message');
+            if (existingMsg) {
+                existingMsg.remove();
+            }
+            
+            // Create new message
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `file-validation-message alert alert-${type === 'success' ? 'success' : 'danger'}`;
+            msgDiv.innerHTML = message;
+            
+            // Insert after file input
+            pdfFileInput.parentNode.insertBefore(msgDiv, pdfFileInput.nextSibling);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                if (msgDiv.parentNode) {
+                    msgDiv.remove();
+                }
+            }, 3000);
+        }
+    });
+</script>
 @endsection 

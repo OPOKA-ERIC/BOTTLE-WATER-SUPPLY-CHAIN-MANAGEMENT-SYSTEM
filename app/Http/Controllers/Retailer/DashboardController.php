@@ -62,7 +62,8 @@ class DashboardController extends Controller
             ->with('products')
             ->latest()
             ->paginate(10);
-        return view('retailer.orders.index', compact('orders'))
+        $products = Product::all();
+        return view('retailer.orders.index', compact('orders', 'products'))
             ->with('title', 'Retailer Orders - BWSCMS')
             ->with('activePage', 'orders')
             ->with('navName', 'Retailer Orders');
@@ -92,6 +93,9 @@ class DashboardController extends Controller
             ]);
         }
 
+        // Calculate and save the total amount
+        $order->calculateTotal();
+
         DeliverySchedule::create([
             'order_id' => $order->id,
             'retailer_id' => auth()->id(),
@@ -99,7 +103,7 @@ class DashboardController extends Controller
             'status' => 'scheduled',
         ]);
 
-        return redirect()->route('retailer.orders.show', $order)
+        return redirect()->route('retailer.orders.index')
             ->with('success', 'Order placed successfully');
     }
 
@@ -118,14 +122,14 @@ class DashboardController extends Controller
     public function reports()
     {
         $salesReport = Order::where('retailer_id', auth()->id())
-            ->where('status', 'completed')
+            ->whereIn('status', ['completed', 'delivered'])
             ->selectRaw('DATE(created_at) as date, SUM(total_amount) as total')
             ->groupBy('date')
             ->orderBy('date')
             ->get();
 
         $productReport = Order::where('retailer_id', auth()->id())
-            ->where('status', 'completed')
+            ->whereIn('status', ['completed', 'delivered'])
             ->with('products')
             ->get()
             ->pluck('products')
@@ -145,5 +149,37 @@ class DashboardController extends Controller
             ->with('title', 'Retailer Reports - BWSCMS')
             ->with('activePage', 'reports')
             ->with('navName', 'Retailer Reports');
+    }
+
+    public function apiReports()
+    {
+        $salesReport = Order::where('retailer_id', auth()->id())
+            ->whereIn('status', ['completed', 'delivered'])
+            ->selectRaw('DATE(created_at) as date, SUM(total_amount) as total')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        $productReport = Order::where('retailer_id', auth()->id())
+            ->whereIn('status', ['completed', 'delivered'])
+            ->with('products')
+            ->get()
+            ->pluck('products')
+            ->flatten()
+            ->groupBy('id')
+            ->map(function ($products) {
+                return [
+                    'name' => $products->first()->name,
+                    'total_quantity' => $products->sum('pivot.quantity'),
+                    'total_revenue' => $products->sum(function ($product) {
+                        return $product->pivot->quantity * $product->pivot->price;
+                    }),
+                ];
+            });
+
+        return response()->json([
+            'salesReport' => $salesReport,
+            'productReport' => $productReport->values(),
+        ]);
     }
 } 
