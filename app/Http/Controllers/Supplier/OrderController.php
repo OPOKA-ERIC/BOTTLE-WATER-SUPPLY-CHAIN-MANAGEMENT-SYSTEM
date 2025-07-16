@@ -11,7 +11,7 @@ class OrderController extends Controller
     public function index()
     {
         $orders = PurchaseOrder::where('supplier_id', auth()->id())
-            ->with('manufacturer')
+            ->with(['manufacturer', 'rawMaterials'])
             ->latest()
             ->paginate(10);
 

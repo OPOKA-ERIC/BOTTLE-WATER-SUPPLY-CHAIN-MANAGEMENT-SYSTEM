@@ -130,7 +130,9 @@
                                 <div class="col-md-6">
                                     <select class="form-control" name="products[0][id]" required>
                                         <option value="">Select Product</option>
-                                        <!-- Add your products here -->
+                                        @foreach($products as $product)
+                                            <option value="{{ $product->id }}">{{ $product->name }} ({{ $product->volume ?? '' }} {{ $product->unit ?? '' }})</option>
+                                        @endforeach
                                     </select>
                                 </div>
                                 <div class="col-md-4">
@@ -552,14 +554,19 @@
 <script>
 $(document).ready(function() {
     let productIndex = 1;
-    
+    // Prepare product options as a string
+    var productOptions = `
+        <option value="">Select Product</option>
+        @foreach($products as $product)
+            <option value=\"{{ $product->id }}\">{{ $product->name }} ({{ $product->volume ?? '' }} {{ $product->unit ?? '' }})</option>
+        @endforeach
+    `;
     $('#add-product').click(function() {
         const newProduct = `
             <div class="row mb-2">
                 <div class="col-md-6">
                     <select class="form-control" name="products[${productIndex}][id]" required>
-                        <option value="">Select Product</option>
-                        <!-- Add your products here -->
+                        ${productOptions}
                     </select>
                 </div>
                 <div class="col-md-4">
@@ -573,7 +580,6 @@ $(document).ready(function() {
         $('#products-container').append(newProduct);
         productIndex++;
     });
-    
     $(document).on('click', '.remove-product', function() {
         $(this).closest('.row').remove();
     });

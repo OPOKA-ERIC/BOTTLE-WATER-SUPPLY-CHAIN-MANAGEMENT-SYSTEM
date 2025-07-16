@@ -125,7 +125,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="materials-list">
-                                                @foreach($order->materials as $material)
+                                                @foreach($order->rawMaterials as $material)
                                                             <span class="material-badge">
                                                                 <i class="nc-icon nc-box-2"></i>
                                                                 {{ $material->name }} ({{ $material->pivot->quantity }})
@@ -134,8 +134,8 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <span class="quantity-badge quantity-{{ $order->materials->sum('pivot.quantity') > 100 ? 'high' : ($order->materials->sum('pivot.quantity') > 50 ? 'medium' : 'low') }}">
-                                                        {{ $order->materials->sum('pivot.quantity') }}
+                                                    <span class="quantity-badge quantity-{{ $order->rawMaterials->sum('pivot.quantity') > 100 ? 'high' : ($order->rawMaterials->sum('pivot.quantity') > 50 ? 'medium' : 'low') }}">
+                                                        {{ $order->rawMaterials->sum('pivot.quantity') }}
                                                     </span>
                                             </td>
                                             <td>

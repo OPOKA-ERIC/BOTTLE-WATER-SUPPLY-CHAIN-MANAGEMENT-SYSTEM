@@ -57,14 +57,30 @@ class DashboardController extends Controller
 
     public function updateMaterial(Request $request, $id)
     {
-        $material = RawMaterial::findOrFail($id);
+        try {
+            // Validate the request
+            $request->validate([
+                'quantity_available' => 'required|numeric|min:0',
+                'price' => 'required|numeric|min:0',
+                'status' => 'required|string|in:available,low_stock,unavailable',
+            ]);
+
+            // Find the material and ensure it belongs to the authenticated supplier
+            $material = RawMaterial::where('id', $id)
+                ->where('supplier_id', auth()->id())
+                ->firstOrFail();
+
+            // Update the material
         $material->update([
-            'quantity' => $request->quantity,
+            'quantity_available' => $request->quantity_available,
             'price' => $request->price,
             'status' => $request->status,
         ]);
 
         return redirect()->back()->with('success', 'Material updated successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error updating material: ' . $e->getMessage());
+        }
     }
 
     public function submitVendorApplication(Request $request)
@@ -86,5 +102,44 @@ class DashboardController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Application submitted successfully');
+    }
+
+    public function apiMaterials()
+    {
+        $materials = RawMaterial::where('supplier_id', auth()->id())->paginate(10);
+        $total_value = collect($materials->items())->sum(function($m) {
+            return $m->quantity_available * $m->price;
+        });
+        return response()->json([
+            'materials' => $materials->items(),
+            'total' => $materials->total(),
+            'available' => collect($materials->items())->where('status', 'available')->count(),
+            'low_stock' => collect($materials->items())->where('status', 'low_stock')->count(),
+            'total_value' => $total_value,
+        ]);
+    }
+
+    public function storeMaterial(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|in:bottles,bottle lids,boxes for packing,water,paper',
+            'description' => 'nullable|string',
+            'quantity_available' => 'required|numeric|min:0',
+            'unit_of_measure' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'status' => 'required|string',
+        ]);
+
+        RawMaterial::create([
+            'supplier_id' => auth()->id(),
+            'name' => $request->name,
+            'description' => $request->description,
+            'quantity_available' => $request->quantity_available,
+            'unit_of_measure' => $request->unit_of_measure,
+            'price' => $request->price,
+            'status' => $request->status,
+        ]);
+
+        return redirect()->back()->with('success', 'Material added successfully!');
     }
 } 

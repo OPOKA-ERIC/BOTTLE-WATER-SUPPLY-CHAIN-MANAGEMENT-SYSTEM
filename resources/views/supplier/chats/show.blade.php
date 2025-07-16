@@ -41,18 +41,20 @@
                     </div>
 
                     <!-- Chat Messages -->
-                    <div class="chat-messages mb-4">
+                    <div class="chat-messages mb-4 chat-debug-style">
                         <div class="message-container">
-                            <div class="message supplier-message">
-                                <div class="message-content">
-                                    <div class="message-text">
-                                        {{ $chat->message }}
-                                    </div>
-                                    <div class="message-time">
-                                        {{ $chat->created_at->format('M d, Y H:i') }}
+                            @foreach($messages as $message)
+                                <div class="message {{ $message->supplier_id == auth()->id() ? 'sent' : 'received' }}">
+                                    <div class="message-content">
+                                        <div class="message-text">
+                                            {{ $message->message }}
+                                        </div>
+                                        <div class="message-time">
+                                            {{ $message->created_at->format('M d, Y H:i') }}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
 
@@ -109,11 +111,11 @@
     margin-bottom: 10px;
 }
 
-.supplier-message {
+.message.sent {
     justify-content: flex-end;
 }
 
-.manufacturer-message {
+.message.received {
     justify-content: flex-start;
 }
 
@@ -124,16 +126,15 @@
     position: relative;
 }
 
-.supplier-message .message-content {
-    background-color: #007bff;
-    color: white;
-    border-bottom-right-radius: 4px;
+.message.sent .message-content {
+    background: #667eea !important;
+    color: #fff !important;
 }
 
-.manufacturer-message .message-content {
-    background-color: #e9ecef;
-    color: #333;
-    border-bottom-left-radius: 4px;
+.message.received .message-content {
+    background: #f1f1f1 !important;
+    color: #222 !important;
+    border: 1px solid #e0e0e0 !important;
 }
 
 .message-text {
@@ -149,6 +150,18 @@
 .chat-reply {
     border-top: 1px solid #e9ecef;
     padding-top: 20px;
+}
+
+/* Debug timestamp: {{ now() }} */
+.chat-debug-style .message.sent .message-content {
+    background: #667eea !important;
+    color: #fff !important;
+    border: 2px solid #003399 !important;
+}
+.chat-debug-style .message.received .message-content {
+    background: #f1f1f1 !important;
+    color: #222 !important;
+    border: 2px solid #ff0000 !important;
 }
 </style>
 @endpush

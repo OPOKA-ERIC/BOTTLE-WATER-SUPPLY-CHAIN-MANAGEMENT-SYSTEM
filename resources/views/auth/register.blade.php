@@ -122,14 +122,12 @@
                                                 <option value="retailer" {{ old('role') == 'retailer' ? 'selected' : '' }} style="background: #1565C0; color: white;">
                                                     🏪 Retailer
                                                 </option>
-                                                <option value="supplier" {{ old('role') == 'supplier' ? 'selected' : '' }} style="background: #1565C0; color: white;">
-                                                    🚛 Supplier
-                                                </option>
+                                        
                                                 <option value="manufacturer" {{ old('role') == 'manufacturer' ? 'selected' : '' }} style="background: #1565C0; color: white;">
                                                     🏭 Manufacturer
                                                 </option>
                                                 <option value="vendor" {{ old('role') == 'vendor' ? 'selected' : '' }} style="background: #1565C0; color: white;">
-                                                    🛒 Vendor
+                                                    🛒 Vendor(Supplier)
                                                 </option>
                                             </select>
                                         </div>

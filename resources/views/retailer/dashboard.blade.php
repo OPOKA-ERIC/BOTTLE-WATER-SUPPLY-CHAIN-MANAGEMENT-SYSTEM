@@ -41,7 +41,7 @@
                             <i class="nc-icon nc-money-coins"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number">${{ number_format($stats['total_revenue'], 2) }}</h3>
+                        <h3 class="stats-number">UGX {{ number_format($stats['total_revenue']) }}</h3>
                         <p class="stats-label">Total Revenue</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
@@ -102,9 +102,9 @@
                                                 {{ ucfirst($order->status) }}
                                             </span>
                                         </td>
-                                        <td><span class="amount">${{ number_format($order->total_amount, 2) }}</span></td>
+                                        <td><span class="amount">UGX {{ number_format($order->total_amount) }}</span></td>
                                         <td>
-                                            <a href="{{ route('retailer.orders.show', $order->id) }}" class="action-btn">
+                                            <a href="{{ route('retailer.orders.track', $order->id) }}" class="action-btn">
                                                 <i class="nc-icon nc-zoom-split-in"></i>
                                                 <span>View</span>
                                             </a>
@@ -193,7 +193,7 @@
                                     @endif
                                     <div class="product-content">
                                         <h5 class="product-title">{{ $product->name }}</h5>
-                                        <p class="product-price">${{ number_format($product->price, 2) }}</p>
+                                        <p class="product-price">UGX {{ number_format($product->price) }}</p>
                                         <a href="{{ route('retailer.products.show', $product->id) }}" class="product-btn">
                                             <i class="nc-icon nc-zoom-split-in"></i>
                                             <span>View Details</span>
