@@ -11,13 +11,17 @@ class ProductionBatch extends Model
         'product_id',
         'quantity',
         'production_date',
+        'start_date',
+        'estimated_completion',
         'status',
         'notes',
         'completed_at',
     ];
 
     protected $casts = [
-        'production_date' => 'datetime',
+        'production_date' => 'date',
+        'start_date' => 'date',
+        'estimated_completion' => 'date',
         'completed_at' => 'datetime',
     ];
 

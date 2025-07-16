@@ -26,7 +26,7 @@
                         <i class="nc-icon nc-money-coins"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number">${{ number_format($salesReport->sum('total'), 2) }}</h3>
+                        <h3 class="stats-number">UGX {{ number_format($salesReport->sum('total')) }}</h3>
                         <p class="stats-label">Total Sales</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
@@ -71,7 +71,7 @@
                         <i class="nc-icon nc-chart-bar-32"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number">${{ number_format($salesReport->avg('total'), 2) }}</h3>
+                        <h3 class="stats-number">UGX {{ number_format($salesReport->avg('total')) }}</h3>
                         <p class="stats-label">Avg Daily Sales</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
@@ -114,7 +114,7 @@
                                                     <span class="date-label">{{ \Carbon\Carbon::parse($sale->date)->format('M d, Y') }}</span>
                                                 </td>
                                                 <td>
-                                                    <span class="amount">${{ number_format($sale->total, 2) }}</span>
+                                                    <span class="amount">UGX {{ number_format($sale->total) }}</span>
                                                 </td>
                                                 <td>
                                                     <span class="order-count">{{ $sale->orders_count ?? 1 }}</span>
@@ -145,7 +145,7 @@
                                             </div>
                                             <div class="summary-content">
                                                 <h5 class="summary-title">Total Revenue</h5>
-                                                <p class="summary-value">${{ number_format($salesReport->sum('total'), 2) }}</p>
+                                                <p class="summary-value">UGX {{ number_format($salesReport->sum('total')) }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -156,7 +156,7 @@
                                             </div>
                                             <div class="summary-content">
                                                 <h5 class="summary-title">Average Daily Sales</h5>
-                                                <p class="summary-value">${{ number_format($salesReport->avg('total'), 2) }}</p>
+                                                <p class="summary-value">UGX {{ number_format($salesReport->avg('total')) }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -168,7 +168,7 @@
                                             <div class="summary-content">
                                                 <h5 class="summary-title">Best Day</h5>
                                                 <p class="summary-value">{{ \Carbon\Carbon::parse($salesReport->max('date'))->format('M d, Y') }}</p>
-                                                <p class="summary-subtitle">${{ number_format($salesReport->max('total'), 2) }}</p>
+                                                <p class="summary-subtitle">UGX {{ number_format($salesReport->max('total')) }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -231,7 +231,7 @@
                                                     <span class="quantity-label">{{ $product['total_quantity'] }}</span>
                                                 </td>
                                                 <td>
-                                                    <span class="amount">${{ number_format($product['total_revenue'], 2) }}</span>
+                                                    <span class="amount">UGX {{ number_format($product['total_revenue']) }}</span>
                                                 </td>
                                                 <td>
                                                     @php
@@ -270,7 +270,7 @@
                                             </div>
                                             <div class="summary-content">
                                                 <h5 class="summary-title">Total Revenue</h5>
-                                                <p class="summary-value">${{ number_format($productReport->sum('total_revenue'), 2) }}</p>
+                                                <p class="summary-value">UGX {{ number_format($productReport->sum('total_revenue')) }}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -787,94 +787,106 @@
 @if($salesReport->count() > 0)
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+function formatCurrency(amount) {
+    return 'UGX ' + amount.toLocaleString();
+}
+
+function updateReportsUI(data) {
+    // Update statistics cards
+    document.querySelector('.stats-number[data-type="total-sales"]').textContent = formatCurrency(data.salesReport.reduce((sum, s) => sum + Number(s.total), 0));
+    document.querySelector('.stats-number[data-type="products-sold"]').textContent = data.productReport.length;
+    document.querySelector('.stats-number[data-type="total-quantity"]').textContent = data.productReport.reduce((sum, p) => sum + Number(p.total_quantity), 0);
+    document.querySelector('.stats-number[data-type="avg-daily-sales"]').textContent = formatCurrency(data.salesReport.length ? (data.salesReport.reduce((sum, s) => sum + Number(s.total), 0) / data.salesReport.length) : 0);
+
+    // Update sales table
+    let salesTableBody = document.getElementById('sales-table-body');
+    if (salesTableBody) {
+        salesTableBody.innerHTML = '';
+        data.salesReport.forEach(sale => {
+            let avgSales = data.salesReport.length ? (data.salesReport.reduce((sum, s) => sum + Number(s.total), 0) / data.salesReport.length) : 0;
+            let performance = sale.total >= avgSales ? 'above' : 'below';
+            salesTableBody.innerHTML += `<tr>
+                <td><span class="date-label">${new Date(sale.date).toLocaleDateString()}</span></td>
+                <td><span class="amount">${formatCurrency(Number(sale.total))}</span></td>
+                <td><span class="order-count">1</span></td>
+                <td><span class="performance-badge performance-${performance}"><i class="nc-icon ${performance === 'above' ? 'nc-chart-bar-32' : 'nc-chart-pie-35'}"></i> ${performance === 'above' ? 'Above Average' : 'Below Average'}</span></td>
+            </tr>`;
+        });
+    }
+    // Update product table
+    let productTableBody = document.getElementById('product-table-body');
+    if (productTableBody) {
+        productTableBody.innerHTML = '';
+        data.productReport.slice(0, 10).forEach((product, index) => {
+            let avgRevenue = data.productReport.length ? (data.productReport.reduce((sum, p) => sum + Number(p.total_revenue), 0) / data.productReport.length) : 0;
+            let performance = product.total_revenue >= avgRevenue ? 'excellent' : 'good';
+            productTableBody.innerHTML += `<tr>
+                <td><div class="product-info"><span class="product-name">${product.name}</span>${index < 3 ? `<span class="top-seller-badge"><i class="nc-icon nc-trophy"></i> Top ${index + 1}</span>` : ''}</div></td>
+                <td><span class="quantity-label">${product.total_quantity}</span></td>
+                <td><span class="amount">${formatCurrency(Number(product.total_revenue))}</span></td>
+                <td><span class="performance-badge performance-${performance}"><i class="nc-icon ${performance === 'excellent' ? 'nc-trophy' : 'nc-chart-bar-32'}"></i> ${performance === 'excellent' ? 'Excellent' : 'Good'}</span></td>
+            </tr>`;
+        });
+    }
+    // Update chart
+    if (window.salesChartInstance) {
+        window.salesChartInstance.data.labels = data.salesReport.map(s => new Date(s.date).toLocaleDateString());
+        window.salesChartInstance.data.datasets[0].data = data.salesReport.map(s => Number(s.total));
+        window.salesChartInstance.update();
+    }
+}
+
+function fetchReportsData() {
+    fetch('/retailer/reports/api')
+        .then(res => res.json())
+        .then(data => {
+            updateReportsUI(data);
+        });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('salesChart').getContext('2d');
-    
-    const salesData = @json($salesReport->map(function($sale) {
-        return [
-            'date' => \Carbon\Carbon::parse($sale->date)->format('M d'),
-            'total' => $sale->total
-        ];
-    }));
-    
-    new Chart(ctx, {
+    // Add data-type attributes to stats cards for JS targeting
+    document.querySelectorAll('.stats-number')[0].setAttribute('data-type', 'total-sales');
+    document.querySelectorAll('.stats-number')[1].setAttribute('data-type', 'products-sold');
+    document.querySelectorAll('.stats-number')[2].setAttribute('data-type', 'total-quantity');
+    document.querySelectorAll('.stats-number')[3].setAttribute('data-type', 'avg-daily-sales');
+
+    // Add IDs to table bodies for JS targeting
+    let salesTable = document.querySelector('.table tbody');
+    if (salesTable) salesTable.id = 'sales-table-body';
+    let productTable = document.querySelectorAll('.table tbody')[1];
+    if (productTable) productTable.id = 'product-table-body';
+
+    // Setup chart.js for sales chart
+    let salesChartCanvas = document.getElementById('salesChart');
+    if (salesChartCanvas) {
+        window.salesChartInstance = new Chart(salesChartCanvas.getContext('2d'), {
         type: 'line',
         data: {
-            labels: salesData.map(item => item.date),
+                labels: [],
             datasets: [{
-                label: 'Daily Sales ($)',
-                data: salesData.map(item => item.total),
-                borderColor: 'rgb(25, 118, 210)',
-                backgroundColor: 'rgba(25, 118, 210, 0.1)',
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: 'rgb(25, 118, 210)',
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 6,
-                pointHoverRadius: 8
+                    label: 'Sales',
+                    data: [],
+                    backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                    borderColor: '#667eea',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    fill: true
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    titleColor: '#fff',
-                    bodyColor: '#fff',
-                    borderColor: 'rgba(25, 118, 210, 0.5)',
-                    borderWidth: 1,
-                    cornerRadius: 8,
-                    callbacks: {
-                        label: function(context) {
-                            return 'Sales: $' + context.parsed.y.toLocaleString();
-                        }
-                    }
-                }
-            },
             scales: {
-                x: {
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.1)',
-                        borderColor: 'rgba(0, 0, 0, 0.1)'
-                    },
-                    ticks: {
-                        color: '#666',
-                        font: {
-                            size: 12
-                        }
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.1)',
-                        borderColor: 'rgba(0, 0, 0, 0.1)'
-                    },
-                    ticks: {
-                        color: '#666',
-                        font: {
-                            size: 12
-                        },
-                        callback: function(value) {
-                            return '$' + value.toLocaleString();
-                        }
-                    }
-                }
-            },
-            elements: {
-                point: {
-                    hoverBackgroundColor: 'rgb(25, 118, 210)',
-                    hoverBorderColor: '#fff'
+                    x: { display: true, title: { display: true, text: 'Date' } },
+                    y: { display: true, title: { display: true, text: 'Sales (UGX)' } }
                 }
             }
-        }
-    });
+        });
+    }
+    // Initial fetch
+    fetchReportsData();
+    // Poll every 30 seconds
+    setInterval(fetchReportsData, 30000);
 });
 </script>
 @endif

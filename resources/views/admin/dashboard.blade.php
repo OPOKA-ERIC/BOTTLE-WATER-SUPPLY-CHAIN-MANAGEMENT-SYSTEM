@@ -19,23 +19,23 @@
     </div>
 
     <!-- Statistics Cards -->
-        <div class="row">
-            <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-4 col-sm-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-icon">
                         <i class="nc-icon nc-circle-09"></i>
-            </div>
+                    </div>
                     <div class="stats-content">
                         <h3 class="stats-number">{{ $stats['total_users'] }}</h3>
                         <p class="stats-label">Total Users</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
                             <span>Updated just now</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            </div>
-        </div>
-            </div>
-            <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+            <div class="col-lg-4 col-md-4 col-sm-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-icon">
                         <i class="nc-icon nc-cart-simple"></i>
@@ -46,11 +46,11 @@
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
                             <span>Updated just now</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            </div>
-        </div>
-            </div>
-            <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+            <div class="col-lg-4 col-md-4 col-sm-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-icon">
                         <i class="nc-icon nc-box"></i>
@@ -61,11 +61,11 @@
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
                             <span>Updated just now</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            </div>
-        </div>
-            </div>
-            <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+            <div class="col-lg-4 col-md-4 col-sm-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-icon">
                         <i class="nc-icon nc-paper"></i>
@@ -78,9 +78,9 @@
                             <span>Updated just now</span>
                         </div>
                     </div>
+                </div>
             </div>
-        </div>
-            <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+            <div class="col-lg-4 col-md-4 col-sm-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-icon task-stats">
                         <i class="nc-icon nc-briefcase-24"></i>
@@ -95,7 +95,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+            <div class="col-lg-4 col-md-4 col-sm-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-icon urgent-stats">
                         <i class="nc-icon nc-alert-circle-i"></i>

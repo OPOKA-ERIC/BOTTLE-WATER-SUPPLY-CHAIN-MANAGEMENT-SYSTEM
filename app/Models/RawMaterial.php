@@ -13,12 +13,11 @@ class RawMaterial extends Model
         'supplier_id',
         'name',
         'description',
-        'price',
         'quantity_available',
         'unit_of_measure',
-        'category',
+        'price',
         'status',
-        'image_path'
+        'image_path',
     ];
 
     public function supplier()

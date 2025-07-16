@@ -18,6 +18,53 @@
             </div>
         </div>
 
+        <!-- Success/Error Messages -->
+        @if(session('success'))
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="nc-icon nc-check-2"></i>
+                        {{ session('success') }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="nc-icon nc-alert-circle-i"></i>
+                        {{ session('error') }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="nc-icon nc-alert-circle-i"></i>
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <!-- Statistics Cards -->
     <div class="row">
             <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
@@ -71,7 +118,9 @@
                         <i class="nc-icon nc-money-coins"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number">${{ number_format($materials->sum('price'), 2) }}</h3>
+                        <h3 class="stats-number">
+                            UGX {{ number_format($materials->sum(function($m) { return $m->quantity_available * $m->price; }), 0) }}/=
+                        </h3>
                         <p class="stats-label">Total Value</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
@@ -94,23 +143,29 @@
                         <div class="header-icon">
                             <i class="nc-icon nc-box-2"></i>
                         </div>
-                </div>
-                <div class="card-body">
-                    @if(isset($materials) && $materials->count() > 0)
-                        <div class="table-responsive">
+                        <div class="header-actions ml-auto">
+                            <button class="action-btn primary" data-toggle="modal" data-target="#addMaterialModal">
+                                <i class="nc-icon nc-simple-add"></i>
+                                <span>Add Material</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if(isset($materials) && $materials->count() > 0)
                             <table class="table">
                                 <thead>
                                     <tr>
                                         <th>Material Name</th>
                                         <th>Description</th>
                                         <th>Quantity</th>
-                                        <th>Price</th>
+                                        <th>Unit</th>
+                                        <th>Unit Price (UGX)</th>
                                         <th>Status</th>
                                         <th>Last Updated</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="materials-table-body">
                                     @foreach($materials as $material)
                                         <tr>
                                                 <td>
@@ -122,12 +177,15 @@
                                                     <span class="material-description">{{ Str::limit($material->description, 50) }}</span>
                                                 </td>
                                                 <td>
-                                                    <span class="quantity-badge quantity-{{ $material->quantity > 100 ? 'high' : ($material->quantity > 50 ? 'medium' : 'low') }}">
-                                                        {{ $material->quantity }}
+                                                    <span class="quantity-badge quantity-{{ $material->quantity_available > 100 ? 'high' : ($material->quantity_available > 50 ? 'medium' : 'low') }}">
+                                                        {{ $material->quantity_available }}
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <span class="price-label">${{ number_format($material->price, 2) }}</span>
+                                                    <span class="unit-label">{{ $material->unit_of_measure }}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="price-label">UGX {{ number_format($material->price, 0) }}/=</span>
                                                 </td>
                                                 <td>
                                                     <span class="status-badge status-{{ $material->status }}">
@@ -148,33 +206,137 @@
                                     @endforeach
                                 </tbody>
                             </table>
-                        </div>
-                        
-                        <!-- Pagination -->
+                            <!-- Pagination -->
                             <div class="pagination-section">
-                            {{ $materials->links() }}
+                                {{ $materials->links() }}
+                            </div>
+                        @else
+                                <div class="empty-state">
+                                    <div class="empty-icon">
+                                        <i class="nc-icon nc-box-2"></i>
+                                    </div>
+                                    <h5 class="empty-title">No Materials Found</h5>
+                                    <p class="empty-subtitle">No raw materials have been added to your inventory yet</p>
+                                    <div class="empty-actions">
+                                        <button class="action-btn primary">
+                                            <i class="nc-icon nc-simple-add"></i>
+                                            <span>Add First Material</span>
+                                        </button>
+                                    </div>
+                            </div>
+                        @endif
                         </div>
-                    @else
-                            <div class="empty-state">
-                                <div class="empty-icon">
-                                    <i class="nc-icon nc-box-2"></i>
-                                </div>
-                                <h5 class="empty-title">No Materials Found</h5>
-                                <p class="empty-subtitle">No raw materials have been added to your inventory yet</p>
-                                <div class="empty-actions">
-                                    <button class="action-btn primary">
-                                        <i class="nc-icon nc-simple-add"></i>
-                                        <span>Add First Material</span>
-                                    </button>
-                                </div>
-                        </div>
-                    @endif
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Add Material Modal -->
+<div class="modal fade" id="addMaterialModal" tabindex="-1" role="dialog" aria-labelledby="addMaterialModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form method="POST" action="{{ route('supplier.materials.store') }}">
+      @csrf
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addMaterialModalLabel">Add New Material</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="name">Material Name</label>
+            <select name="name" id="name" class="form-control" required>
+                <option value="bottles">Bottles</option>
+                <option value="bottle lids">Bottle Lids</option>
+                <option value="boxes for packing">Boxes for Packing</option>
+                <option value="water">Water</option>
+                <option value="paper">Paper</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="material-description">Description</label>
+            <textarea class="form-control" id="material-description" name="description"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="material-quantity">Quantity</label>
+            <input type="number" class="form-control" id="material-quantity" name="quantity_available" min="0" required>
+          </div>
+          <div class="form-group">
+            <label for="material-unit">Unit of Measure</label>
+            <select class="form-control" id="material-unit" name="unit_of_measure" required>
+              <option value="pieces">Pieces</option>
+              <option value="litres">Litres</option>
+              <option value="reams">Reams</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="material-price">Unit Price (UGX)</label>
+            <input type="number" class="form-control" id="material-price" name="price" min="0" step="0.01" required>
+          </div>
+          <div class="form-group">
+            <label for="material-status">Status</label>
+            <select class="form-control" id="material-status" name="status" required>
+              <option value="available">Available</option>
+              <option value="low_stock">Low Stock</option>
+              <option value="unavailable">Unavailable</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Material</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Update Material Modals -->
+@foreach($materials as $material)
+<div class="modal fade" id="updateMaterialModal{{ $material->id }}" tabindex="-1" role="dialog" aria-labelledby="updateMaterialModalLabel{{ $material->id }}" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form method="POST" action="{{ route('supplier.materials.update', $material->id) }}">
+      @csrf
+      @method('PUT')
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="updateMaterialModalLabel{{ $material->id }}">Update Material</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="material-quantity-{{ $material->id }}">Quantity</label>
+            <input type="number" class="form-control" id="material-quantity-{{ $material->id }}" name="quantity_available" value="{{ $material->quantity_available }}" min="0" required>
+          </div>
+          <div class="form-group">
+            <label for="material-price-{{ $material->id }}">Unit Price (UGX)</label>
+            <input type="number" class="form-control" id="material-price-{{ $material->id }}" name="price" value="{{ $material->price }}" min="0" step="0.01" required>
+          </div>
+          <div class="form-group">
+            <label for="material-status-{{ $material->id }}">Status</label>
+            <select class="form-control" id="material-status-{{ $material->id }}" name="status" required>
+              <option value="available" {{ $material->status == 'available' ? 'selected' : '' }}>Available</option>
+              <option value="low_stock" {{ $material->status == 'low_stock' ? 'selected' : '' }}>Low Stock</option>
+              <option value="unavailable" {{ $material->status == 'unavailable' ? 'selected' : '' }}>Unavailable</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Material</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+@endforeach
+
+
 
 <style>
 /* Main Content Adjustments */
@@ -354,11 +516,29 @@
 
 .card-body {
     padding: 30px;
+    overflow-x: auto;
+    overflow-y: visible;
+    /* Hide scrollbar if not needed */
+    scrollbar-width: thin;
+    scrollbar-color: #ccc #f5f5f5;
+}
+
+.card-body::-webkit-scrollbar {
+    height: 8px;
+    background: #f5f5f5;
+}
+
+.card-body::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
 }
 
 /* Table Styling */
 .table {
     margin: 0;
+    min-width: 100%;
+    width: 100%;
+    table-layout: auto;
 }
 
 .table thead th {
@@ -623,5 +803,270 @@
         align-items: center;
     }
 }
+
+/* Remove all vertical and horizontal scrolling from inner containers */
+.content,
+.container-fluid,
+.card-body,
+.content-card,
+.row,
+.col-md-12 {
+    overflow-y: visible !important;
+    overflow-x: visible !important;
+    max-height: none !important;
+    height: auto !important;
+}
+
+/* Alert Styles */
+.alert {
+    border-radius: 15px;
+    border: none;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(20px);
+}
+
+.alert-success {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.95) 0%, rgba(56, 142, 60, 0.95) 100%);
+    color: white;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.95) 0%, rgba(211, 47, 47, 0.95) 100%);
+    color: white;
+}
+
+.alert i {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.alert .close {
+    color: white;
+    opacity: 0.8;
+}
+
+.alert .close:hover {
+    opacity: 1;
+}
+
+/* Modal Styles - Ensure proper visibility and positioning */
+.modal {
+    z-index: 1050 !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.modal-dialog {
+    z-index: 1055 !important;
+    margin: 30px auto !important;
+    max-width: 500px !important;
+}
+
+.modal-content {
+    border-radius: 15px !important;
+    border: none !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+    backdrop-filter: blur(20px) !important;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, rgba(25, 118, 210, 0.95) 0%, rgba(13, 71, 161, 0.95) 100%) !important;
+    color: white !important;
+    border-radius: 15px 15px 0 0 !important;
+    border-bottom: none !important;
+    padding: 20px 25px !important;
+}
+
+.modal-title {
+    font-weight: 600 !important;
+    font-size: 1.25rem !important;
+}
+
+.modal-header .close {
+    color: white !important;
+    opacity: 0.8 !important;
+    text-shadow: none !important;
+}
+
+.modal-header .close:hover {
+    opacity: 1 !important;
+}
+
+.modal-body {
+    padding: 25px !important;
+    background: white !important;
+}
+
+.modal-footer {
+    background: #f8f9fa !important;
+    border-top: 1px solid #dee2e6 !important;
+    border-radius: 0 0 15px 15px !important;
+    padding: 20px 25px !important;
+}
+
+.form-group {
+    margin-bottom: 20px !important;
+}
+
+.form-group label {
+    font-weight: 500 !important;
+    color: #333 !important;
+    margin-bottom: 8px !important;
+}
+
+.form-control {
+    border-radius: 8px !important;
+    border: 1px solid #ddd !important;
+    padding: 12px 15px !important;
+    font-size: 14px !important;
+    transition: all 0.3s ease !important;
+}
+
+.form-control:focus {
+    border-color: #1976d2 !important;
+    box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25) !important;
+}
+
+.btn {
+    border-radius: 8px !important;
+    padding: 10px 20px !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #1976d2, #1565c0) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #1565c0, #0d47a1) !important;
+    transform: translateY(-2px) !important;
+    color: white !important;
+    text-decoration: none !important;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #2196f3, #1976d2) !important;
+    border: none !important;
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #1976d2, #1565c0) !important;
+    transform: translateY(-2px) !important;
+    color: white !important;
+    text-decoration: none !important;
+}
+
+/* Ensure modal is scrollable if content is too long */
+.modal-body {
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+}
+
+/* Fix for modal backdrop */
+.modal-backdrop {
+    z-index: 1040 !important;
+}
 </style>
+
+<script>
+function formatCurrency(amount) {
+    return 'UGX ' + Number(amount).toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+}
+
+function updateMaterialsUI(data) {
+    // Update statistics cards
+    document.querySelectorAll('.stats-number')[0].textContent = data.total;
+    document.querySelectorAll('.stats-number')[1].textContent = data.available;
+    document.querySelectorAll('.stats-number')[2].textContent = data.low_stock;
+    document.querySelectorAll('.stats-number')[3].textContent = formatCurrency(
+        data.materials.reduce((sum, m) => sum + (m.quantity_available * m.price), 0)
+    );
+
+    // Update materials table
+    let tbody = document.getElementById('materials-table-body');
+    if (tbody) {
+        tbody.innerHTML = '';
+        data.materials.forEach(material => {
+            let quantityClass = material.quantity_available > 100 ? 'high' : (material.quantity_available > 50 ? 'medium' : 'low');
+            tbody.innerHTML += `<tr>
+                <td><div class='material-info'><span class='material-name'>${material.name}</span></div></td>
+                <td><span class='material-description'>${material.description ? material.description.substring(0, 50) : ''}</span></td>
+                <td><span class='quantity-badge quantity-${quantityClass}'>${material.quantity_available}</span></td>
+                <td><span class='unit-label'>${material.unit_of_measure}</span></td>
+                <td><span class='price-label'>${formatCurrency(material.price)}</span></td>
+                <td><span class='status-badge status-${material.status}'><i class='nc-icon ${material.status === 'available' ? 'nc-check-2' : (material.status === 'low_stock' ? 'nc-alert-circle-i' : 'nc-simple-remove')}'></i> ${material.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span></td>
+                <td><span class='date-label'>${new Date(material.updated_at).toLocaleDateString()}</span></td>
+                <td><button class='action-btn primary' data-toggle='modal' data-target='#updateMaterialModal${material.id}'><i class='nc-icon nc-settings-gear-65'></i><span>Update</span></button></td>
+            </tr>`;
+        });
+    }
+}
+
+function fetchMaterialsData() {
+    fetch('/supplier/materials/api')
+        .then(res => res.json())
+        .then(data => {
+            updateMaterialsUI(data);
+        });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Only fetch data initially, don't auto-refresh to preserve modal functionality
+    // fetchMaterialsData();
+    // setInterval(fetchMaterialsData, 30000);
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Add Material button in header
+  var addHeaderBtn = document.querySelector('.header-actions .action-btn.primary');
+  if (addHeaderBtn) {
+    addHeaderBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      $('#addMaterialModal').modal('show');
+    });
+  }
+  // Add First Material button in empty state
+  var addBtn = document.querySelector('.empty-actions .action-btn.primary');
+  if (addBtn) {
+    addBtn.setAttribute('data-toggle', 'modal');
+    addBtn.setAttribute('data-target', '#addMaterialModal');
+    addBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      $('#addMaterialModal').modal('show');
+    });
+  }
+
+  // Ensure modals are properly initialized
+  $('.modal').on('shown.bs.modal', function () {
+    $(this).find('input:first').focus();
+  });
+
+  // Handle modal close
+  $('.modal').on('hidden.bs.modal', function () {
+    $(this).find('form')[0].reset();
+  });
+
+  // Ensure modals are visible and properly positioned
+  $('.modal').css({
+    'display': 'none',
+    'z-index': '1050'
+  });
+
+  // Fix for modal backdrop
+  $('body').on('show.bs.modal', '.modal', function () {
+    var zIndex = 1040 + (10 * $('.modal:visible').length);
+    $(this).css('z-index', zIndex);
+    setTimeout(function() {
+      $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+    }, 0);
+  });
+});
+</script>
 @endsection 
