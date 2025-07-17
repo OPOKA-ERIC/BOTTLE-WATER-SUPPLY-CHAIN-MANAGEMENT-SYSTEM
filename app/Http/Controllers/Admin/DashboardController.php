@@ -38,6 +38,10 @@ class DashboardController extends Controller
             'urgent_tasks' => Task::where('priority', 'urgent')
                 ->whereNotIn('status', ['completed', 'cancelled'])
                 ->count(),
+            // Task Delivery/Acknowledgement Tracking
+            'total_assigned_tasks' => Task::whereNotNull('assigned_to')->count(),
+            'total_acknowledged_tasks' => Task::where('is_read', true)->count(),
+            'total_unacknowledged_tasks' => Task::where('is_read', false)->whereNotNull('assigned_to')->count(),
         ];
 
         // Get professional KPIs - temporarily disabled for debugging

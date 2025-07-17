@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('raw_materials', function (Blueprint $table) {
-            if (Schema::hasColumn('raw_materials', 'category')) {
-                $table->dropColumn('category');
-            }
+        Schema::table('tasks', function (Blueprint $table) {
+            $table->string('category', 64)->change();
         });
     }
 
@@ -23,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('raw_materials', function (Blueprint $table) {
-            $table->string('category')->nullable();
+        Schema::table('tasks', function (Blueprint $table) {
+            $table->string('category', 15)->change(); // revert to previous size if needed
         });
     }
 };

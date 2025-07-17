@@ -73,20 +73,6 @@
                     </a>
                 </li>
 
-                <!-- Task Reports -->
-                <li class="nav-item @if($activePage == 'task-reports') active @endif">
-                    <a class="nav-link" href="{{ route('admin.tasks.reports') }}">
-                        <div class="nav-icon">
-                            <i class="nc-icon nc-chart-bar-32"></i>
-                        </div>
-                        <div class="nav-content">
-                            <span class="nav-title">{{ __("Task Reports") }}</span>
-                            <span class="nav-subtitle">View task analytics</span>
-                        </div>
-                        <div class="nav-indicator"></div>
-                    </a>
-                </li>
-
                 <!-- Vendor Applications -->
                 <li class="nav-item @if($activePage == 'vendor-applications') active @endif">
                     <a class="nav-link" href="{{route('admin.vendors.applications')}}">
@@ -100,6 +86,20 @@
                             <div class="nav-indicator"></div>
                         </a>
                     </li>
+
+                <!-- Notifications -->
+                <li class="nav-item @if($activePage == 'notifications') active @endif">
+                    <a class="nav-link" href="{{ route('admin.notifications') }}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-bell-55"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">Notifications</span>
+                            <span class="nav-subtitle">View all notifications</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
 
                 <!-- Demand Forecast -->
                 <li class="nav-item">

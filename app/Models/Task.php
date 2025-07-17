@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 use App\Notifications\TaskStatusNotification;
 
 class Task extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'title',
@@ -33,6 +34,11 @@ class Task extends Model
         'is_recurring',
         'recurrence_pattern',
         'created_by',
+        // New fields for assignment audit
+        'assignment_method',
+        'assignment_reason',
+        'contact',
+        'is_read',
     ];
 
     protected $casts = [
@@ -63,6 +69,16 @@ class Task extends Model
     public function timeLogs()
     {
         return $this->hasMany(TaskTimeLog::class);
+    }
+
+    public function assignmentAudits()
+    {
+        return $this->hasMany(TaskAssignmentAudit::class);
+    }
+
+    public function statusAudits()
+    {
+        return $this->hasMany(TaskStatusAudit::class);
     }
 
     // Scopes for filtering
@@ -237,5 +253,11 @@ class Task extends Model
         if ($this->is_overdue && $this->assignedTo) {
             $this->assignedTo->notify(new TaskStatusNotification('Task "' . $this->title . '" is overdue.', $this->id));
         }
+    }
+
+    // Mark task as read/acknowledged
+    public function markAsRead()
+    {
+        $this->update(['is_read' => true]);
     }
 }

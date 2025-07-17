@@ -115,6 +115,20 @@
                     </a>
                 </li>
 
+                <!-- Assigned Tasks -->
+                <li class="nav-item @if($activePage == 'assigned-tasks') active @endif">
+                    <a class="nav-link" href="{{ route('manufacturer.tasks.assigned') }}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-bullet-list-67"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">Assigned Tasks</span>
+                            <span class="nav-subtitle">Respond to assignments</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
+
                 <!-- Static Chat Page -->
                 <li class="nav-item @if($activePage == 'static-chat') active @endif">
                     <a class="nav-link" href="/manufacturer/static-chat">

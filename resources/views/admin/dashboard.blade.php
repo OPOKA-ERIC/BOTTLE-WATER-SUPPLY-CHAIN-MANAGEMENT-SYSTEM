@@ -112,6 +112,55 @@
             </div>
         </div>
 
+    <!-- Task Delivery/Acknowledgement Tracking -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-4 col-md-4 col-sm-6 mb-4">
+            <div class="stats-card bg-info text-white">
+                <div class="stats-icon">
+                    <i class="nc-icon nc-send"></i>
+                </div>
+                <div class="stats-content">
+                    <h3 class="stats-number">{{ $stats['total_assigned_tasks'] }}</h3>
+                    <p class="stats-label">Assigned Tasks</p>
+                    <div class="stats-footer">
+                        <i class="nc-icon nc-refresh-69"></i>
+                        <span>Updated just now</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-6 mb-4">
+            <div class="stats-card bg-success text-white">
+                <div class="stats-icon">
+                    <i class="nc-icon nc-check-2"></i>
+                </div>
+                <div class="stats-content">
+                    <h3 class="stats-number">{{ $stats['total_acknowledged_tasks'] }}</h3>
+                    <p class="stats-label">Acknowledged Tasks</p>
+                    <div class="stats-footer">
+                        <i class="nc-icon nc-refresh-69"></i>
+                        <span>Updated just now</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-6 mb-4">
+            <div class="stats-card bg-warning text-white">
+                <div class="stats-icon">
+                    <i class="nc-icon nc-bell-55"></i>
+                </div>
+                <div class="stats-content">
+                    <h3 class="stats-number">{{ $stats['total_unacknowledged_tasks'] }}</h3>
+                    <p class="stats-label">Unacknowledged Tasks</p>
+                    <div class="stats-footer">
+                        <i class="nc-icon nc-refresh-69"></i>
+                        <span>Updated just now</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
         <!-- Professional KPI Section -->
         <div class="row mb-4">
             <div class="col-12">

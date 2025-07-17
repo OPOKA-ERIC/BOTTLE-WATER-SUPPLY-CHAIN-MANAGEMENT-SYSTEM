@@ -17,6 +17,10 @@ class DatabaseSeeder extends Seeder
             ProductSeeder::class,
             InventorySeeder::class,
             NotificationSeeder::class,
+            TaskCategorySeeder::class,
         ]);
+        // 
+        // Call the real users and tasks seeder for production-like data
+        $this->call(RealUsersAndTasksSeeder::class);
     }
 }
