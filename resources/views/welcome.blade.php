@@ -1,7 +1,7 @@
 @extends('layouts/app', ['activePage' => 'welcome', 'title' => 'BWSCMS Management System'])
 
 @section('content')
-    <div class="full-page section-image" data-image="https://media.istockphoto.com/id/681814098/photo/beautiful-water-bottle-with-spray-on-background.jpg?s=1024x1024&w=is&k=20&c=GxkbN1WrDi16xev3bPZgqEQRaEMropNS5lh1M6qYpB4=">
+    <div class="full-page section-image" data-image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSrmkE63RVED2s0vOHBY0Wx-wVDLJUeZ_MmoQ&s">
         <!-- Content without overlay for clean image display -->
         <div class="content position-relative">
             <div class="container">
@@ -139,8 +139,14 @@
 @push('css')
     <style>
         .full-page {
-            position: relative;
-            overflow: hidden;
+            min-height: 100vh !important;
+            height: 100vh !important;
+            background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80') !important;
+            background-size: cover !important;
+            background-position: center !important;
+        }
+        .full-page:before {
+            opacity: 0 !important;
         }
         
         .overlay {

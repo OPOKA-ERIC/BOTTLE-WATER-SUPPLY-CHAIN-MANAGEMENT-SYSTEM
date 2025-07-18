@@ -14,30 +14,46 @@
                 </div>
             </div>
 
-            <!-- Notifications - Only for Admin -->
-            @if(auth()->user()->role === 'administrator')
+            <!-- Notifications - For All Users -->
             <div class="nav-item notification-container">
-                <button class="notification-btn" data-toggle="dropdown" id="adminNotificationBtn">
+                <button class="notification-btn" data-toggle="dropdown" id="userNotificationBtn">
                     <i class="nc-icon nc-bell-55"></i>
-                    <span class="notification-badge" id="notificationCount">0</span>
+                    @if(auth()->user()->unreadNotifications->count())
+                        <span class="notification-badge" id="notificationCount">{{ auth()->user()->unreadNotifications->count() }}</span>
+                    @endif
                 </button>
                 <div class="dropdown-menu notification-dropdown">
                     <div class="dropdown-header">
-                        <h6>Admin Notifications</h6>
-                        <span class="notification-count" id="notificationCountText">0 new</span>
+                        <h6>Notifications</h6>
+                        <span class="notification-count" id="notificationCountText">{{ auth()->user()->unreadNotifications->count() }} new</span>
                     </div>
-                    <div class="notification-list" id="adminNotificationList">
-                        <div class="notification-loading">
-                            <i class="nc-icon nc-refresh-69"></i>
-                            <span>Loading notifications...</span>
-                        </div>
+                    <div class="notification-list" id="userNotificationList">
+                        @forelse(auth()->user()->unreadNotifications->take(5) as $notification)
+                            @php
+                                $taskId = $notification->data['task_id'] ?? null;
+                                $role = auth()->user()->role;
+                                if ($role === 'administrator' && $taskId) {
+                                    $link = route('admin.tasks.show', $taskId);
+                                } elseif ($role === 'manufacturer' && $taskId) {
+                                    $link = route('manufacturer.tasks.assigned');
+                                } else {
+                                    $link = route($role . '.dashboard');
+                                }
+                            @endphp
+                            <a href="{{ $link }}" class="dropdown-item">
+                                {{ $notification->data['message'] ?? $notification->data['title'] ?? 'New Notification' }}
+                                <br>
+                                <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
+                            </a>
+                        @empty
+                            <span class="dropdown-item">No new notifications</span>
+                        @endforelse
                     </div>
                     <div class="dropdown-footer">
-                        <a href="{{ route('admin.dashboard') }}" class="view-all-link">View Admin Dashboard</a>
+                        <a href="{{ route((auth()->user()->role === 'administrator' ? 'admin' : auth()->user()->role) . '.notifications') }}" class="view-all-link">View All Notifications</a>
                     </div>
                 </div>
             </div>
-            @endif
 
             <!-- User Menu -->
             <div class="nav-item user-container">

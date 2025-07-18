@@ -72,12 +72,31 @@ Route::middleware(['auth', 'role:administrator', 'redirect.role'])->prefix('admi
     Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'getAdminNotifications'])->name('admin.notifications');
     Route::get('/work-distribution', [App\Http\Controllers\Admin\WorkDistributionController::class, 'index'])->name('admin.work-distribution.index');
     Route::get('/work-distribution/create', [App\Http\Controllers\Admin\WorkDistributionController::class, 'create'])->name('admin.work-distribution.create');
-    Route::get('/tasks', [App\Http\Controllers\Admin\TaskController::class, 'index'])->name('admin.tasks.index');
+    Route::post('/work-distribution', [App\Http\Controllers\Admin\WorkDistributionController::class, 'store'])->name('admin.work-distribution.store');
+    Route::post('/work-distribution/{task}/acknowledge', [App\Http\Controllers\Admin\WorkDistributionController::class, 'acknowledge'])->name('admin.work-distribution.acknowledge');
+    Route::post('/work-distribution/{task}/reassign', [App\Http\Controllers\Admin\WorkDistributionController::class, 'reassign'])->name('admin.work-distribution.reassign');
+    Route::post('/work-distribution/{task}/status', [App\Http\Controllers\Admin\WorkDistributionController::class, 'updateStatus'])->name('admin.work-distribution.updateStatus');
+    Route::post('/work-distribution/{task}/comment', [App\Http\Controllers\Admin\WorkDistributionController::class, 'addComment'])->name('admin.work-distribution.addComment');
+    Route::post('/work-distribution/{task}/feedback', [App\Http\Controllers\Admin\WorkDistributionController::class, 'submitFeedback'])->name('admin.work-distribution.feedback');
+    Route::post('/work-distribution/{task}/review', [App\Http\Controllers\Admin\WorkDistributionController::class, 'submitReview'])->name('admin.work-distribution.review');
+    Route::resource('tasks', App\Http\Controllers\Admin\TaskController::class);
     Route::get('/tasks/reports', [App\Http\Controllers\Admin\TaskController::class, 'reports'])->name('admin.tasks.reports');
     Route::get('/tasks/create', [App\Http\Controllers\Admin\TaskController::class, 'create'])->name('admin.tasks.create');
+<<<<<<< HEAD
     // Add admin reports routes
     Route::get('/reports', [AdminDashboardController::class, 'reports'])->name('admin.reports');
     Route::get('/reports/download', [AdminDashboardController::class, 'downloadReport'])->name('admin.reports.download');
+=======
+    Route::delete('/work-distribution/{task}', [App\Http\Controllers\Admin\WorkDistributionController::class, 'destroy'])->name('admin.work-distribution.destroy');
+    Route::get('/work-distribution/{task}/history', [App\Http\Controllers\Admin\WorkDistributionController::class, 'showHistory'])->name('admin.work-distribution.history');
+    Route::get('/work-distribution/report', [\App\Http\Controllers\Admin\WorkDistributionController::class, 'report'])->name('admin.work-distribution.report');
+    Route::get('/work-distribution/feedback/all', [App\Http\Controllers\Admin\WorkDistributionController::class, 'allFeedback'])->name('admin.work-distribution.allFeedback');
+    Route::get('/work-distribution/reviews/all', [App\Http\Controllers\Admin\WorkDistributionController::class, 'allReviews'])->name('admin.work-distribution.allReviews');
+});
+
+Route::prefix('admin')->middleware(['auth', 'role:administrator'])->name('admin.')->group(function () {
+    Route::resource('tasks', \App\Http\Controllers\Admin\TaskController::class);
+>>>>>>> 53b55260038ec1088546a0789b7243a4938e5444
 });
 
 // Vendor Routes
@@ -340,3 +359,8 @@ Route::get('/test-supplier-chat', function() {
         ], 500);
     }
 })->middleware(['auth', 'role:supplier']);
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('manufacturer/assigned-tasks', [\App\Http\Controllers\Manufacturer\TaskController::class, 'assigned'])->name('manufacturer.tasks.assigned');
+    Route::post('manufacturer/assigned-tasks/{task}/status', [\App\Http\Controllers\Manufacturer\TaskController::class, 'updateStatus'])->name('manufacturer.tasks.updateStatus');
+});

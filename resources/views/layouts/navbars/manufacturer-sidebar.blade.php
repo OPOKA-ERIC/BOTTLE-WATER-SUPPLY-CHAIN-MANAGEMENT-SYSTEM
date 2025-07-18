@@ -101,6 +101,7 @@
                     </a>
                 </li>
 
+<<<<<<< HEAD
                 <!-- Reports -->
                 <li class="nav-item @if($activePage == 'reports') active @endif">
                     <a class="nav-link" href="{{ route('manufacturer.reports') }}">
@@ -110,14 +111,31 @@
                         <div class="nav-content">
                             <span class="nav-title">{{ __("Reports") }}</span>
                             <span class="nav-subtitle">Production & Inventory</span>
+=======
+                <!-- Assigned Tasks -->
+                <li class="nav-item @if($activePage == 'assigned-tasks') active @endif">
+                    <a class="nav-link" href="{{ route('manufacturer.tasks.assigned') }}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-bullet-list-67"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">Assigned Tasks</span>
+                            <span class="nav-subtitle">Respond to assignments</span>
+>>>>>>> 53b55260038ec1088546a0789b7243a4938e5444
                         </div>
                         <div class="nav-indicator"></div>
                     </a>
                 </li>
 
+<<<<<<< HEAD
                 <!-- Chat Page -->
                 <li class="nav-item @if($activePage == 'chat') active @endif">
                     <a class="nav-link" href="{{ route('manufacturer.chats.index') }}">
+=======
+                <!-- Static Chat Page -->
+                <li class="nav-item @if($activePage == 'static-chat') active @endif">
+                    <a class="nav-link" href="/manufacturer/static-chat">
+>>>>>>> 53b55260038ec1088546a0789b7243a4938e5444
                         <div class="nav-icon">
                             <i class="nc-icon nc-chat-33"></i>
                         </div>

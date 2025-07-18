@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('raw_materials', function (Blueprint $table) {
-            if (Schema::hasColumn('raw_materials', 'category')) {
-                $table->dropColumn('category');
+        Schema::table('tasks', function (Blueprint $table) {
+            if (!Schema::hasColumn('tasks', 'contact')) {
+                $table->string('contact')->nullable();
             }
         });
     }
@@ -23,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('raw_materials', function (Blueprint $table) {
-            $table->string('category')->nullable();
+        Schema::table('tasks', function (Blueprint $table) {
+            if (Schema::hasColumn('tasks', 'contact')) {
+                $table->dropColumn('contact');
+            }
         });
     }
 };

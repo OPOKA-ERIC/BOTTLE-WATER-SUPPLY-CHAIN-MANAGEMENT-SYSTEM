@@ -14,42 +14,26 @@ class AutoTaskScheduler extends Command
 
     public function handle()
     {
-        $today = Carbon::today();
-        $created = 0;
-
-        // Example 1: Auto-create a "Repatch Order" task for each delivery agent if there are pending orders (dummy logic)
-        $deliveryAgents = User::where('role', 'delivery_agent')->get();
-        foreach ($deliveryAgents as $agent) {
-            // Dummy condition: always create a repatch order task for demo
-            Task::create([
-                'title' => 'Repatch Order',
-                'description' => 'Automatically generated repatch order for delivery agent.',
-                'assigned_by' => 1, // System/admin user
-                'assigned_to' => $agent->id,
-                'priority' => 'high',
-                'category' => 'delivery',
-                'status' => 'pending',
-                'due_date' => $today->copy()->addDay(),
-            ]);
-            $created++;
+        $this->info('Starting automated task scheduling...');
+        $assignedCount = 0;
+        $tasks = \App\Models\Task::whereNull('assigned_to')->orWhere('assignment_method', 'auto')->where('status', 'pending')->get();
+        foreach ($tasks as $task) {
+            $category = \App\Models\TaskCategory::where('name', $task->category)->first();
+            $assignee = $category ? $category->getBestAssignee() : null;
+            if ($assignee) {
+                $task->assigned_to = $assignee->id;
+                $task->assignment_method = 'auto';
+                $task->assignment_reason = 'Assigned to ' . $assignee->name . ' (least busy ' . ucfirst($assignee->role) . ')';
+                $task->save();
+                // Optionally notify the user
+                $assignee->notify(new \App\Notifications\TaskStatusNotification('You have been assigned a new task: "' . $task->title . '"', $task->id));
+                $assignedCount++;
+            } else {
+                $task->assignment_method = 'auto';
+                $task->assignment_reason = 'No eligible user found';
+                $task->save();
+            }
         }
-
-        // Example 2: Auto-create a "Send Daily Report" task for all administrators
-        $admins = User::where('role', 'administrator')->get();
-        foreach ($admins as $admin) {
-            Task::create([
-                'title' => 'Send Daily Report',
-                'description' => 'Automatically generated daily report task.',
-                'assigned_by' => 1, // System/admin user
-                'assigned_to' => $admin->id,
-                'priority' => 'medium',
-                'category' => 'admin',
-                'status' => 'pending',
-                'due_date' => $today->copy()->addDay(),
-            ]);
-            $created++;
-        }
-
-        $this->info("Auto-scheduled $created tasks.");
+        $this->info("Automated scheduling complete. $assignedCount tasks assigned.");
     }
 } 
