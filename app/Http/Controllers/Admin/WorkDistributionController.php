@@ -224,4 +224,68 @@ class WorkDistributionController extends Controller
 
         return view('admin.work_distribution.report', compact('tasks', 'users', 'categories', 'stats', 'byUser', 'byCategory'));
     }
+
+    /**
+     * Submit feedback for a task by the assigned worker
+     */
+    public function submitFeedback(Request $request, \App\Models\Task $task)
+    {
+        $request->validate([
+            'feedback' => 'required|string',
+        ]);
+        if (auth()->id() !== $task->assigned_to) {
+            return back()->with('error', 'Unauthorized');
+        }
+        if ($task->feedback) {
+            return back()->with('error', 'Feedback already submitted.');
+        }
+        \App\Models\TaskFeedback::create([
+            'task_id' => $task->id,
+            'user_id' => auth()->id(),
+            'feedback' => $request->feedback,
+        ]);
+        return back()->with('success', 'Feedback submitted!');
+    }
+
+    /**
+     * Submit a review for a task by a supervisor (admin)
+     */
+    public function submitReview(Request $request, \App\Models\Task $task)
+    {
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'review' => 'nullable|string',
+        ]);
+        if (!auth()->user()->isAdmin()) {
+            return back()->with('error', 'Unauthorized');
+        }
+        if ($task->review) {
+            return back()->with('error', 'Review already submitted.');
+        }
+        \App\Models\TaskReview::create([
+            'task_id' => $task->id,
+            'supervisor_id' => auth()->id(),
+            'rating' => $request->rating,
+            'review' => $request->review,
+        ]);
+        return back()->with('success', 'Review submitted!');
+    }
+
+    /**
+     * Show all task feedback for admin management
+     */
+    public function allFeedback()
+    {
+        $feedbacks = \App\Models\TaskFeedback::with(['task', 'user'])->latest()->paginate(20);
+        return view('admin.work_distribution.all_feedback', compact('feedbacks'));
+    }
+
+    /**
+     * Show all task reviews for admin management
+     */
+    public function allReviews()
+    {
+        $reviews = \App\Models\TaskReview::with(['task', 'supervisor'])->latest()->paginate(20);
+        return view('admin.work_distribution.all_reviews', compact('reviews'));
+    }
 } 

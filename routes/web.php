@@ -77,12 +77,16 @@ Route::middleware(['auth', 'role:administrator', 'redirect.role'])->prefix('admi
     Route::post('/work-distribution/{task}/reassign', [App\Http\Controllers\Admin\WorkDistributionController::class, 'reassign'])->name('admin.work-distribution.reassign');
     Route::post('/work-distribution/{task}/status', [App\Http\Controllers\Admin\WorkDistributionController::class, 'updateStatus'])->name('admin.work-distribution.updateStatus');
     Route::post('/work-distribution/{task}/comment', [App\Http\Controllers\Admin\WorkDistributionController::class, 'addComment'])->name('admin.work-distribution.addComment');
+    Route::post('/work-distribution/{task}/feedback', [App\Http\Controllers\Admin\WorkDistributionController::class, 'submitFeedback'])->name('admin.work-distribution.feedback');
+    Route::post('/work-distribution/{task}/review', [App\Http\Controllers\Admin\WorkDistributionController::class, 'submitReview'])->name('admin.work-distribution.review');
     Route::resource('tasks', App\Http\Controllers\Admin\TaskController::class);
     Route::get('/tasks/reports', [App\Http\Controllers\Admin\TaskController::class, 'reports'])->name('admin.tasks.reports');
     Route::get('/tasks/create', [App\Http\Controllers\Admin\TaskController::class, 'create'])->name('admin.tasks.create');
     Route::delete('/work-distribution/{task}', [App\Http\Controllers\Admin\WorkDistributionController::class, 'destroy'])->name('admin.work-distribution.destroy');
     Route::get('/work-distribution/{task}/history', [App\Http\Controllers\Admin\WorkDistributionController::class, 'showHistory'])->name('admin.work-distribution.history');
     Route::get('/work-distribution/report', [\App\Http\Controllers\Admin\WorkDistributionController::class, 'report'])->name('admin.work-distribution.report');
+    Route::get('/work-distribution/feedback/all', [App\Http\Controllers\Admin\WorkDistributionController::class, 'allFeedback'])->name('admin.work-distribution.allFeedback');
+    Route::get('/work-distribution/reviews/all', [App\Http\Controllers\Admin\WorkDistributionController::class, 'allReviews'])->name('admin.work-distribution.allReviews');
 });
 
 Route::prefix('admin')->middleware(['auth', 'role:administrator'])->name('admin.')->group(function () {

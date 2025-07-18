@@ -81,6 +81,16 @@ class Task extends Model
         return $this->hasMany(TaskStatusAudit::class);
     }
 
+    public function feedback()
+    {
+        return $this->hasOne(TaskFeedback::class);
+    }
+
+    public function review()
+    {
+        return $this->hasOne(TaskReview::class);
+    }
+
     // Scopes for filtering
     public function scopePending($query)
     {

@@ -107,5 +107,62 @@
             </ul>
         </div>
     </div>
+    {{-- Feedback and Review Section --}}
+    @if($task->status === 'completed')
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white">Feedback & Review</div>
+            <div class="card-body">
+                {{-- Worker Feedback --}}
+                @if(!$task->feedback && auth()->id() === $task->assigned_to)
+                    <form method="POST" action="{{ route('admin.work-distribution.feedback', $task->id) }}">
+                        @csrf
+                        <div class="form-group">
+                            <label for="feedback">Your Feedback on this Task</label>
+                            <textarea class="form-control" id="feedback" name="feedback" rows="2" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">Submit Feedback</button>
+                    </form>
+                @elseif($task->feedback)
+                    <div class="mb-3">
+                        <h5>Worker Feedback</h5>
+                        <div class="alert alert-info mb-0">
+                            <strong>{{ $task->feedback->user->name }}:</strong> {{ $task->feedback->feedback }}
+                            <br>
+                            <small class="text-muted">{{ $task->feedback->created_at->format('Y-m-d H:i') }}</small>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Supervisor Review --}}
+                @if(!$task->review && auth()->user() && auth()->user()->isAdmin())
+                    <form method="POST" action="{{ route('admin.work-distribution.review', $task->id) }}">
+                        @csrf
+                        <div class="form-group">
+                            <label for="rating">Rate Worker Performance (1-5)</label>
+                            <input type="number" class="form-control w-25" id="rating" name="rating" min="1" max="5" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="review">Supervisor Review (optional)</label>
+                            <textarea class="form-control" id="review" name="review" rows="2"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                    </form>
+                @elseif($task->review)
+                    <div class="mb-3">
+                        <h5>Supervisor Review</h5>
+                        <div class="alert alert-primary mb-0">
+                            <strong>{{ $task->review->supervisor->name }}:</strong> 
+                            <span>Rating: <b>{{ $task->review->rating }}/5</b></span>
+                            <br>
+                            @if($task->review->review)
+                                <span>{{ $task->review->review }}</span><br>
+                            @endif
+                            <small class="text-muted">{{ $task->review->created_at->format('Y-m-d H:i') }}</small>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
 </div>
 @endsection 

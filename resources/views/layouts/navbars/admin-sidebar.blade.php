@@ -59,6 +59,32 @@
                     </a>
                 </li>
 
+                <!-- Work Distribution Feedback/Review -->
+                <li class="nav-item @if($activePage == 'task-feedback') active @endif">
+                    <a class="nav-link" href="{{ route('admin.work-distribution.allFeedback') }}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-chat-33"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">Task Feedback</span>
+                            <span class="nav-subtitle">Worker feedback on tasks</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
+                <li class="nav-item @if($activePage == 'task-reviews') active @endif">
+                    <a class="nav-link" href="{{ route('admin.work-distribution.allReviews') }}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-badge"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">Task Reviews</span>
+                            <span class="nav-subtitle">Supervisor ratings</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
+
                 <!-- Task Scheduling -->
                 <li class="nav-item @if($activePage == 'task-scheduling') active @endif">
                     <a class="nav-link" href="{{ route('admin.tasks.index') }}">
