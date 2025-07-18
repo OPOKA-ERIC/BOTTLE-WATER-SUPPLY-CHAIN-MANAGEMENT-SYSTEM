@@ -125,36 +125,9 @@
                                     <span class="action-subtitle">Add to inventory</span>
                                 </div>
                             </button>
-                            <button class="quick-action-btn" onclick="openInventoryReportModal()">
-                                <div class="action-icon">
-                                    <i class="nc-icon nc-chart-bar-32"></i>
                                 </div>
-                                <div class="action-content">
-                                    <span class="action-title">Inventory Report</span>
-                                    <span class="action-subtitle">Generate reports</span>
                                 </div>
-                            </button>
-                            <button class="quick-action-btn" onclick="openStockAlertsModal()">
-                                <div class="action-icon">
-                                    <i class="nc-icon nc-bell-55"></i>
                                 </div>
-                                <div class="action-content">
-                                    <span class="action-title">Stock Alerts</span>
-                                    <span class="action-subtitle">View alerts</span>
-                                </div>
-                            </button>
-                            <button class="quick-action-btn" onclick="openBulkUpdateModal()">
-                                <div class="action-icon">
-                                    <i class="nc-icon nc-settings-gear-65"></i>
-                                </div>
-                                <div class="action-content">
-                                    <span class="action-title">Bulk Update</span>
-                                    <span class="action-subtitle">Update multiple items</span>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 

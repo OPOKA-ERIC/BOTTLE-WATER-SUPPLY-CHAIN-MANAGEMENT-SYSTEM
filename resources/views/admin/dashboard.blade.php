@@ -129,7 +129,7 @@
                                     <i class="nc-icon nc-money-coins"></i>
                                 </div>
                                 <div class="kpi-content">
-                                    <h3 class="kpi-value">${{ number_format($kpis['total_revenue'], 2) }}</h3>
+                                    <h3 class="kpi-value">{{ number_format($kpis['total_revenue']) }} UGX</h3>
                                     <p class="kpi-label">Total Revenue</p>
                                     <div class="kpi-trend {{ $kpis['revenue_growth_rate'] >= 0 ? 'positive' : 'negative' }}">
                                         <i class="nc-icon {{ $kpis['revenue_growth_rate'] >= 0 ? 'nc-chart-bar-32' : 'nc-chart-bar-32' }}"></i>
@@ -306,17 +306,6 @@
                 </div>
             </a>
                         </div>
-                        <div class="col-md-2 mb-3">
-                            <a href="#" class="quick-action-card d-block text-center p-4">
-                                <div class="quick-action-icon info mb-2">
-                                    <i class="nc-icon nc-settings-gear-64"></i>
-                </div>
-                <div class="quick-action-content">
-                    <h4>System Settings</h4>
-                    <p>Configure application preferences</p>
-                </div>
-            </a>
-                        </div>
                         <!-- Task Scheduling Quick Action -->
                         <div class="col-md-2 mb-3">
                             <a href="{{ route('admin.tasks.index') }}" class="quick-action-card d-block text-center p-4">
@@ -414,11 +403,11 @@
                                         <td>{{ $application->user->name ?? 'N/A' }}</td>
                                         <td>
                                             <span class="status-badge status-{{ $application->status }}">
-                                            {{ ucfirst($application->status) }}
-                                        </span>
-                                    </td>
+                                                {{ $application->status === 'approved' ? 'Approved' : ($application->status === 'rejected' ? 'Rejected' : ucfirst($application->status)) }}
+                                            </span>
+                                        </td>
                                         <td>{{ $application->created_at->format('M d, Y') }}</td>
-                                </tr>
+                                    </tr>
                                 @empty
                                 <tr>
                                         <td colspan="4" class="text-center">No recent applications found</td>
@@ -465,6 +454,65 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Vendor Validation Scores Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="content-card">
+            <div class="card-header">
+                <div class="header-content">
+                    <h4 class="card-title">Latest Vendor Application Validation Scores</h4>
+                    <p class="card-subtitle">Quick view of the most recent vendor validation results</p>
+                </div>
+                <div class="header-icon">
+                    <i class="nc-icon nc-badge"></i>
+                </div>
+            </div>
+            <div class="card-body">
+                @php
+                    $latestVendorApp = \App\Models\VendorApplication::with('user')->latest()->first();
+                @endphp
+                @if($latestVendorApp)
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="score-item">
+                            <div class="score-label">Financial</div>
+                            <div class="score-value">{{ $latestVendorApp->financial_score !== null ? (int)$latestVendorApp->financial_score : '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="score-item">
+                            <div class="score-label">Reputation</div>
+                            <div class="score-value">{{ $latestVendorApp->reputation_score !== null ? (int)$latestVendorApp->reputation_score : '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="score-item">
+                            <div class="score-label">Compliance</div>
+                            <div class="score-value">{{ $latestVendorApp->compliance_score !== null ? (int)$latestVendorApp->compliance_score : '-' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="score-item">
+                            <div class="score-label">Overall</div>
+                            <div class="score-value">{{ $latestVendorApp->overall_score !== null ? (int)$latestVendorApp->overall_score : '-' }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <strong>Vendor:</strong> {{ $latestVendorApp->user->name ?? 'N/A' }}<br>
+                    <strong>Status:</strong> {{ ucfirst($latestVendorApp->status) }}<br>
+                    @if($latestVendorApp->rejection_reason)
+                        <strong>Rejection Reason:</strong> {{ $latestVendorApp->rejection_reason }}
+                    @endif
+                </div>
+                @else
+                <p>No vendor applications found.</p>
+                @endif
             </div>
         </div>
     </div>

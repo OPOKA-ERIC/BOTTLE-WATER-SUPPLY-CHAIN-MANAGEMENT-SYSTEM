@@ -22,7 +22,7 @@ class DashboardController extends Controller
                 ->where('status', 'pending')
                 ->count(),
             'total_revenue' => Order::where('retailer_id', $user->id)
-                ->where('status', 'completed')
+                ->where('status', 'delivered')
                 ->sum('total_amount')
         ];
 
@@ -181,5 +181,48 @@ class DashboardController extends Controller
             'salesReport' => $salesReport,
             'productReport' => $productReport->values(),
         ]);
+    }
+
+    public function downloadReport()
+    {
+        $user = auth()->user();
+        $salesReport = Order::where('retailer_id', $user->id)
+            ->whereIn('status', ['completed', 'delivered'])
+            ->selectRaw('DATE(created_at) as date, SUM(total_amount) as total')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        $productReport = Order::where('retailer_id', $user->id)
+            ->whereIn('status', ['completed', 'delivered'])
+            ->with('products')
+            ->get()
+            ->pluck('products')
+            ->flatten()
+            ->groupBy('id')
+            ->map(function ($products) {
+                return [
+                    'name' => $products->first()->name,
+                    'total_quantity' => $products->sum('pivot.quantity'),
+                    'total_revenue' => $products->sum(function ($product) {
+                        return $product->pivot->quantity * $product->pivot->price;
+                    }),
+                ];
+            });
+
+        $html = view('retailer.report_pdf', [
+            'user' => $user,
+            'salesReport' => $salesReport,
+            'productReport' => $productReport,
+        ])->render();
+
+        // If barryvdh/laravel-dompdf is installed, use it. Otherwise, return HTML for now.
+        if (class_exists('Barryvdh\\DomPDF\\Facade\\Pdf')) {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML($html);
+            return $pdf->download('retailer_report_' . $user->id . '.pdf');
+        } else {
+            // Fallback: return HTML with a note
+            return response($html)->header('Content-Type', 'text/html');
+        }
     }
 } 

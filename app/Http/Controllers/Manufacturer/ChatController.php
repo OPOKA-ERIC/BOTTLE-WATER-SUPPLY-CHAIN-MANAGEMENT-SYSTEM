@@ -86,9 +86,20 @@ class ChatController extends Controller
             'file' => 'nullable|file|max:10240' // 10MB max
         ]);
 
+        $user = auth()->user();
+        if ($user->role === 'manufacturer') {
+            $manufacturer_id = $user->id;
+            $supplier_id = $request->supplier_id;
+        } elseif ($user->role === 'supplier') {
+            $manufacturer_id = $request->manufacturer_id; // Must be sent from frontend
+            $supplier_id = $user->id;
+        } else {
+            abort(403, 'Unauthorized');
+        }
+
         $chat = Chat::create([
-            'manufacturer_id' => auth()->id(),
-            'supplier_id' => $request->supplier_id,
+            'manufacturer_id' => $manufacturer_id,
+            'supplier_id' => $supplier_id,
             'message' => $request->message,
             'type' => $request->type ?? 'text',
             'file_path' => $request->hasFile('file') ? $request->file('file')->store('chats') : null

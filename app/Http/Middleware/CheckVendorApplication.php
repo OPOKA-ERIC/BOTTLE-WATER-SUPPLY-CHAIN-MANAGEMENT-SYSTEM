@@ -30,7 +30,9 @@ class CheckVendorApplication
                 'vendor.applications.store',
                 'vendor.applications.show',
                 'vendor.applications.index',
-                'vendor.dashboard' // Allow access to dashboard to see application status
+                'vendor.dashboard', // Allow access to dashboard to see application status
+                'vendor.reports', // Allow access to reports page
+                'vendor.reports.download', // Allow access to download report
             ];
             
             if (!in_array($request->route()->getName(), $excludedRoutes)) {

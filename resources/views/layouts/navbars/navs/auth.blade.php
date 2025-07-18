@@ -69,11 +69,7 @@
                             <span>My Profile</span>
                         </a>
                         @if(auth()->user()->role === 'administrator')
-                        <a href="#" class="dropdown-item">
-                            <i class="nc-icon nc-settings-gear-64"></i>
-                            <span>Settings</span>
-                        </a>
-                        <a href="#" class="dropdown-item">
+                        <a href="{{ route('admin.analytics') }}" class="dropdown-item" onclick="event.stopPropagation(); window.location.href='{{ route('admin.analytics') }}'; return false;" target="_self">
                             <i class="nc-icon nc-chart-bar-32"></i>
                             <span>Analytics</span>
                         </a>

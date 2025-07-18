@@ -40,8 +40,14 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
+                                        <th>Business Name</th>
+                                        <th>Type</th>
                                         <th>Status</th>
-                                        <th>Vendor</th>
+                                        <th>Financial</th>
+                                        <th>Reputation</th>
+                                        <th>Compliance</th>
+                                        <th>Overall</th>
+                                        <th>Submitted</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -49,12 +55,22 @@
                                     @foreach($applications as $application)
                                     <tr>
                                         <td><span class="order-id">#{{ $application->id }}</span></td>
+                                        <td>{{ $application->business_name ?? 'N/A' }}</td>
+                                        <td>{{ $application->business_type ?? 'N/A' }}</td>
                                         <td>
-                                            <span class="status-badge status-{{ strtolower($application->status ?? 'pending') }}">
-                                                {{ ucfirst($application->status ?? 'N/A') }}
+                                            <span class="status-badge status-{{ strtolower($application->status === 'approved' ? 'approved' : 'rejected') }}">
+                                                @if($application->status === 'approved')
+                                                    Approved
+                                                @else
+                                                    Rejected
+                                                @endif
                                             </span>
                                         </td>
-                                        <td>{{ $application->user->name ?? 'N/A' }}</td>
+                                        <td>{{ $application->financial_score == 1 ? 1 : 0 }}</td>
+                                        <td>{{ $application->reputation_score == 1 ? 1 : 0 }}</td>
+                                        <td>{{ $application->compliance_score == 1 ? 1 : 0 }}</td>
+                                        <td>{{ $application->overall_score !== null ? $application->overall_score : '❓' }}</td>
+                                        <td>{{ $application->created_at ? $application->created_at->format('M d, Y') : 'N/A' }}</td>
                                         <td>
                                             <a href="{{ route('vendor.applications.show', $application->id) }}" class="action-btn">
                                                 <i class="nc-icon nc-zoom-split-in"></i>

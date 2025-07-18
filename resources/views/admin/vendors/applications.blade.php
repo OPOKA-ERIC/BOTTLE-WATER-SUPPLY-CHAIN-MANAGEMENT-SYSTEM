@@ -39,37 +39,32 @@
                             <th>Business Name</th>
                             <th>Applicant</th>
                             <th>Status</th>
+                            <th>Financial</th>
+                            <th>Reputation</th>
+                            <th>Compliance</th>
+                            <th>Overall</th>
                             <th>Submitted</th>
-                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($applications as $application)
+                            @if($application->status === 'approved' || $application->status === 'rejected')
                             <tr>
-                                        <td><span class="order-id">#{{ $application->id }}</span></td>
+                                <td><span class="order-id">#{{ $application->id }}</span></td>
                                 <td>{{ $application->business_name ?? 'N/A' }}</td>
                                 <td>{{ $application->user->name ?? 'N/A' }}</td>
-                                        <td>
-                                            <span class="status-badge status-{{ $application->status }}">
-                                                {{ ucfirst($application->status) }}
-                                            </span>
-                                        </td>
-                                <td>{{ $application->created_at->format('M d, Y') }}</td>
                                 <td>
-                                    @if($application->status === 'pending')
-                                        <form action="{{ route('admin.vendors.approve', $application->id) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                                    <button type="submit" class="action-btn" style="background: linear-gradient(135deg, #2ecc71, #27ae60);"><i class="nc-icon nc-check-2"></i> Approve</button>
-                                        </form>
-                                        <form action="{{ route('admin.vendors.reject', $application->id) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                                    <button type="submit" class="action-btn" style="background: linear-gradient(135deg, #e74c3c, #c0392b);"><i class="nc-icon nc-simple-remove"></i> Reject</button>
-                                        </form>
-                                    @else
-                                        <span class="text-muted">No actions</span>
-                                    @endif
+                                    <span class="status-badge status-{{ $application->status }}">
+                                        {{ $application->status === 'approved' ? 'Approved' : 'Rejected' }}
+                                    </span>
                                 </td>
+                                <td>{{ $application->financial_score !== null ? (int)$application->financial_score : '-' }}</td>
+                                <td>{{ $application->reputation_score !== null ? (int)$application->reputation_score : '-' }}</td>
+                                <td>{{ $application->compliance_score !== null ? (int)$application->compliance_score : '-' }}</td>
+                                <td>{{ $application->overall_score !== null ? (int)$application->overall_score : '-' }}</td>
+                                <td>{{ $application->created_at->format('M d, Y') }}</td>
                             </tr>
+                            @endif
                         @endforeach
                     </tbody>
                 </table>

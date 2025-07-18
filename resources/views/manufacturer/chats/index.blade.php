@@ -59,6 +59,7 @@
                         <!-- Messages -->
                         <div class="flex-grow-1 overflow-auto mb-3 px-4 pt-4 chat-messages" id="messagesContainer" style="min-height:300px; max-height:420px;">
                             <div class="text-muted text-center" id="noMessages">Select a supplier to start chatting.</div>
+                            {{-- Messages will be rendered here by JS using the same structure as show.blade.php --}}
                         </div>
                         <!-- Message Input -->
                         <form id="messageForm" class="d-flex p-3 border-top chat-input-bar" style="gap:10px; display:none; background:#f8f9fa; border-radius:0 0 16px 16px;" autocomplete="off">
@@ -78,54 +79,172 @@
 <style>
 .chat-bg-gradient {
     background: linear-gradient(120deg, #f8fafc 0%, #e3e6f3 100%);
+    min-height: 100vh;
 }
 .welcome-card {
     box-shadow: 0 4px 24px rgba(102,126,234,0.15);
     font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
 }
-.supplier-item.active, .supplier-item:active {
-    background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%) !important;
-    color: #234567 !important;
-    transition: background 0.2s, color 0.2s;
-}
-.supplier-item:hover {
-    background: linear-gradient(90deg, #e0eafc 0%, #cfdef3 100%) !important;
-    color: #234567 !important;
-    transition: background 0.2s, color 0.2s;
-}
-.chat-sidebar {
+.card.chat-window {
+    border-radius: 16px;
+    min-height: 600px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
     background: #fff;
+    box-shadow: 0 8px 32px rgba(102,126,234,0.10);
 }
-.chat-window {
-    background: #fff;
-}
-.chat-messages {
-    scrollbar-width: thin;
-    scrollbar-color: #b3b3b3 #f8f9fa;
-}
-.chat-messages::-webkit-scrollbar {
-    width: 8px;
+.flex-grow-1.chat-messages {
     background: #f8f9fa;
+    padding: 30px 0 0 0;
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 300px;
+    max-height: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }
-.chat-messages::-webkit-scrollbar-thumb {
-    background: #b3b3b3;
-    border-radius: 4px;
+.message-group-label {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 2px;
+    margin-left: 60px;
+    margin-right: 60px;
+    text-align: left;
+    font-weight: 600;
 }
-.chat-input-bar {
-    border-top: 1px solid #e0e0e0;
+.message.sent .message-group-label {
+    color: #667eea;
+    text-align: right;
+    margin-left: 0;
+    margin-right: 60px;
 }
-.chat-input:focus {
-    box-shadow: 0 0 0 2px #667eea33;
-    border-color: #667eea;
+.message.received .message-group-label {
+    color: #20c997;
+    text-align: left;
+    margin-left: 60px;
+    margin-right: 0;
 }
-.message.sent .chat-bubble, .message.sent .message-text {
-    background: #667eea !important;
+.message {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    max-width: 70%;
+    margin-bottom: 2px;
+}
+.message.sent {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+    margin-left: 60px !important;
+}
+.message.sent .message-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
     color: #fff !important;
+    border-radius: 20px 20px 4px 20px;
+    box-shadow: 0 4px 16px rgba(102,126,234,0.10);
+    position: relative;
 }
-.message.received .chat-bubble, .message.received .message-text {
+.message.sent .message-content::after {
+    content: '';
+    position: absolute;
+    right: -12px;
+    top: 18px;
+    width: 0;
+    height: 0;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-left: 12px solid #667eea;
+    filter: drop-shadow(0 2px 4px rgba(102,126,234,0.10));
+}
+.message.received {
+    align-self: flex-start;
+    margin-right: 60px !important;
+}
+.message.received .message-content {
     background: #f1f1f1 !important;
     color: #222 !important;
+    border-radius: 20px 20px 20px 4px;
     border: 1px solid #e0e0e0 !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    position: relative;
+}
+.message.received .message-content::after {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 18px;
+    width: 0;
+    height: 0;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-right: 12px solid #f1f1f1;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06));
+}
+.message-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.message.sent .message-avatar {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+.message.received .message-avatar {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+.message-avatar i {
+    font-size: 18px;
+    color: white;
+}
+.message-content {
+    background: white;
+    padding: 15px 20px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    min-width: 200px;
+}
+.message-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    word-wrap: break-word;
+}
+.message-time {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.message.sent .message-time { justify-content: flex-end; }
+.message-time i { font-size: 12px; }
+.card-body.d-flex.flex-column.p-0 { flex: 1 1 auto; display: flex; flex-direction: column; }
+.chat-input-bar { background: #fff; border-radius: 0 0 16px 16px; border-top: 1px solid #e0e0e0; position: sticky; bottom: 0; z-index: 2; }
+.message-sender-label {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 2px;
+    margin-left: 60px;
+    margin-right: 60px;
+    text-align: left;
+    font-weight: 600;
+}
+.message-sender-label.sent {
+    color: #667eea;
+    text-align: right;
+    margin-left: 0;
+    margin-right: 60px;
+}
+.message-sender-label.received {
+    color: #20c997;
+    text-align: left;
+    margin-left: 60px;
+    margin-right: 0;
 }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
@@ -176,6 +295,7 @@ $(document).ready(function() {
         });
     }
 
+    // Replace displayMessages to use message grouping and no auto-scroll unless new message
     function displayMessages(messages) {
         const container = $('#messagesContainer');
         container.empty();
@@ -183,19 +303,28 @@ $(document).ready(function() {
             container.html('<div class="text-muted text-center">No messages yet.</div>');
             return;
         }
-        messages.forEach(message => {
-            const isSent = message.manufacturer_id == {{ auth()->id() }};
+        messages.forEach((message, idx) => {
+            // The sender is always the manufacturer field (by your schema)
+            let senderName = message.manufacturer && message.manufacturer.name ? message.manufacturer.name : 'Unknown';
+            let senderRole = message.manufacturer && message.manufacturer.role ? message.manufacturer.role : 'unknown';
+            // Sent if the sender is the current user
+            const isSent = message.manufacturer && message.manufacturer.id == {{ auth()->id() }} && message.manufacturer.role == "{{ auth()->user()->role }}";
             const messageHtml = `
-                <div class="d-flex mb-2 ${isSent ? 'justify-content-end' : 'justify-content-start'}">
-                    <div class="chat-bubble p-2 px-3 rounded message ${isSent ? 'sent' : 'received'}" style="max-width:70%; box-shadow:0 2px 8px rgba(102,126,234,0.07); border-radius:18px;">
-                        <div style="word-break:break-word;">${message.message}</div>
-                        <div class="small text-muted text-end" style="font-size:0.85em;">${new Date(message.created_at).toLocaleTimeString()}</div>
+                <div class="message ${isSent ? 'sent' : 'received'}">
+                    <div class="message-avatar">
+                        <i class="nc-icon nc-single-02"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-text">${message.message}</div>
+                        <div class="message-time">
+                            ${new Date(message.created_at).toLocaleTimeString()}
+                            ${isSent ? '<i class=\'nc-icon nc-time-alarm text-muted\'></i>' : ''}
+                        </div>
                     </div>
                 </div>
             `;
             container.append(messageHtml);
         });
-        container.scrollTop(container[0].scrollHeight);
     }
 
     $('#messageForm').on('submit', function(e) {

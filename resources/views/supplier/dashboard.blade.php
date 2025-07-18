@@ -41,7 +41,7 @@
                         <i class="nc-icon nc-money-coins"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number">${{ number_format($stats['total_sales'], 2) }}</h3>
+                        <h3 class="stats-number">UGX {{ number_format($stats['total_sales'], 0) }}/=</h3>
                         <p class="stats-label">Total Sales</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
@@ -98,7 +98,7 @@
                                     <tr>
                                         <td><span class="order-id">#{{ $order->order_number }}</span></td>
                                         <td><span class="manufacturer-name">{{ $order->manufacturer->name }}</span></td>
-                                        <td><span class="amount">${{ number_format($order->total_amount, 2) }}</span></td>
+                                        <td><span class="amount">UGX {{ number_format($order->total_amount, 0) }}/=</span></td>
                                         <td>
                                             <span class="status-badge status-{{ $order->status }}">
                                                 {{ ucfirst($order->status) }}

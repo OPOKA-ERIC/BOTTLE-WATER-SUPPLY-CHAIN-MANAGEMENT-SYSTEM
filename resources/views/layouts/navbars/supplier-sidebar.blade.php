@@ -73,6 +73,20 @@
                     </a>
                 </li>
 
+                <!-- Reports -->
+                <li class="nav-item @if($activePage == 'reports') active @endif">
+                    <a class="nav-link" href="{{ route('supplier.reports') }}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-single-copy-04"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">Reports</span>
+                            <span class="nav-subtitle">Activity & PDF</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
+
                 <!-- Notifications -->
                 <li class="nav-item @if($activePage == 'notifications') active @endif">
                     <a class="nav-link" href="{{ route('supplier.notifications') }}">

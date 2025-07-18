@@ -202,8 +202,33 @@
                                 </div>
                             </div>
                             @empty
-                            <div class="col-12">
-                                <p class="text-center">No recommended products available</p>
+                            <!-- Fallback: Show 3 mineral water products -->
+                            <div class="col-md-6 mb-3">
+                                <div class="product-card">
+                                    <div class="product-content">
+                                        <h5 class="product-title">Mineral Water 500ml</h5>
+                                        <p class="product-price">UGX 500</p>
+                                        <span class="badge badge-info">Mineral Water</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="product-card">
+                                    <div class="product-content">
+                                        <h5 class="product-title">Mineral Water 1L</h5>
+                                        <p class="product-price">UGX 1,000</p>
+                                        <span class="badge badge-info">Mineral Water</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="product-card">
+                                    <div class="product-content">
+                                        <h5 class="product-title">Mineral Water 5L</h5>
+                                        <p class="product-price">UGX 5,000</p>
+                                        <span class="badge badge-info">Mineral Water</span>
+                                    </div>
+                                </div>
                             </div>
                             @endforelse
                         </div>

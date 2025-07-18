@@ -2,10 +2,7 @@
 
 @section('content')
 <!-- Real-time Indicator -->
-<div class="real-time-indicator" id="real-time-indicator">
-    <i class="nc-icon nc-refresh-69"></i>
-    <span>Live Updates</span>
-</div>
+{{-- Removed real-time-indicator (Live Updates) --}}
 <div class="content">
     <div class="container-fluid">
         <!-- Welcome Section -->
@@ -587,7 +584,8 @@
     justify-content: center;
 }
 
-/* Real-time indicator */
+/* Remove the .real-time-indicator CSS and related keyframes */
+/*
 .real-time-indicator {
     position: fixed;
     top: 20px;
@@ -609,6 +607,7 @@
     50% { opacity: 0.7; }
     100% { opacity: 1; }
 }
+*/
 
 .notification-status {
     position: absolute;

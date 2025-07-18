@@ -303,28 +303,16 @@
 
         <!-- Sales Chart -->
         @if($salesReport->count() > 0)
-        <div class="row">
-        <div class="col-md-12">
-                <div class="content-card">
-                <div class="card-header">
-                        <div class="header-content">
-                            <h4 class="card-title">Sales Trend Analysis</h4>
-                            <p class="card-subtitle">Visual representation of your sales performance over time</p>
-                        </div>
-                        <div class="header-icon">
-                            <i class="nc-icon nc-chart-bar-32"></i>
-                        </div>
-                </div>
-                <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="salesChart"></canvas>
-                        </div>
-                        </div>
-                </div>
-            </div>
-        </div>
+        <!-- Sales Trend Analysis section removed as per request -->
         @endif
     </div>
+</div>
+
+<!-- Download Button at the Bottom -->
+<div class="d-flex justify-content-end mt-4">
+    <a href="{{ route('retailer.reports.download') }}" class="btn btn-primary" target="_blank" rel="noopener">
+        <i class="nc-icon nc-single-copy-04"></i> Download PDF Report
+    </a>
 </div>
 
 <style>

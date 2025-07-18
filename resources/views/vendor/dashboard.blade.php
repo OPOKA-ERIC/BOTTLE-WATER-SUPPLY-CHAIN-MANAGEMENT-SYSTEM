@@ -38,21 +38,6 @@
             <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-icon">
-                        <i class="nc-icon nc-time-alarm"></i>
-                    </div>
-                    <div class="stats-content">
-                        <h3 class="stats-number">{{ $stats['pending_applications'] }}</h3>
-                        <p class="stats-label">Pending Review</p>
-                        <div class="stats-footer">
-                            <i class="nc-icon nc-check-2"></i>
-                            <span>Awaiting validation</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                <div class="stats-card">
-                    <div class="stats-icon">
                         <i class="nc-icon nc-check-2"></i>
                     </div>
                     <div class="stats-content">
@@ -108,28 +93,10 @@
                                             {{ ucfirst(str_replace('_', ' ', $application->status)) }}
                                         </span>
                                     </p>
-                                    @if($application->overall_score)
-                                    <p class="info-item"><strong>Overall Score:</strong> 
-                                        <span class="score-highlight">{{ number_format($application->overall_score, 1) }}/100</span>
-                                    </p>
-                                    @endif
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="application-details">
-                                    @if($application->scheduled_visit_Type)
-                                    <p class="info-item"><strong>Visit Scheduled:</strong> 
-                                        <span class="Type-highlight">{{ $application->scheduled_visit_Type->format('M d, Y H:i') }}</span>
-                                    </p>
-                                    @endif
-                                    @if($application->visit_status)
-                                    <p class="info-item">
-                                        <strong>Visit Status:</strong>
-                                        <span class="status-badge status-{{ $application->visit_status }}">
-                                            {{ ucfirst($application->visit_status) }}
-                                        </span>
-                                    </p>
-                                    @endif
                                     @if($application->rejection_reason)
                                     <p class="info-item"><strong>Rejection Reason:</strong> 
                                         <span class="rejection-reason">{{ $application->rejection_reason }}</span>
@@ -138,46 +105,37 @@
                                 </div>
                             </div>
                         </div>
-
-                        @if($application->overall_score)
                         <div class="row mt-4">
                             <div class="col-md-12">
                                 <h6 class="scores-title">Validation Scores:</h6>
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="score-item">
                                             <div class="score-label">Financial</div>
-                                            <div class="progress-custom">
-                                                <div class="progress-bar-custom bg-info" style="width: {{ $application->financial_score }}%">
-                                                    {{ number_format($application->financial_score, 1) }}%
-                                                </div>
-                                            </div>
+                                            <div class="score-value">{{ $application->financial_score == 1 ? 1 : 0 }}</div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="score-item">
                                             <div class="score-label">Reputation</div>
-                                            <div class="progress-custom">
-                                                <div class="progress-bar-custom bg-warning" style="width: {{ $application->reputation_score }}%">
-                                                    {{ number_format($application->reputation_score, 1) }}%
-                                                </div>
-                                            </div>
+                                            <div class="score-value">{{ $application->reputation_score == 1 ? 1 : 0 }}</div>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="score-item">
                                             <div class="score-label">Compliance</div>
-                                            <div class="progress-custom">
-                                                <div class="progress-bar-custom bg-success" style="width: {{ $application->compliance_score }}%">
-                                                    {{ number_format($application->compliance_score, 1) }}%
-                                                </div>
-                                            </div>
+                                            <div class="score-value">{{ $application->compliance_score == 1 ? 1 : 0 }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="score-item">
+                                            <div class="score-label">Overall</div>
+                                            <div class="score-value">{{ $application->overall_score !== null ? $application->overall_score : 0 }}</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        @endif
                     </div>
                 </div>
             </div>
@@ -232,7 +190,10 @@
                                         <th>Business Name</th>
                                         <th>Type</th>
                                         <th>Status</th>
-                                        <th>Score</th>
+                                        <th>Financial</th>
+                                        <th>Reputation</th>
+                                        <th>Compliance</th>
+                                        <th>Overall</th>
                                         <th>Submitted</th>
                                         <th>Actions</th>
                                     </tr>
@@ -243,17 +204,18 @@
                                         <td><span class="business-name">{{ $app->business_name }}</span></td>
                                         <td>{{ $app->business_type }}</td>
                                         <td>
-                                            <span class="status-badge status-{{ $app->status }}">
-                                                {{ ucfirst(str_replace('_', ' ', $app->status)) }}
+                                            <span class="status-badge status-{{ $app->status === 'approved' ? 'approved' : 'rejected' }}">
+                                                @if($app->status === 'approved')
+                                                    Approved
+                                                @else
+                                                    Rejected
+                                                @endif
                                             </span>
                                         </td>
-                                        <td>
-                                            @if($app->overall_score)
-                                                <span class="score-highlight">{{ number_format($app->overall_score, 1) }}</span>
-                                            @else
-                                                <span class="text-muted">N/A</span>
-                                            @endif
-                                        </td>
+                                        <td>{{ $app->financial_score == 1 ? 1 : 0 }}</td>
+                                        <td>{{ $app->reputation_score == 1 ? 1 : 0 }}</td>
+                                        <td>{{ $app->compliance_score == 1 ? 1 : 0 }}</td>
+                                        <td>{{ $app->overall_score !== null ? $app->overall_score : 0 }}</td>
                                         <td>{{ $app->created_at->format('M d, Y') }}</td>
                                         <td>
                                             <a href="{{ route('vendor.applications.show', $app->id) }}" class="action-btn">
@@ -264,7 +226,7 @@
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="6" class="text-center">No applications found</td>
+                                        <td colspan="9" class="text-center">No applications found</td>
                                     </tr>
                                     @endforelse
                                 </tbody>

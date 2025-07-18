@@ -34,7 +34,7 @@
             <div class="col-12">
                 <div class="chat-container">
                     <!-- Messages Area -->
-                    <div class="messages-area chat-debug-style" id="messagesArea">
+                    <div class="messages-area" id="messagesArea">
                         <div class="messages-container" id="messagesContainer">
                             @foreach($messages as $message)
                                 <div class="message {{ $message->manufacturer_id == auth()->id() ? 'sent' : 'received' }}">
@@ -217,13 +217,56 @@
     }
 }
 
+/* Outgoing (sent) message bubble */
 .message.sent {
     align-self: flex-end;
     flex-direction: row-reverse;
+    margin-left: 60px !important;
+}
+.message.sent .message-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: #fff !important;
+    border-radius: 20px 20px 4px 20px;
+    box-shadow: 0 4px 16px rgba(102,126,234,0.10);
+    position: relative;
+}
+.message.sent .message-content::after {
+    content: '';
+    position: absolute;
+    right: -12px;
+    top: 18px;
+    width: 0;
+    height: 0;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-left: 12px solid #667eea;
+    filter: drop-shadow(0 2px 4px rgba(102,126,234,0.10));
 }
 
+/* Incoming (received) message bubble */
 .message.received {
     align-self: flex-start;
+    margin-right: 60px !important;
+}
+.message.received .message-content {
+    background: #f1f1f1 !important;
+    color: #222 !important;
+    border-radius: 20px 20px 20px 4px;
+    border: 1px solid #e0e0e0 !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    position: relative;
+}
+.message.received .message-content::after {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 18px;
+    width: 0;
+    height: 0;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-right: 12px solid #f1f1f1;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.06));
 }
 
 .message-avatar {
@@ -427,18 +470,6 @@
 
 .messages-area::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
-}
-
-/* Debug timestamp: {{ now() }} */
-.messages-area.chat-debug-style .message.sent .message-content {
-    background: #667eea !important;
-    color: #fff !important;
-    border: 2px solid #003399 !important;
-}
-.messages-area.chat-debug-style .message.received .message-content {
-    background: #f1f1f1 !important;
-    color: #222 !important;
-    border: 2px solid #ff0000 !important;
 }
 </style>
 

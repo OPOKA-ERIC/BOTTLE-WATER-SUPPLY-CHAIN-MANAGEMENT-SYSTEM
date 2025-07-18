@@ -15,16 +15,16 @@ class DashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $application = VendorApplication::where('user_id', $user->id)->first();
+        $application = VendorApplication::where('user_id', $user->id)->latest()->first();
         
         $stats = [
-            'total_applications' => VendorApplication::count(),
-            'pending_applications' => VendorApplication::pending()->count(),
-            'approved_applications' => VendorApplication::approvedForVisit()->count(),
-            'rejected_applications' => VendorApplication::rejected()->count(),
+            'total_applications' => VendorApplication::where('user_id', $user->id)->count(),
+            'approved_applications' => VendorApplication::where('user_id', $user->id)->where('status', 'approved')->count(),
+            'rejected_applications' => VendorApplication::where('user_id', $user->id)->where('status', 'rejected')->count(),
         ];
 
         $recentApplications = VendorApplication::with('user')
+            ->where('user_id', $user->id)
             ->latest()
             ->take(5)
             ->get();
@@ -36,13 +36,14 @@ class DashboardController extends Controller
             'title' => 'BWSCMS',
             'activePage' => 'dashboard',
             'activeButton' => 'laravel',
-            
         ]);
     }
 
     public function applications()
     {
+        $user = auth()->user();
         $applications = VendorApplication::with('user', 'reviewer')
+            ->where('user_id', $user->id)
             ->latest()
             ->paginate(10);
 
@@ -110,20 +111,17 @@ class DashboardController extends Controller
             // Send to Java validation server
             $validationResult = $this->sendToValidationServer($application, $request->file('pdf_file'));
             
-            if (!$validationResult) {
-                // If validation server is not available, still save the application but mark it for manual review
-                $application->update([
-                    'status' => 'pending_manual_review',
-                    'rejection_reason' => 'Automatic validation server unavailable. Application will be reviewed manually.'
-                ]);
-                
+            if ($application->status === 'approved') {
+                $scoreMsg = 'Your validation scores - Financial: ' . ($application->financial_score === 1 ? '✔️' : '❌') . ', Reputation: ' . ($application->reputation_score === 1 ? '✔️' : '❌') . ', Compliance: ' . ($application->compliance_score === 1 ? '✔️' : '❌') . ', Overall: ' . ($application->overall_score !== null ? $application->overall_score : '❓');
+                return redirect()->route('vendor.applications.show', $application->id)
+                    ->with('success', 'Congratulations! Your application has been approved. You are now eligible to become a supplier. Please log out and log in again to access supplier features. ' . $scoreMsg);
+            } elseif ($application->status === 'rejected') {
+                return redirect()->route('vendor.applications.show', $application->id)
+                    ->with('error', 'Application rejected: ' . ($application->rejection_reason ?? 'Validation failed.'));
+            } else {
                 return redirect()->route('vendor.applications.show', $application->id)
                     ->with('warning', 'Vendor application submitted successfully. Automatic validation is currently unavailable. Your application will be reviewed manually.');
             }
-
-            return redirect()->route('vendor.applications.show', $application->id)
-                ->with('success', 'Vendor application submitted successfully and sent for validation.');
-
         } catch (\Exception $e) {
             return back()->with('error', 'Error submitting application: ' . $e->getMessage())->withInput();
         }
@@ -131,47 +129,76 @@ class DashboardController extends Controller
 
     private function sendToValidationServer($application, $pdfFile)
     {
+        \Log::info('sendToValidationServer called', ['application_id' => $application->id]);
         try {
-            $response = Http::timeout(30)->attach(
-                'pdfFile',
+            $response = \Illuminate\Support\Facades\Http::timeout(30)->attach(
+                'file',
                 file_get_contents($pdfFile->getRealPath()),
                 $pdfFile->getClientOriginalName()
-            )->post('http://localhost:8082/vendor-validation/api/vendor-validation/validate', [
-                'businessName' => $application->business_name,
-                'businessType' => $application->business_type,
-                'description' => $application->description,
+            )->post('http://localhost:8081/api/vendor/validate');
+
+            $data = null;
+            $criteria = [];
+            if ($response->header('Content-Type') && str_contains($response->header('Content-Type'), 'application/json')) {
+                $data = $response->json();
+                $criteria = $data['criteria'] ?? [];
+            } else {
+                // Try to decode body as JSON anyway
+                $data = json_decode($response->body(), true);
+                $criteria = $data['criteria'] ?? [];
+            }
+            // Log the raw response, parsed data, and criteria for debugging
+            \Log::info('Validation server raw response', ['body' => $response->body()]);
+            \Log::info('Validation server parsed data', ['data' => $data]);
+            \Log::info('Validation server criteria', ['criteria' => $criteria]);
+            
+            
+            // Always update scores from criteria, even if not successful
+            $application->update([
+                'financial_score' => array_key_exists('financial', $criteria) ? ($criteria['financial'] ? 1 : 0) : 0,
+                'reputation_score' => array_key_exists('reputation', $criteria) ? ($criteria['reputation'] ? 1 : 0) : 0,
+                'compliance_score' => array_key_exists('regulatory', $criteria) ? ($criteria['regulatory'] ? 1 : 0) : 0,
+            ]);
+            $application->update([
+                'overall_score' => $application->financial_score + $application->reputation_score + $application->compliance_score,
+            ]);
+            // Debug log the updated scores
+            \Log::info('Updated application scores', [
+                'id' => $application->id,
+                'financial_score' => $application->financial_score,
+                'reputation_score' => $application->reputation_score,
+                'compliance_score' => $application->compliance_score,
+                'overall_score' => $application->overall_score,
             ]);
 
-            if ($response->successful()) {
-                $data = $response->json();
-                if ($data['success']) {
-                    $validatedApp = $data['application'];
-                    \Log::info('Validation result:', $validatedApp);
-                    // Update application with validation results
-                    $application->update([
-                        'status' => $validatedApp['status'],
-                        'financial_score' => $validatedApp['financialScore'] ?? null,
-                        'reputation_score' => $validatedApp['reputationScore'] ?? null,
-                        'compliance_score' => $validatedApp['complianceScore'] ?? null,
-                        'overall_score' => $validatedApp['overallScore'] ?? null,
-                        'scheduled_visit_date' => $validatedApp['scheduledVisitDate'] ?? null,
-                        'visit_status' => $validatedApp['visitStatus'] ?? 'pending',
-                        'validated_at' => now(),
-                    ]);
-
-                    // Extract and store detailed validation data
-                    $this->extractValidationData($application, $validatedApp);
-                    
-                    return true; // Validation successful
-                }
+            if ($data && isset($data['status']) && $data['status'] === 'APPROVED') {
+                // Update application as approved and schedule facility visit 3 days from now
+                $application->update([
+                    'status' => 'approved',
+                    'validated_at' => now(),
+                    'rejection_reason' => null,
+                    'scheduled_visit_date' => now()->addDays(3),
+                    'visit_status' => 'scheduled',
+                ]);
+                return true;
+            } else if ($data) {
+                // Rejected: update application with reason
+                $application->update([
+                    'status' => 'rejected',
+                    'validated_at' => now(),
+                    'rejection_reason' => 'Failed validation criteria',
+                    'scheduled_visit_date' => null,
+                    'visit_status' => null,
+                ]);
+                return false;
             }
-            
+
             \Log::error('Validation server response not successful: ' . $response->body());
-            return false; // Validation failed
-            
+            return false;
+
         } catch (\Exception $e) {
             \Log::error('Error sending to validation server: ' . $e->getMessage());
-            return false; // Validation failed due to exception
+            return false;
         }
     }
 
@@ -302,32 +329,51 @@ class DashboardController extends Controller
 
     public function reports()
     {
+        $user = auth()->user();
+
+        // Only this vendor's applications
+        $applications = VendorApplication::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         $stats = [
-            'total_applications' => VendorApplication::count(),
-            'pending_applications' => VendorApplication::pending()->count(),
-            'approved_applications' => VendorApplication::where('status', 'approved')->count(),
-            'rejected_applications' => VendorApplication::rejected()->count(),
-            'visit_scheduled' => VendorApplication::visitScheduled()->count(),
-            'visit_completed' => VendorApplication::visitCompleted()->count(),
+            'total_applications' => $applications->count(),
+            'approved_applications' => $applications->where('status', 'approved')->count(),
+            'rejected_applications' => $applications->where('status', 'rejected')->count(),
         ];
 
-        $applicationsByStatus = VendorApplication::selectRaw('status, count(*) as count')
-            ->groupBy('status')
-            ->get();
-
-        $applicationsByMonth = VendorApplication::selectRaw('MONTH(created_at) as month, count(*) as count')
-            ->whereYear('created_at', date('Y'))
-            ->groupBy('month')
-            ->get();
-
         return view('vendor.reports', [
+            'applications' => $applications,
             'stats' => $stats,
-            'applicationsByStatus' => $applicationsByStatus,
-            'applicationsByMonth' => $applicationsByMonth,
+            'user' => $user,
             'title' => 'Vendor Reports',
             'activePage' => 'reports',
             'activeButton' => 'laravel',
             'navName' => 'Vendor Reports',
         ]);
+    }
+
+    public function downloadReport()
+    {
+        $user = auth()->user();
+        $applications = VendorApplication::with('reviewer')
+            ->where('user_id', $user->id)
+            ->whereIn('status', ['approved', 'rejected'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $html = view('vendor.report_pdf', [
+            'user' => $user,
+            'applications' => $applications,
+        ])->render();
+
+        // If barryvdh/laravel-dompdf is installed, use it. Otherwise, return HTML for now.
+        if (class_exists('Barryvdh\\DomPDF\\Facade\\Pdf')) {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML($html);
+            return $pdf->download('vendor_report_' . $user->id . '.pdf');
+        } else {
+            // Fallback: return HTML with a note
+            return response($html)->header('Content-Type', 'text/html');
+        }
     }
 }

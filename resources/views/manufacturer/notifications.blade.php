@@ -8,8 +8,8 @@
             <div class="col-12">
                 <div class="welcome-card">
                     <div class="welcome-content">
-                        <h1 class="welcome-title">Manufacturing Notifications</h1>
-                        <p class="welcome-subtitle">Stay updated with production alerts, inventory warnings, and system notifications</p>
+                        <h1 class="welcome-title">Manufacturer Notifications</h1>
+                        <p class="welcome-subtitle">Stay updated with your production, inventory, and important system alerts</p>
                     </div>
                     <div class="welcome-icon">
                         <i class="nc-icon nc-bell-55"></i>
@@ -18,19 +18,19 @@
             </div>
         </div>
 
-        <!-- Statistics Cards -->
-        <div class="row">
+        <!-- Notification Stats -->
+        <div class="row mb-4">
             <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-icon">
                         <i class="nc-icon nc-bell-55"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number">24</h3>
+                        <h3 class="stats-number" id="total-notifications">{{ $stats['total'] ?? $notifications->total() }}</h3>
                         <p class="stats-label">Total Notifications</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
-                            <span>This month</span>
+                            <span>All time</span>
                         </div>
                     </div>
                 </div>
@@ -38,11 +38,11 @@
             <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-icon">
-                        <i class="nc-icon nc-alert-circle-i"></i>
+                        <i class="nc-icon nc-single-02"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number">8</h3>
-                        <p class="stats-label">Unread Alerts</p>
+                        <h3 class="stats-number" id="unread-notifications">{{ $stats['unread'] ?? $notifications->where('is_read', false)->count() }}</h3>
+                        <p class="stats-label">Unread Notifications</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
                             <span>Require attention</span>
@@ -56,11 +56,11 @@
                         <i class="nc-icon nc-check-2"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number">16</h3>
-                        <p class="stats-label">Resolved Issues</p>
+                        <h3 class="stats-number" id="read-notifications">{{ $stats['read'] ?? $notifications->where('is_read', true)->count() }}</h3>
+                        <p class="stats-label">Read Notifications</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
-                            <span>This month</span>
+                            <span>Already viewed</span>
                         </div>
                     </div>
                 </div>
@@ -71,139 +71,11 @@
                         <i class="nc-icon nc-time-alarm"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number">2.3h</h3>
-                        <p class="stats-label">Avg Response Time</p>
+                        <h3 class="stats-number" id="today-notifications">{{ $notifications->where('created_at', '>=', now()->startOfDay())->count() }}</h3>
+                        <p class="stats-label">Today's Notifications</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
-                            <span>To alerts</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notification Management -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="content-card">
-                    <div class="card-header">
-                        <div class="header-content">
-                            <h4 class="card-title">Notification Center</h4>
-                            <p class="card-subtitle">Manage and respond to system alerts and production notifications</p>
-                        </div>
-                        <div class="header-icon">
-                            <i class="nc-icon nc-bell-55"></i>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <!-- Filter Controls -->
-                        <div class="filter-section">
-                            <div class="filter-controls">
-                                <div class="filter-group">
-                                    <label class="filter-label">Filter by:</label>
-                                    <select class="filter-select" id="statusFilter">
-                                        <option value="all">All Notifications</option>
-                                        <option value="unread">Unread Only</option>
-                                        <option value="read">Read Only</option>
-                                    </select>
-                                </div>
-                                <div class="filter-group">
-                                    <label class="filter-label">Type:</label>
-                                    <select class="filter-select" id="typeFilter">
-                                        <option value="all">All Types</option>
-                                        <option value="warning">Warnings</option>
-                                        <option value="success">Success</option>
-                                        <option value="info">Information</option>
-                                        <option value="error">Errors</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="action-buttons">
-                                <button class="action-btn mark-all-read">
-                                    <i class="nc-icon nc-check-2"></i>
-                                    Mark All Read
-                                </button>
-                                <button class="action-btn clear-all">
-                                    <i class="nc-icon nc-simple-remove"></i>
-                                    Clear All
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Notifications List -->
-                        <div class="notifications-list">
-                            <!-- Unread Notification -->
-                            <div class="notification-item unread warning">
-                                <div class="notification-icon">
-                                    <i class="nc-icon nc-alert-circle-i"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-header">
-                                        <h6 class="notification-title">Low Inventory Alert</h6>
-                                        <div class="notification-meta">
-                                            <span class="notification-time">2 hours ago</span>
-                                            <span class="notification-priority high">High Priority</span>
-                                        </div>
-                                    </div>
-                                    <p class="notification-message">Plastic bottles inventory is running low. Current stock: 1,250 units. Reorder recommended to maintain production schedule.</p>
-                                    <div class="notification-actions">
-                                        <button class="action-btn small primary">Reorder Now</button>
-                                        <button class="action-btn small secondary">View Details</button>
-                                        <button class="action-btn small mark-read">Mark Read</button>
-                                    </div>
-                                </div>
-                                <div class="notification-status">
-                                    <div class="unread-indicator"></div>
-                                </div>
-                            </div>
-
-                            <!-- Read Notification -->
-                            <div class="notification-item read success">
-                                <div class="notification-icon">
-                                    <i class="nc-icon nc-check-2"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-header">
-                                        <h6 class="notification-title">Production Target Achieved</h6>
-                                        <div class="notification-meta">
-                                            <span class="notification-time">1 day ago</span>
-                                            <span class="notification-priority medium">Medium Priority</span>
-                                        </div>
-                                    </div>
-                                    <p class="notification-message">Monthly production target of 15,000 units has been achieved ahead of schedule. Great work team!</p>
-                                    <div class="notification-actions">
-                                        <button class="action-btn small secondary">View Report</button>
-                                        <button class="action-btn small">Share</button>
-                                    </div>
-                                </div>
-                                <div class="notification-status">
-                                    <div class="read-indicator"></div>
-                                </div>
-                            </div>
-
-                            <!-- Information Notification -->
-                            <div class="notification-item unread info">
-                                <div class="notification-icon">
-                                    <i class="nc-icon nc-chart-bar-32"></i>
-                                </div>
-                                <div class="notification-content">
-                                    <div class="notification-header">
-                                        <h6 class="notification-title">Efficiency Report Available</h6>
-                                        <div class="notification-meta">
-                                            <span class="notification-time">3 days ago</span>
-                                            <span class="notification-priority low">Low Priority</span>
-                                        </div>
-                                    </div>
-                                    <p class="notification-message">Weekly efficiency report is now available. Production efficiency increased by 8.2% compared to last week.</p>
-                                    <div class="notification-actions">
-                                        <button class="action-btn small primary">View Report</button>
-                                        <button class="action-btn small mark-read">Mark Read</button>
-                                    </div>
-                                </div>
-                                <div class="notification-status">
-                                    <div class="unread-indicator"></div>
-                                </div>
-                            </div>
+                            <span>Recent activity</span>
                         </div>
                     </div>
                 </div>
@@ -211,104 +83,91 @@
         </div>
 
         <!-- Quick Actions -->
-        <div class="row">
-            <div class="col-lg-6 mb-4">
-                <div class="content-card">
-                    <div class="card-header">
-                        <div class="header-content">
-                            <h4 class="card-title">Notification Settings</h4>
-                            <p class="card-subtitle">Configure your notification preferences</p>
-                        </div>
-                        <div class="header-icon">
-                            <i class="nc-icon nc-settings-gear-65"></i>
-                        </div>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="welcome-card">
+                    <div class="welcome-content">
+                        <h1 class="welcome-title">Quick Actions</h1>
+                        <p class="welcome-subtitle">Manage your notifications efficiently</p>
                     </div>
-                    <div class="card-body">
-                        <div class="settings-list">
-                            <div class="setting-item">
-                                <div class="setting-content">
-                                    <h6 class="setting-title">Production Alerts</h6>
-                                    <p class="setting-description">Get notified about production issues and milestones</p>
-                                </div>
-                                <div class="setting-toggle">
-                                    <label class="switch">
-                                        <input type="checkbox" checked>
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-content">
-                                    <h6 class="setting-title">Inventory Warnings</h6>
-                                    <p class="setting-description">Receive alerts when stock levels are low</p>
-                                </div>
-                                <div class="setting-toggle">
-                                    <label class="switch">
-                                        <input type="checkbox" checked>
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="setting-item">
-                                <div class="setting-content">
-                                    <h6 class="setting-title">Equipment Maintenance</h6>
-                                    <p class="setting-description">Notifications for scheduled maintenance</p>
-                                </div>
-                                <div class="setting-toggle">
-                                    <label class="switch">
-                                        <input type="checkbox" checked>
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
-                            </div>
+                    <div class="welcome-icon">
+                        <i class="nc-icon nc-settings-gear-65"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="markAllAsRead()">
+                        <div class="action-icon">
+                            <i class="nc-icon nc-check-2"></i>
                         </div>
+                        <div class="action-content">
+                            <span class="action-title">Mark All as Read</span>
+                            <span class="action-subtitle">Clear all unread notifications</span>
+                        </div>
+                    </button>
+                    <button class="quick-action-btn" onclick="clearAllNotifications()">
+                        <div class="action-icon">
+                            <i class="nc-icon nc-simple-remove"></i>
+                    </div>
+                        <div class="action-content">
+                            <span class="action-title">Clear All</span>
+                            <span class="action-subtitle">Delete all notifications</span>
+                                </div>
+                    </button>
+                    <button class="quick-action-btn" onclick="refreshNotifications()">
+                        <div class="action-icon">
+                            <i class="nc-icon nc-refresh-69"></i>
+                                </div>
+                        <div class="action-content">
+                            <span class="action-title">Refresh</span>
+                            <span class="action-subtitle">Update notification list</span>
+                        </div>
+                    </button>
                     </div>
                 </div>
             </div>
 
-            <div class="col-lg-6 mb-4">
+        <!-- Notifications List -->
+        <div class="row">
+            <div class="col-12">
                 <div class="content-card">
-                    <div class="card-header">
-                        <div class="header-content">
-                            <h4 class="card-title">Recent Activity</h4>
-                            <p class="card-subtitle">Latest system activities and updates</p>
-                        </div>
-                        <div class="header-icon">
-                            <i class="nc-icon nc-chart-bar-32"></i>
-                        </div>
-                    </div>
                     <div class="card-body">
-                        <div class="activity-list">
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="nc-icon nc-box-2"></i>
+                        <div id="notifications-container">
+                            @if($notifications->count() > 0)
+                                <div class="notifications-list">
+                                    @foreach($notifications as $notification)
+                                        <div class="notification-item {{ $notification->is_read ? 'read' : 'unread' }} {{ $notification->type }}" data-id="{{ $notification->id }}">
+                                            <div class="notification-icon">
+                                                <i class="{{ $notification->type === 'success' ? 'nc-icon nc-check-2' : ($notification->type === 'warning' ? 'nc-icon nc-alert-circle-i' : ($notification->type === 'error' ? 'nc-icon nc-simple-remove' : 'nc-icon nc-bell-55')) }}"></i>
                                 </div>
-                                <div class="activity-content">
-                                    <h6 class="activity-title">New Production Batch Started</h6>
-                                    <p class="activity-description">Batch #2024-001 initiated for 500ml bottles</p>
-                                    <span class="activity-time">30 minutes ago</span>
+                                            <div class="notification-content">
+                                                <h6 class="notification-title">{{ $notification->title }}</h6>
+                                                <p class="notification-message">{{ $notification->message }}</p>
+                                                <div class="notification-meta">
+                                                    <span class="notification-time">{{ $notification->created_at->diffForHumans() }}</span>
                                 </div>
                             </div>
-                            <div class="activity-item">
-                                <div class="activity-icon">
+                                            <div class="notification-actions">
+                                                @if(!$notification->is_read)
+                                                    <button class="action-btn primary" onclick="markAsRead({{ $notification->id }})" title="Mark as Read">
                                     <i class="nc-icon nc-check-2"></i>
-                                </div>
-                                <div class="activity-content">
-                                    <h6 class="activity-title">Quality Check Completed</h6>
-                                    <p class="activity-description">Batch #2023-045 passed all quality tests</p>
-                                    <span class="activity-time">2 hours ago</span>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-icon">
-                                    <i class="nc-icon nc-time-alarm"></i>
-                                </div>
-                                <div class="activity-content">
-                                    <h6 class="activity-title">Maintenance Scheduled</h6>
-                                    <p class="activity-description">Equipment maintenance scheduled for tomorrow</p>
-                                    <span class="activity-time">4 hours ago</span>
+                                                    </button>
+                                                @endif
+                                                <button class="action-btn danger" onclick="deleteNotification({{ $notification->id }})" title="Delete">
+                                                    <i class="nc-icon nc-simple-remove"></i>
+                                                </button>
                                 </div>
                             </div>
+                                    @endforeach
+                                </div>
+                                <!-- Pagination -->
+                                <div class="pagination-container">
+                                    {{ $notifications->onEachSide(1)->links('pagination::bootstrap-4') }}
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -351,7 +210,7 @@
 .welcome-subtitle {
     font-size: 1.1rem;
     opacity: 0.9;
-    margin: 0;
+    margin: 0 0 15px 0;
     font-weight: 300;
 }
 
@@ -428,106 +287,70 @@
     margin-bottom: 30px;
 }
 
-.card-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 25px 30px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.header-content h4 {
-    margin: 0;
-    font-size: 1.4rem;
-    font-weight: 600;
-}
-
-.header-content p {
-    margin: 5px 0 0 0;
-    opacity: 0.9;
-    font-size: 0.95rem;
-}
-
-.header-icon {
-    font-size: 2rem;
-    opacity: 0.8;
-}
-
 .card-body {
     padding: 30px;
 }
 
-/* Filter Section */
-.filter-section {
+/* Quick Actions */
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.quick-action-btn {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    gap: 15px;
     padding: 20px;
     background: rgba(255, 255, 255, 0.8);
     border-radius: 15px;
     border: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    border: none;
+    width: 100%;
 }
 
-.filter-controls {
+.quick-action-btn:hover {
+    background: rgba(255, 255, 255, 0.95);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    color: inherit;
+    text-decoration: none;
+}
+
+.action-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
     display: flex;
-    gap: 20px;
     align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: white;
+    flex-shrink: 0;
 }
 
-.filter-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.action-content {
+    flex: 1;
 }
 
-.filter-label {
+.action-title {
+    display: block;
     font-weight: 600;
     color: #2c3e50;
-    font-size: 0.9rem;
+    font-size: 1rem;
+    margin-bottom: 3px;
 }
 
-.filter-select {
-    padding: 8px 12px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    background: white;
-    font-size: 0.9rem;
-    color: #2c3e50;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-.action-btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.action-btn.mark-all-read {
-    background: #27ae60;
-    color: white;
-}
-
-.action-btn.clear-all {
-    background: #e74c3c;
-    color: white;
-}
-
-.action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+.action-subtitle {
+    display: block;
+    color: #7f8c8d;
+    font-size: 0.85rem;
 }
 
 /* Notifications List */
@@ -540,13 +363,12 @@
 .notification-item {
     display: flex;
     align-items: flex-start;
-    gap: 20px;
-    padding: 25px;
+    gap: 15px;
+    padding: 20px;
     background: rgba(255, 255, 255, 0.8);
-    border-radius: 15px;
+    border-radius: 12px;
     border: 1px solid rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
-    position: relative;
 }
 
 .notification-item:hover {
@@ -560,398 +382,130 @@
     background: rgba(102, 126, 234, 0.05);
 }
 
-.notification-item.warning {
-    border-left: 4px solid #f39c12;
+.notification-item.read {
+    opacity: 0.7;
 }
 
 .notification-item.success {
     border-left: 4px solid #27ae60;
 }
 
-.notification-item.info {
-    border-left: 4px solid #3498db;
+.notification-item.warning {
+    border-left: 4px solid #f39c12;
 }
 
 .notification-item.error {
     border-left: 4px solid #e74c3c;
 }
 
-.notification-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    color: white;
-    flex-shrink: 0;
+.notification-item.success .notification-icon {
+    background: #27ae60;
 }
 
 .notification-item.warning .notification-icon {
     background: #f39c12;
 }
 
-.notification-item.success .notification-icon {
-    background: #27ae60;
-}
-
-.notification-item.info .notification-icon {
-    background: #3498db;
-}
-
 .notification-item.error .notification-icon {
     background: #e74c3c;
 }
 
-.notification-content {
-    flex: 1;
-}
-
-.notification-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 10px;
-}
-
-.notification-title {
-    font-weight: 600;
-    color: #2c3e50;
-    margin: 0;
-    font-size: 1.1rem;
-}
-
-.notification-meta {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 5px;
-}
-
-.notification-time {
-    font-size: 0.8rem;
-    color: #95a5a6;
-}
-
-.notification-priority {
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.notification-priority.high {
-    background: #e74c3c;
-    color: white;
-}
-
-.notification-priority.medium {
-    background: #f39c12;
-    color: white;
-}
-
-.notification-priority.low {
-    background: #27ae60;
-    color: white;
-}
-
-.notification-message {
-    color: #7f8c8d;
-    font-size: 0.95rem;
-    margin-bottom: 15px;
-    line-height: 1.5;
-}
-
-.notification-actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.action-btn.small {
-    padding: 6px 12px;
-    font-size: 0.8rem;
-}
-
-.action-btn.primary {
+.notification-item:not(.success):not(.warning):not(.error) .notification-icon {
     background: #667eea;
-    color: white;
 }
 
-.action-btn.secondary {
-    background: rgba(102, 126, 234, 0.1);
-    color: #667eea;
-    border: 1px solid #667eea;
+/* --- Retailer-style info notification --- */
+.notification-item.info {
+    border-left: 4px solid #3498db;
+    background: rgba(52, 152, 219, 0.05);
 }
-
-.action-btn.mark-read {
-    background: #27ae60;
-    color: white;
+.notification-item.info .notification-icon {
+    background: #3498db;
 }
+/* --- End retailer-style info notification --- */
 
-.notification-status {
+.card-header-blue {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding: 25px 30px;
     display: flex;
     align-items: center;
-}
-
-.unread-indicator {
-    width: 12px;
-    height: 12px;
-    background: #667eea;
-    border-radius: 50%;
-    animation: pulse 2s infinite;
-}
-
-.read-indicator {
-    width: 12px;
-    height: 12px;
-    background: #95a5a6;
-    border-radius: 50%;
-}
-
-@keyframes pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
-    }
-    70% {
-        box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
-    }
-}
-
-/* Settings List */
-.settings-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.setting-item {
-    display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
 }
-
-.setting-content {
-    flex: 1;
-}
-
-.setting-title {
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 5px;
-    font-size: 1rem;
-}
-
-.setting-description {
-    color: #7f8c8d;
-    font-size: 0.9rem;
-    margin: 0;
-}
-
-/* Toggle Switch */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 24px;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: #667eea;
-}
-
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-
-/* Activity List */
-.activity-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.activity-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-    padding: 15px;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 12px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-}
-
-.activity-item:hover {
-    background: rgba(255, 255, 255, 0.95);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.activity-icon {
-    width: 40px;
-    height: 40px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    color: white;
-    flex-shrink: 0;
-}
-
-.activity-content {
-    flex: 1;
-}
-
-.activity-title {
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 5px;
-    font-size: 0.95rem;
-}
-
-.activity-description {
-    color: #7f8c8d;
-    font-size: 0.85rem;
-    margin-bottom: 5px;
-}
-
-.activity-time {
-    font-size: 0.75rem;
-    color: #95a5a6;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .welcome-card {
-        flex-direction: column;
-        text-align: center;
-        padding: 30px 20px;
-    }
-    
-    .welcome-icon {
-        margin-left: 0;
-        margin-top: 20px;
-        font-size: 3rem;
-    }
-    
-    .welcome-title {
-        font-size: 2rem;
-    }
-    
-    .stats-card {
-        padding: 20px;
-    }
-    
-    .stats-number {
-        font-size: 2rem;
-    }
-    
-    .filter-section {
-        flex-direction: column;
-        gap: 20px;
-    }
-    
-    .filter-controls {
-        flex-direction: column;
-        width: 100%;
-    }
-    
-    .filter-group {
-        width: 100%;
-        justify-content: space-between;
-    }
-    
-    .filter-select {
-        flex: 1;
-        margin-left: 10px;
-    }
-    
-    .action-buttons {
-        width: 100%;
-        justify-content: center;
-    }
-    
-    .notification-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-    
-    .notification-meta {
-        align-items: flex-start;
-    }
-    
-    .notification-actions {
-        justify-content: flex-start;
-    }
-}
-
-@media (max-width: 576px) {
-    .content {
-        padding-top: 80px !important;
-    }
-    
-    .welcome-title {
-        font-size: 1.8rem;
-    }
-    
-    .stats-card {
-        padding: 15px;
-    }
-    
-    .card-body {
-        padding: 20px;
-    }
-    
-    .notification-item {
-        padding: 20px;
-    }
-    
-    .setting-item {
-        padding: 15px;
-    }
+.card-header-blue .card-title,
+.card-header-blue .card-subtitle,
+.card-header-blue .header-icon i {
+    color: white !important;
 }
 </style>
+<script>
+function markAsRead(id) {
+    var btn = event.target.closest('button');
+    btn.disabled = true;
+    fetch(`/manufacturer/notifications/${id}/read`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+        },
+    })
+    .then(res => res.json())
+    .then(() => location.reload())
+    .catch(() => { alert('Failed to mark as read.'); btn.disabled = false; });
+}
+function deleteNotification(id) {
+    var btn = event.target.closest('button');
+    btn.disabled = true;
+    fetch(`/manufacturer/notifications/${id}`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ _method: 'DELETE' })
+    })
+    .then(res => res.json())
+    .then(() => location.reload())
+    .catch(() => { alert('Failed to delete notification.'); btn.disabled = false; });
+}
+function markAllAsRead() {
+    var btn = event.target.closest('button');
+    btn.disabled = true;
+    fetch('/manufacturer/notifications/mark-all-read', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+        },
+    })
+    .then(res => res.json())
+    .then(() => location.reload())
+    .catch(() => { alert('Failed to mark all as read.'); btn.disabled = false; });
+}
+function clearAllNotifications() {
+    var btn = event.target.closest('button');
+    btn.disabled = true;
+    fetch('/manufacturer/notifications', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ _method: 'DELETE' })
+    })
+    .then(res => res.json())
+    .then(() => location.reload())
+    .catch(() => { alert('Failed to clear all notifications.'); btn.disabled = false; });
+}
+function refreshNotifications() {
+    location.reload();
+}
+function filterNotifications() {
+    // TODO: Filter notifications in the DOM or via AJAX
+}
+</script>
 @endsection 

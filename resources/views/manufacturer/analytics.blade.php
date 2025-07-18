@@ -344,6 +344,13 @@
             </div>
         </div>
 
+        <!-- Add Download PDF Production Report Button below Production Report section -->
+        <div class="d-flex justify-content-end mt-4">
+            <a href="{{ route('manufacturer.production.report.pdf') }}" class="btn btn-primary" target="_blank" rel="noopener">
+                <i class="nc-icon nc-single-copy-04"></i> Download PDF Production Report
+            </a>
+        </div>
+
         <div class="row">
             <!-- Performance Metrics -->
             <div class="col-lg-6 mb-4">

@@ -75,6 +75,9 @@ Route::middleware(['auth', 'role:administrator', 'redirect.role'])->prefix('admi
     Route::get('/tasks', [App\Http\Controllers\Admin\TaskController::class, 'index'])->name('admin.tasks.index');
     Route::get('/tasks/reports', [App\Http\Controllers\Admin\TaskController::class, 'reports'])->name('admin.tasks.reports');
     Route::get('/tasks/create', [App\Http\Controllers\Admin\TaskController::class, 'create'])->name('admin.tasks.create');
+    // Add admin reports routes
+    Route::get('/reports', [AdminDashboardController::class, 'reports'])->name('admin.reports');
+    Route::get('/reports/download', [AdminDashboardController::class, 'downloadReport'])->name('admin.reports.download');
 });
 
 // Vendor Routes
@@ -88,6 +91,9 @@ Route::middleware(['auth', 'role:vendor', 'redirect.role'])->prefix('vendor')->n
     Route::get('/applications/{id}', [VendorDashboardController::class, 'showApplication'])->name('applications.show');
     Route::get('/applications/{id}/download', [VendorDashboardController::class, 'downloadPdf'])->name('applications.download');
     
+    // TEMPORARY: Route to update rejection_reason for all rejected applications for the current vendor (for debug/demo)
+    Route::post('/applications/update-rejected-reasons', [VendorDashboardController::class, 'updateRejectedReasons'])->name('applications.updateRejectedReasons');
+    
     // Visit Management Routes (require valid application)
     Route::middleware(['check.vendor.application'])->group(function () {
     Route::get('/applications/{id}/schedule-visit', [VendorDashboardController::class, 'scheduleVisit'])->name('applications.schedule-visit');
@@ -98,6 +104,8 @@ Route::middleware(['auth', 'role:vendor', 'redirect.role'])->prefix('vendor')->n
     Route::middleware(['check.vendor.application'])->group(function () {
     Route::get('/reports', [VendorDashboardController::class, 'reports'])->name('reports');
     });
+    // Download report should NOT require a valid application
+    Route::get('/reports/download', [VendorDashboardController::class, 'downloadReport'])->name('reports.download');
 });
 
 // Supplier Routes
@@ -129,6 +137,10 @@ Route::middleware(['auth', 'role:supplier'])->prefix('supplier')->name('supplier
     Route::get('/chats/{manufacturerId}/messages', [App\Http\Controllers\Supplier\ChatController::class, 'getMessages'])->name('chats.messages');
     Route::put('/chats/{id}/read', [App\Http\Controllers\Supplier\ChatController::class, 'markAsRead'])->name('chats.read');
     Route::get('/chats/unread/count', [App\Http\Controllers\Supplier\ChatController::class, 'getUnreadCount'])->name('chats.unread-count');
+    
+    // Reports Routes
+    Route::get('/reports', [App\Http\Controllers\Supplier\DashboardController::class, 'reports'])->name('reports');
+    Route::get('/reports/download', [App\Http\Controllers\Supplier\DashboardController::class, 'downloadReport'])->name('reports.download');
 });
 
 // Manufacturer Routes - Fixed and consolidated
@@ -136,6 +148,7 @@ Route::middleware(['auth', 'role:manufacturer', 'redirect.role'])->prefix('manuf
     // Dashboard and Analytics
     Route::get('/dashboard', [ManufacturerDashboardController::class, 'index'])->name('manufacturer.dashboard');
     Route::get('/analytics', [ManufacturerDashboardController::class, 'analytics'])->name('manufacturer.analytics');
+    Route::get('/reports', [ManufacturerDashboardController::class, 'reports'])->name('manufacturer.reports');
     Route::get('/notifications', [ManufacturerDashboardController::class, 'notifications'])->name('manufacturer.notifications');
     
     // Inventory Routes
@@ -179,6 +192,8 @@ Route::middleware(['auth', 'role:manufacturer', 'redirect.role'])->prefix('manuf
     // Report Routes
     Route::get('/efficiency-report', [ManufacturerDashboardController::class, 'efficiencyReport'])->name('efficiency.report');
     Route::get('/financial-report', [ManufacturerDashboardController::class, 'financialReport'])->name('financial.report');
+    // PDF Production Report Download Route
+    Route::get('/production/report/pdf', [ManufacturerDashboardController::class, 'downloadProductionReport'])->name('manufacturer.production.report.pdf');
     
     // Chat Routes - Working chat functionality
     Route::get('/chats', [ManufacturerChatController::class, 'index'])->name('manufacturer.chats.index');
@@ -201,6 +216,12 @@ Route::middleware(['auth', 'role:manufacturer', 'redirect.role'])->prefix('manuf
             'navName' => 'Static Chat'
         ]);
     })->name('manufacturer.static-chat');
+
+    // Manufacturer notification AJAX routes
+    Route::post('/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('manufacturer.notifications.read');
+    Route::post('/notifications/mark-all-read', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('manufacturer.notifications.mark-all-read');
+    Route::delete('/notifications/{id}', [App\Http\Controllers\NotificationController::class, 'delete'])->name('manufacturer.notifications.delete');
+    Route::delete('/notifications', [App\Http\Controllers\NotificationController::class, 'clearAll'])->name('manufacturer.notifications.clear-all');
 });
 
 // Retailer Routes
@@ -211,6 +232,8 @@ Route::middleware(['auth', 'role:retailer', 'redirect.role'])->prefix('retailer'
     Route::get('/orders/{id}/track', [RetailerDashboardController::class, 'trackOrder'])->name('retailer.orders.track');
     Route::get('/reports', [RetailerDashboardController::class, 'reports'])->name('retailer.reports.index');
     Route::get('/reports/api', [App\Http\Controllers\Retailer\DashboardController::class, 'apiReports'])->name('retailer.reports.api');
+    // Retailer PDF report download route
+    Route::get('/reports/download', [App\Http\Controllers\Retailer\DashboardController::class, 'downloadReport'])->name('retailer.reports.download');
     // Retailer Notifications Route
     Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('retailer.notifications');
     Route::post('/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead']);

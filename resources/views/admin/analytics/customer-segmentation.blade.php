@@ -72,6 +72,9 @@
         segments.forEach(seg => { segmentCounts[seg] = (segmentCounts[seg] || 0) + 1; });
         const labels = Object.keys(segmentCounts).map(s => 'Segment ' + s);
         const data = Object.values(segmentCounts);
+        // Map segment keys to profiles
+        const segmentProfiles = @json($segmentProfiles);
+        const segmentKeys = Object.keys(segmentCounts);
         const ctx = document.getElementById('segmentsChart').getContext('2d');
         new Chart(ctx, {
             type: 'bar',
@@ -89,7 +92,22 @@
                 responsive: true,
                 plugins: {
                     legend: { display: false },
-                    title: { display: false }
+                    title: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                // Get segment key (not label with 'Segment ' prefix)
+                                const idx = context.dataIndex;
+                                const segmentKey = segmentKeys[idx];
+                                const count = context.parsed.y;
+                                const profile = segmentProfiles[segmentKey] || '';
+                                return [
+                                    'Number of Customers: ' + count,
+                                    'Profile: ' + profile
+                                ];
+                            }
+                        }
+                    }
                 },
                 scales: {
                     x: { title: { display: true, text: 'Segment' } },

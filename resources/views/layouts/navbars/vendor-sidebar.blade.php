@@ -43,64 +43,24 @@
                         <div class="nav-indicator"></div>
                     </a>
                 </li>
-                <!-- User Profile -->
-                <li class="nav-item @if($activePage == 'user') active @endif">
-                    <a class="nav-link" href="{{route('profile.edit')}}">
+                <!-- Reports -->
+                <li class="nav-item @if($activePage == 'reports') active @endif">
+                    <a class="nav-link" href="{{ route('vendor.reports') }}">
                         <div class="nav-icon">
-                            <i class="nc-icon nc-single-02"></i>
+                            <i class="nc-icon nc-single-copy-04"></i>
                         </div>
                         <div class="nav-content">
-                            <span class="nav-title">{{ __("User Profile") }}</span>
-                            <span class="nav-subtitle">Your profile</span>
+                            <span class="nav-title">{{ __("Reports") }}</span>
+                            <span class="nav-subtitle">Download PDF</span>
                         </div>
                         <div class="nav-indicator"></div>
                     </a>
                 </li>
-                
-                <!-- Analytics -->
-                <li class="nav-item @if($activePage == 'analytics') active @endif">
-                    <a class="nav-link" href="#">
-                        <div class="nav-icon">
-                            <i class="nc-icon nc-chart-bar-32"></i>
-                        </div>
-                        <div class="nav-content">
-                            <span class="nav-title">{{ __("Analytics") }}</span>
-                            <span class="nav-subtitle">Data insights</span>
-                        </div>
-                        <div class="nav-indicator"></div>
-                    </a>
-                </li>
-                
             </ul>
         </div>
 
         <!-- Sidebar Footer -->
         <div class="sidebar-footer">
-            <!-- Logout Button -->
-            <div class="logout-section">
-                <form id="logout-form" action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="logout-btn">
-                        <div class="logout-icon">
-                            <i class="nc-icon nc-button-power"></i>
-                        </div>
-                        <div class="logout-content">
-                            <span class="logout-title">{{ __("Logout") }}</span>
-                            <span class="logout-subtitle">Sign out</span>
-                        </div>
-                    </button>
-                </form>
-            </div>
-            <!-- Vendor Info -->
-            <div class="admin-info">
-                <div class="admin-avatar">
-                    <i class="nc-icon nc-single-02"></i>
-                </div>
-                <div class="admin-details">
-                    <span class="admin-name">Vendor</span>
-                    <span class="admin-role">Partner</span>
-                </div>
-            </div>
         </div>
     </div>
 </div>

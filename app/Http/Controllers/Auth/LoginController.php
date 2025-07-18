@@ -46,6 +46,13 @@ class LoginController extends Controller
             return back()->with('error', 'Your account is inactive. Please contact the administrator.');
         }
 
+        // Promote vendor to supplier if they have an approved application
+        if ($user->role === 'vendor' && \App\Models\VendorApplication::where('user_id', $user->id)->where('status', 'approved')->exists()) {
+            $user->role = 'supplier';
+            $user->save();
+            session()->flash('success', 'You have been promoted to supplier! You now have access to supplier features.');
+        }
+
         return redirect()->route($user->getDashboardRoute());
     }
 }

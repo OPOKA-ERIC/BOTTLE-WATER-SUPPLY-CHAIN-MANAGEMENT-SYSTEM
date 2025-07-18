@@ -142,4 +142,57 @@ class DashboardController extends Controller
 
         return redirect()->back()->with('success', 'Material added successfully!');
     }
+
+    public function reports()
+    {
+        $user = auth()->user();
+        $orders = \App\Models\PurchaseOrder::where('supplier_id', $user->id)->with('manufacturer')->orderBy('created_at', 'desc')->get();
+        $materials = \App\Models\RawMaterial::where('supplier_id', $user->id)->get();
+        $totalSales = $orders->where('status', 'completed')->sum('total_amount');
+        $pendingOrders = $orders->where('status', 'pending')->count();
+        $completedOrders = $orders->where('status', 'completed')->count();
+        $stats = [
+            'total_sales' => $totalSales,
+            'pending_orders' => $pendingOrders,
+            'completed_orders' => $completedOrders,
+            'total_materials' => $materials->count(),
+        ];
+        return view('supplier.reports', [
+            'user' => $user,
+            'orders' => $orders,
+            'materials' => $materials,
+            'stats' => $stats,
+            'title' => 'Supplier Reports',
+            'activePage' => 'reports',
+            'navName' => 'Supplier Reports',
+        ]);
+    }
+
+    public function downloadReport()
+    {
+        $user = auth()->user();
+        $orders = \App\Models\PurchaseOrder::where('supplier_id', $user->id)->with('manufacturer')->orderBy('created_at', 'desc')->get();
+        $materials = \App\Models\RawMaterial::where('supplier_id', $user->id)->get();
+        $totalSales = $orders->where('status', 'completed')->sum('total_amount');
+        $pendingOrders = $orders->where('status', 'pending')->count();
+        $completedOrders = $orders->where('status', 'completed')->count();
+        $stats = [
+            'total_sales' => $totalSales,
+            'pending_orders' => $pendingOrders,
+            'completed_orders' => $completedOrders,
+            'total_materials' => $materials->count(),
+        ];
+        $html = view('supplier.report_pdf', [
+            'user' => $user,
+            'orders' => $orders,
+            'materials' => $materials,
+            'stats' => $stats,
+        ])->render();
+        if (class_exists('Barryvdh\\DomPDF\\Facade\\Pdf')) {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML($html);
+            return $pdf->download('supplier_report_' . $user->id . '.pdf');
+        } else {
+            return response($html)->header('Content-Type', 'text/html');
+        }
+    }
 } 

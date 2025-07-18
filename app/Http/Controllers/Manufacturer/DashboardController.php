@@ -11,6 +11,7 @@ use App\Models\Chat;
 use App\Models\DemandForecast;
 use App\Models\Notification;
 use App\Models\Order;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class DashboardController extends Controller
 {
@@ -87,6 +88,17 @@ class DashboardController extends Controller
                 'notes' => $request->notes,
             ]);
 
+            // Create notification for the manufacturer
+            \App\Models\Notification::create([
+                'user_id' => auth()->id(),
+                'title' => 'Inventory Updated',
+                'message' => $inventory->product->name . ' - ' . $inventory->quantity . ' units',
+                'type' => 'info',
+                'priority' => 'medium',
+                'is_read' => false,
+                'data' => json_encode(['inventory_id' => $inventory->id]),
+            ]);
+
             if ($request->ajax()) {
                 return response()->json([
                     'success' => true,
@@ -142,15 +154,24 @@ class DashboardController extends Controller
 
     public function productionBatches()
     {
-        $batches = ProductionBatch::where('manufacturer_id', auth()->id())
+        $manufacturerId = auth()->id();
+        $batches = ProductionBatch::where('manufacturer_id', $manufacturerId)
             ->with('product')
             ->paginate(10);
-            
         $products = \App\Models\Product::where('status', 'active')->get();
-        
+        $totalBatches = ProductionBatch::where('manufacturer_id', $manufacturerId)->count();
+        // Calculate stats from all batches, not just paginated
+        $allBatches = ProductionBatch::where('manufacturer_id', $manufacturerId)->get();
+        $inProgressBatches = $allBatches->where('status', 'in_progress')->count();
+        $completedBatches = $allBatches->where('status', 'completed')->count();
+        $totalQuantity = $allBatches->sum('quantity');
         return view('manufacturer.production.batches', [
             'batches' => $batches,
             'products' => $products,
+            'totalBatches' => $totalBatches,
+            'inProgressBatches' => $inProgressBatches,
+            'completedBatches' => $completedBatches,
+            'totalQuantity' => $totalQuantity,
             'title' => 'Production Batches',
             'activePage' => 'production',
             'activeButton' => 'manufacturer',
@@ -220,6 +241,17 @@ class DashboardController extends Controller
             \Log::info('Production batch created successfully', [
                 'batch_id' => $batch->id,
                 'user_id' => auth()->id()
+            ]);
+
+            // Create notification for the manufacturer
+            \App\Models\Notification::create([
+                'user_id' => auth()->id(),
+                'title' => 'Production Batch ' . $batch->id . ' Created',
+                'message' => 'Batch of ' . $batch->quantity . ' units has been created.',
+                'type' => 'info',
+                'priority' => 'medium',
+                'is_read' => false,
+                'data' => json_encode(['batch_id' => $batch->id]),
             ]);
 
             if ($request->ajax()) {
@@ -575,20 +607,18 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
         
-        // Get notification statistics
-        $stats = [
-            'total' => $user->notifications()->count(),
-            'unread' => $user->unreadNotifications()->count(),
-            'read' => $user->readNotifications()->count(),
-            'avg_response_time' => $this->calculateAvgResponseTime($user)
-        ];
-        
-        // Get notifications with pagination
-        $notifications = $user->notifications()
+        // Use custom Notification model to fetch real notifications
+        $notifications = \App\Models\Notification::where('user_id', $user->id)
             ->latest()
             ->paginate(10);
             
-        // Get recent activity (simplified - you can expand this)
+        $stats = [
+            'total' => $notifications->total(),
+            'unread' => $notifications->where('is_read', false)->count(),
+            'read' => $notifications->where('is_read', true)->count(),
+            'avg_response_time' => 0 // You can implement your logic here if needed
+        ];
+
         $recentActivity = $this->getRecentActivity();
         
         return view('manufacturer.notifications', [
@@ -677,6 +707,17 @@ class DashboardController extends Controller
                 'quantity' => $request->quantity,
                 'estimated_completion' => $request->estimated_completion,
                 'notes' => $request->notes,
+            ]);
+
+            // Create notification for the manufacturer
+            \App\Models\Notification::create([
+                'user_id' => auth()->id(),
+                'title' => 'Production Batch ' . $batch->id . ' Updated',
+                'message' => 'Batch of ' . $batch->quantity . ' units has been updated.',
+                'type' => 'info',
+                'priority' => 'medium',
+                'is_read' => false,
+                'data' => json_encode(['batch_id' => $batch->id]),
             ]);
 
             if ($request->ajax()) {
@@ -771,6 +812,17 @@ class DashboardController extends Controller
                 'unit' => $request->unit,
                 'quantity' => $request->current_stock,
                 'notes' => $request->notes,
+            ]);
+
+            // Create notification for the manufacturer
+            \App\Models\Notification::create([
+                'user_id' => auth()->id(),
+                'title' => 'Inventory Created',
+                'message' => $inventory->product->name . ' - ' . $inventory->quantity . ' units',
+                'type' => 'info',
+                'priority' => 'medium',
+                'is_read' => false,
+                'data' => json_encode(['inventory_id' => $inventory->id]),
             ]);
 
             // Log successful creation
@@ -1023,53 +1075,31 @@ class DashboardController extends Controller
         }
     }
 
-    public function inventoryReport()
+    public function inventoryReport(Request $request)
     {
         try {
             $manufacturerId = auth()->id();
-            
-            // Get all inventory items for the manufacturer
             $inventory = Inventory::where('manufacturer_id', $manufacturerId)
                 ->with('product')
                 ->get();
-            
-            // Calculate comprehensive statistics
             $stats = [
                 'total_items' => $inventory->count(),
                 'total_stock' => $inventory->sum('current_stock'),
-                'total_value' => $inventory->sum('current_stock'), // Simplified value calculation
+                'total_value' => $inventory->sum('current_stock'),
                 'low_stock_items' => $inventory->where('current_stock', '<=', 'minimum_stock')->count(),
                 'out_of_stock_items' => $inventory->where('current_stock', 0)->count(),
                 'well_stocked_items' => $inventory->where('current_stock', '>', 'minimum_stock')->count(),
                 'average_stock_level' => $inventory->count() > 0 ? round($inventory->avg('current_stock'), 2) : 0,
                 'stock_utilization' => $inventory->count() > 0 ? round(($inventory->where('current_stock', '>', 'minimum_stock')->count() / $inventory->count()) * 100, 1) : 0,
             ];
-            
-            // Calculate stock levels by category with proper filtering
             $stockLevels = [
-                'critical' => $inventory->filter(function($item) {
-                    return $item->current_stock < $item->minimum_stock;
-                })->count(),
-                'low' => $inventory->filter(function($item) {
-                    return $item->current_stock >= $item->minimum_stock && $item->current_stock <= ($item->minimum_stock * 1.5);
-                })->count(),
-                'moderate' => $inventory->filter(function($item) {
-                    return $item->current_stock > ($item->minimum_stock * 1.5) && $item->current_stock <= ($item->minimum_stock * 3);
-                })->count(),
-                'good' => $inventory->filter(function($item) {
-                    return $item->current_stock > ($item->minimum_stock * 3);
-                })->count(),
+                'critical' => $inventory->filter(function($item) { return $item->current_stock < $item->minimum_stock; })->count(),
+                'low' => $inventory->filter(function($item) { return $item->current_stock >= $item->minimum_stock && $item->current_stock <= ($item->minimum_stock * 1.5); })->count(),
+                'moderate' => $inventory->filter(function($item) { return $item->current_stock > ($item->minimum_stock * 1.5) && $item->current_stock <= ($item->minimum_stock * 3); })->count(),
+                'good' => $inventory->filter(function($item) { return $item->current_stock > ($item->minimum_stock * 3); })->count(),
             ];
-            
-            // Get top products by stock level
             $topProducts = $inventory->sortByDesc('current_stock')->take(5);
-            
-            // Get low stock items that need attention
-            $lowStockItems = $inventory->filter(function($item) {
-                return $item->current_stock <= $item->minimum_stock;
-            })->sortBy('current_stock');
-            
-            // Calculate stock turnover metrics (simplified)
+            $lowStockItems = $inventory->filter(function($item) { return $item->current_stock <= $item->minimum_stock; })->sortBy('current_stock');
             $stockTurnover = [];
             foreach ($inventory as $item) {
                 $turnoverRate = $item->minimum_stock > 0 ? round(($item->current_stock / $item->minimum_stock), 2) : 0;
@@ -1082,44 +1112,45 @@ class DashboardController extends Controller
                     'status' => $turnoverRate < 1 ? 'Critical' : ($turnoverRate < 1.5 ? 'Low' : ($turnoverRate < 3 ? 'Moderate' : 'Good'))
                 ];
             }
-            
-            // Sort by turnover rate
-            usort($stockTurnover, function($a, $b) {
-                return $a['turnover_rate'] <=> $b['turnover_rate'];
-            });
-            
-            // Get top 5 items by turnover rate
+            usort($stockTurnover, function($a, $b) { return $a['turnover_rate'] <=> $b['turnover_rate']; });
             $topTurnoverItems = array_slice($stockTurnover, 0, 5);
-            
-            // Calculate monthly trends (simplified)
             $monthlyTrends = [];
             for ($i = 5; $i >= 0; $i--) {
                 $month = now()->subMonths($i);
                 $monthlyTrends[$month->format('M Y')] = [
-                    'total_stock' => $inventory->sum('current_stock'), // Simplified - in real app, you'd track historical data
+                    'total_stock' => $inventory->sum('current_stock'),
                     'items_count' => $inventory->count(),
-                    'low_stock_count' => $inventory->filter(function($item) {
-                        return $item->current_stock <= $item->minimum_stock;
-                    })->count(),
+                    'low_stock_count' => $inventory->filter(function($item) { return $item->current_stock <= $item->minimum_stock; })->count(),
                 ];
             }
             
-            // Generate report HTML
+            // PDF download support
+            if ($request->has('pdf')) {
+                $pdf = \PDF::loadView('manufacturer.inventory_report_pdf', [
+                    'stats' => $stats,
+                    'stockLevels' => $stockLevels,
+                    'topProducts' => $topProducts,
+                    'lowStockItems' => $lowStockItems,
+                    'monthlyTrends' => $monthlyTrends,
+                    'topTurnoverItems' => $topTurnoverItems,
+                    'inventory' => $inventory,
+                ]);
+                return $pdf->download('inventory_report.pdf');
+            }
+
+            // Default: return HTML/JSON for AJAX
             $reportHtml = $this->generateInventoryReportHtml($stats, $stockLevels, $topProducts, $lowStockItems, $monthlyTrends, $topTurnoverItems);
-            
             return response()->json([
                 'success' => true,
                 'html' => $reportHtml,
                 'stats' => $stats,
                 'stockLevels' => $stockLevels
             ]);
-            
         } catch (\Exception $e) {
             \Log::error('Failed to generate inventory report', [
                 'error' => $e->getMessage(),
                 'user_id' => auth()->id()
             ]);
-            
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to generate inventory report: ' . $e->getMessage()
@@ -1394,6 +1425,7 @@ class DashboardController extends Controller
             $html .= '</div>';
             $html .= '</div>';
         }
+        $html .= '</div>';
         $html .= '</div>';
         $html .= '</div>';
         $html .= '</div>';
@@ -2294,7 +2326,7 @@ class DashboardController extends Controller
                 'user_id' => $request->supplier_id,
                 'title' => 'New Raw Material Order',
                 'message' => 'You have received a new order for raw materials from ' . auth()->user()->name,
-                'type' => 'order',
+                'type' => 'info', // changed from 'order' to 'info' to match enum
                 'read' => false,
             ]);
 
@@ -2317,6 +2349,86 @@ class DashboardController extends Controller
             'activePage' => 'raw-material-orders',
             'activeButton' => 'manufacturer',
             'navName' => 'Order Details'
+        ]);
+    }
+
+    public function downloadProductionReport()
+    {
+        // Get the same data as the productionReport method
+        $manufacturerId = auth()->id();
+        $batches = \App\Models\ProductionBatch::where('manufacturer_id', $manufacturerId)
+            ->with('product')
+            ->get();
+        $totalBatches = $batches->count();
+        $completedBatches = $batches->where('status', 'completed')->count();
+        $inProgressBatches = $batches->where('status', 'in_progress')->count();
+        $pendingBatches = $batches->where('status', 'pending')->count();
+        $totalProduction = $batches->where('status', 'completed')->sum('quantity');
+        $totalRevenue = $batches->where('status', 'completed')->sum(function($batch) {
+            return $batch->quantity * ($batch->product->price ?? 0);
+        });
+        $efficiency = $totalBatches > 0 ? round(($completedBatches / $totalBatches) * 100, 1) : 0;
+        $avgCycleTime = $batches->where('status', 'completed')->avg(function($batch) {
+            if ($batch->start_date && $batch->estimated_completion) {
+                $start = \Carbon\Carbon::parse($batch->start_date);
+                $end = \Carbon\Carbon::parse($batch->estimated_completion);
+                return $end->diffInHours($start);
+            }
+            return null;
+        });
+        $monthlyProduction = $batches->where('status', 'completed')->groupBy(function($batch) {
+            return \Carbon\Carbon::parse($batch->start_date)->format('Y-m');
+        });
+        $topProducts = $batches->where('status', 'completed')->groupBy('product_id')->map(function($group) {
+            return $group->sum('quantity');
+        })->sortDesc()->take(5);
+        $statusBreakdown = [
+            'completed' => $completedBatches,
+            'in_progress' => $inProgressBatches,
+            'pending' => $pendingBatches,
+        ];
+        $recentActivity = $batches->sortByDesc('updated_at')->take(10);
+
+        // Render the PDF view
+        $pdfView = view('manufacturer.report_pdf', [
+            'batches' => $batches,
+            'totalBatches' => $totalBatches,
+            'completedBatches' => $completedBatches,
+            'inProgressBatches' => $inProgressBatches,
+            'pendingBatches' => $pendingBatches,
+            'totalProduction' => $totalProduction,
+            'totalRevenue' => $totalRevenue,
+            'efficiency' => $efficiency,
+            'avgCycleTime' => $avgCycleTime,
+            'monthlyProduction' => $monthlyProduction,
+            'topProducts' => $topProducts,
+            'statusBreakdown' => $statusBreakdown,
+            'recentActivity' => $recentActivity,
+        ]);
+
+        // Always use DomPDF now that it is installed
+        $pdf = Pdf::loadHTML($pdfView->render());
+        return $pdf->download('production_report.pdf');
+    }
+
+    /**
+     * Show the main reports page for the manufacturer (production & inventory reports).
+     */
+    public function reports()
+    {
+        $manufacturerId = auth()->id();
+        // Fetch summary data for production and inventory
+        $productionBatches = \App\Models\ProductionBatch::where('manufacturer_id', $manufacturerId)->get();
+        $inventory = \App\Models\Inventory::where('manufacturer_id', $manufacturerId)->get();
+
+        // You can add more summary/statistics as needed
+        return view('manufacturer.reports.index', [
+            'productionBatches' => $productionBatches,
+            'inventory' => $inventory,
+            'title' => 'Manufacturer Reports',
+            'activePage' => 'reports',
+            'activeButton' => 'manufacturer',
+            'navName' => 'Manufacturer Reports',
         ]);
     }
 } 

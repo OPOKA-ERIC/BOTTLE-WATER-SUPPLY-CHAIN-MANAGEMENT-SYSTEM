@@ -87,6 +87,20 @@
                     </a>
                 </li>
 
+                <!-- Admin Reports (PDF Download) -->
+                <li class="nav-item @if($activePage == 'admin-reports') active @endif">
+                    <a class="nav-link" href="{{ route('admin.reports') }}">
+                        <div class="nav-icon">
+                            <i class="nc-icon nc-single-copy-04"></i>
+                        </div>
+                        <div class="nav-content">
+                            <span class="nav-title">{{ __("Reports") }}</span>
+                            <span class="nav-subtitle">Download admin report</span>
+                        </div>
+                        <div class="nav-indicator"></div>
+                    </a>
+                </li>
+
                 <!-- Vendor Applications -->
                 <li class="nav-item @if($activePage == 'vendor-applications') active @endif">
                     <a class="nav-link" href="{{route('admin.vendors.applications')}}">

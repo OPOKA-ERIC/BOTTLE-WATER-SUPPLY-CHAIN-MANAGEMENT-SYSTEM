@@ -26,7 +26,7 @@
                         <i class="nc-icon nc-settings-gear-65"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number" id="total-batches">{{ $batches->count() ?? 0 }}</h3>
+                        <h3 class="stats-number" id="total-batches">{{ $totalBatches ?? 0 }}</h3>
                         <p class="stats-label">Total Batches</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
@@ -41,7 +41,7 @@
                         <i class="nc-icon nc-time-alarm"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number" id="in-progress-batches">{{ $batches->where('status', 'in_progress')->count() ?? 0 }}</h3>
+                        <h3 class="stats-number" id="in-progress-batches">{{ $inProgressBatches ?? 0 }}</h3>
                         <p class="stats-label">In Progress</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
@@ -56,7 +56,7 @@
                         <i class="nc-icon nc-check-2"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number" id="completed-batches">{{ $batches->where('status', 'completed')->count() ?? 0 }}</h3>
+                        <h3 class="stats-number" id="completed-batches">{{ $completedBatches ?? 0 }}</h3>
                         <p class="stats-label">Completed</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
@@ -71,7 +71,7 @@
                         <i class="nc-icon nc-box-2"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number" id="total-quantity">{{ number_format($batches->sum('quantity') ?? 0) }}</h3>
+                        <h3 class="stats-number" id="total-quantity">{{ number_format($totalQuantity ?? 0) }}</h3>
                         <p class="stats-label">Total Quantity</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
@@ -106,15 +106,6 @@
                                     <span class="action-subtitle">Start production process</span>
                                 </div>
                             </button>
-                            <a href="{{ route('manufacturer.analytics') }}" class="quick-action-btn">
-                                <div class="action-icon">
-                                    <i class="nc-icon nc-chart-bar-32"></i>
-                                </div>
-                                <div class="action-content">
-                                    <span class="action-title">Production Analytics</span>
-                                    <span class="action-subtitle">View performance metrics</span>
-                                </div>
-                            </a>
                             <a href="{{ route('manufacturer.inventory.index') }}" class="quick-action-btn">
                                 <div class="action-icon">
                                     <i class="nc-icon nc-box-2"></i>
@@ -208,10 +199,10 @@
                                                             </button>
                                                             @endif
                                                             @if($batch->status === 'completed')
-                                                            <button class="action-btn info" title="View Report" onclick="viewBatchReport({{ $batch->id }})">
+                                                            {{-- <button class="action-btn info" title="View Report" onclick="viewBatchReport({{ $batch->id }})">
                                                                 <i class="nc-icon nc-chart-bar-32"></i>
                                                                 <span>Report</span>
-                                                            </button>
+                                                            </button> --}}
                                                             @endif
                                                         </div>
                                                     </td>
@@ -222,9 +213,46 @@
                                 </div>
                                 
                                 <!-- Pagination -->
-                                <div class="pagination-container">
-                                    {{ $batches->links() }}
+                                @if($batches->hasPages())
+                                <div class="d-flex justify-content-center mt-3">
+                                    <nav aria-label="Production batches pagination">
+                                        <ul class="pagination pagination-sm mb-0">
+                                            {{-- Previous Page Link --}}
+                                            @if ($batches->onFirstPage())
+                                                <li class="page-item disabled">
+                                                    <span class="page-link">‹</span>
+                                                </li>
+                                            @else
+                                                <li class="page-item">
+                                                    <a class="page-link" href="{{ $batches->previousPageUrl() }}">‹</a>
+                                                </li>
+                                            @endif
+                                            {{-- Pagination Elements --}}
+                                            @foreach ($batches->getUrlRange(1, $batches->lastPage()) as $page => $url)
+                                                @if ($page == $batches->currentPage())
+                                                    <li class="page-item active">
+                                                        <span class="page-link">{{ $page }}</span>
+                                                    </li>
+                                                @else
+                                                    <li class="page-item">
+                                                        <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                                    </li>
+                                                @endif
+                                            @endforeach
+                                            {{-- Next Page Link --}}
+                                            @if ($batches->hasMorePages())
+                                                <li class="page-item">
+                                                    <a class="page-link" href="{{ $batches->nextPageUrl() }}">›</a>
+                                                </li>
+                                            @else
+                                                <li class="page-item disabled">
+                                                    <span class="page-link">›</span>
+                                                </li>
+                                            @endif
+                                        </ul>
+                                    </nav>
                                 </div>
+                                @endif
                             @else
                                 <div class="empty-state">
                                     <div class="empty-icon">
@@ -1373,12 +1401,7 @@ function updateBatchesTable(batches) {
                 </button>
             `;
         } else if (batch.status === 'completed') {
-            actionButtons += `
-                <button class="action-btn info" title="View Report" onclick="viewBatchReport(${batch.id})">
-                    <i class="nc-icon nc-chart-bar-32"></i>
-                    <span>Report</span>
-                </button>
-            `;
+            // Do not add the Report button for completed batches
         }
         
         tableHtml += `

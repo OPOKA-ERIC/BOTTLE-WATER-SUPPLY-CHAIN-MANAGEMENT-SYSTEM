@@ -44,8 +44,12 @@
                             <div class="detail-row">
                                 <div class="detail-label">Status</div>
                                 <div class="detail-value">
-                                    <span class="status-badge status-{{ strtolower($application->status ?? 'pending') }}">
-                                        {{ ucfirst($application->status ?? 'N/A') }}
+                                    <span class="status-badge status-{{ strtolower($application->status === 'approved' ? 'approved' : 'rejected') }}">
+                                        @if($application->status === 'approved')
+                                            Approved
+                                        @else
+                                            Rejected
+                                        @endif
                                     </span>
                                 </div>
                             </div>
@@ -79,6 +83,30 @@
                                 <div class="detail-label">Last Updated</div>
                                 <div class="detail-value">{{ $application->updated_at ? $application->updated_at->format('F d, Y \a\t g:i A') : 'N/A' }}</div>
                             </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Financial Score</div>
+                                <div class="detail-value">
+                                    {{ $application->financial_score == 1 ? 1 : 0 }}
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Reputation Score</div>
+                                <div class="detail-value">
+                                    {{ $application->reputation_score == 1 ? 1 : 0 }}
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Compliance Score</div>
+                                <div class="detail-value">
+                                    {{ $application->compliance_score == 1 ? 1 : 0 }}
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Overall Score</div>
+                                <div class="detail-value">
+                                    {{ $application->overall_score !== null && $application->overall_score !== '' ? $application->overall_score : 0 }}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -98,21 +126,22 @@
                     <div class="card-body">
                         <div class="status-info">
                             <div class="status-indicator">
-                                <span class="status-badge status-{{ strtolower($application->status ?? 'pending') }}">
-                                    {{ ucfirst($application->status ?? 'N/A') }}
+                                <span class="status-badge status-{{ strtolower($application->status === 'approved' ? 'approved' : 'rejected') }}">
+                                    @if($application->status === 'approved')
+                                        Approved
+                                    @else
+                                        Rejected
+                                    @endif
                                 </span>
                             </div>
                             <div class="status-description">
-                                @if($application->status == 'pending')
-                                    <p>Your application is currently under review by our team.</p>
-                                @elseif($application->status == 'approved')
+                                @if($application->status == 'approved')
                                     <p>Congratulations! Your application has been approved.</p>
-                                @elseif($application->status == 'rejected')
-                                    <p>Your application has been reviewed but not approved.</p>
-                                @elseif($application->status == 'processing')
-                                    <p>Your application is being processed by our team.</p>
                                 @else
-                                    <p>Application status is being determined.</p>
+                                    <p>Your application has been reviewed and was not approved.</p>
+                                    @if($application->rejection_reason)
+                                        <p><strong>Reason:</strong> {{ $application->rejection_reason }}</p>
+                                    @endif
                                 @endif
                             </div>
                         </div>
