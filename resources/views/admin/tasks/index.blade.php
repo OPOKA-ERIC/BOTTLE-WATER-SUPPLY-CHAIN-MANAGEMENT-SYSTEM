@@ -1,7 +1,23 @@
 @extends('layouts.app', ['activePage' => 'task-scheduling', 'title' => 'Task Scheduling'])
 
 @section('content')
-<div class="container-fluid py-4">
+<style>
+    @media (min-width: 992px) {
+        .task-scheduling-content-fix {
+            padding-left: 40px !important;
+        }
+    }
+    @media (max-width: 991px) {
+        .task-scheduling-content-fix {
+            padding-left: 0 !important;
+        }
+    }
+    .task-scheduling-content-fix {
+        margin-top: 70px !important;
+        min-height: 100vh;
+    }
+</style>
+<div class="container-fluid py-4 task-scheduling-content-fix">
     <!-- Filter/Search Bar -->
     <div class="row mb-4 align-items-end">
         <div class="col-md-2">

@@ -71,10 +71,6 @@ class DashboardController extends Controller
             'total_tasks' => Task::count(),
             'pending_tasks' => Task::where('status', 'pending')->count(),
             'in_progress_tasks' => Task::where('status', 'in_progress')->count(),
-<<<<<<< HEAD
-            'overdue_tasks' => Task::where('due_date', '<', now())->whereNotIn('status', ['completed', 'cancelled'])->count(),
-            'urgent_tasks' => Task::where('priority', 'urgent')->whereNotIn('status', ['completed', 'cancelled'])->count(),
-=======
             'overdue_tasks' => Task::where('due_date', '<', now())
                 ->whereNotIn('status', ['completed', 'cancelled'])
                 ->count(),
@@ -85,7 +81,6 @@ class DashboardController extends Controller
             'total_assigned_tasks' => Task::whereNotNull('assigned_to')->count(),
             'total_acknowledged_tasks' => Task::where('is_read', true)->count(),
             'total_unacknowledged_tasks' => Task::where('is_read', false)->whereNotNull('assigned_to')->count(),
->>>>>>> 53b55260038ec1088546a0789b7243a4938e5444
         ];
         $kpis = $this->getBusinessAccurateKPIs();
         $recentOrders = Order::with('retailer')->latest()->take(5)->get();

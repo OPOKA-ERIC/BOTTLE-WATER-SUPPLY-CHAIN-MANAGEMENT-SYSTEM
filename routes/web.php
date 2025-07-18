@@ -58,45 +58,38 @@ Route::group(['middleware' => 'auth'], function () {
 });
 
 // Admin Routes
-Route::middleware(['auth', 'role:administrator', 'redirect.role'])->prefix('admin')->group(function () {
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-    Route::get('/users', [AdminDashboardController::class, 'userManagement'])->name('admin.users.index');
-    Route::get('/orders', [AdminDashboardController::class, 'orders'])->name('admin.orders.index');
-    Route::get('/vendor-applications', [AdminDashboardController::class, 'vendorApplications'])->name('admin.vendors.applications');
-    Route::post('/vendor-applications/{id}/approve', [AdminDashboardController::class, 'approveVendorApplication'])->name('admin.vendors.approve');
-    Route::post('/vendor-applications/{id}/reject', [AdminDashboardController::class, 'rejectVendorApplication'])->name('admin.vendors.reject');
-    Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('admin.analytics');
-    Route::get('/analytics/demand-forecast', [AdminDashboardController::class, 'demandForecast'])->name('admin.analytics.demand-forecast');
-    Route::get('/analytics/customer-segmentation', [AdminDashboardController::class, 'customerSegmentation'])->name('admin.analytics.customer-segmentation');
-    Route::get('/analytics/customer-segmentation/summary', [AdminDashboardController::class, 'customerSegmentationSummary'])->name('admin.analytics.customer-segmentation.summary');
-    Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'getAdminNotifications'])->name('admin.notifications');
-    Route::get('/work-distribution', [App\Http\Controllers\Admin\WorkDistributionController::class, 'index'])->name('admin.work-distribution.index');
-    Route::get('/work-distribution/create', [App\Http\Controllers\Admin\WorkDistributionController::class, 'create'])->name('admin.work-distribution.create');
-    Route::post('/work-distribution', [App\Http\Controllers\Admin\WorkDistributionController::class, 'store'])->name('admin.work-distribution.store');
-    Route::post('/work-distribution/{task}/acknowledge', [App\Http\Controllers\Admin\WorkDistributionController::class, 'acknowledge'])->name('admin.work-distribution.acknowledge');
-    Route::post('/work-distribution/{task}/reassign', [App\Http\Controllers\Admin\WorkDistributionController::class, 'reassign'])->name('admin.work-distribution.reassign');
-    Route::post('/work-distribution/{task}/status', [App\Http\Controllers\Admin\WorkDistributionController::class, 'updateStatus'])->name('admin.work-distribution.updateStatus');
-    Route::post('/work-distribution/{task}/comment', [App\Http\Controllers\Admin\WorkDistributionController::class, 'addComment'])->name('admin.work-distribution.addComment');
-    Route::post('/work-distribution/{task}/feedback', [App\Http\Controllers\Admin\WorkDistributionController::class, 'submitFeedback'])->name('admin.work-distribution.feedback');
-    Route::post('/work-distribution/{task}/review', [App\Http\Controllers\Admin\WorkDistributionController::class, 'submitReview'])->name('admin.work-distribution.review');
+Route::middleware(['auth', 'role:administrator', 'redirect.role'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/users', [AdminDashboardController::class, 'userManagement'])->name('users.index');
+    Route::get('/orders', [AdminDashboardController::class, 'orders'])->name('orders.index');
+    Route::get('/vendor-applications', [AdminDashboardController::class, 'vendorApplications'])->name('vendors.applications');
+    Route::post('/vendor-applications/{id}/approve', [AdminDashboardController::class, 'approveVendorApplication'])->name('vendors.approve');
+    Route::post('/vendor-applications/{id}/reject', [AdminDashboardController::class, 'rejectVendorApplication'])->name('vendors.reject');
+    Route::get('/analytics', [AdminDashboardController::class, 'analytics'])->name('analytics');
+    Route::get('/analytics/demand-forecast', [AdminDashboardController::class, 'demandForecast'])->name('analytics.demand-forecast');
+    Route::get('/analytics/customer-segmentation', [AdminDashboardController::class, 'customerSegmentation'])->name('analytics.customer-segmentation');
+    Route::get('/analytics/customer-segmentation/summary', [AdminDashboardController::class, 'customerSegmentationSummary'])->name('analytics.customer-segmentation.summary');
+    Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'getAdminNotifications'])->name('notifications');
+    Route::get('/work-distribution', [App\Http\Controllers\Admin\WorkDistributionController::class, 'index'])->name('work-distribution.index');
+    Route::get('/work-distribution/create', [App\Http\Controllers\Admin\WorkDistributionController::class, 'create'])->name('work-distribution.create');
+    Route::post('/work-distribution', [App\Http\Controllers\Admin\WorkDistributionController::class, 'store'])->name('work-distribution.store');
+    Route::post('/work-distribution/{task}/acknowledge', [App\Http\Controllers\Admin\WorkDistributionController::class, 'acknowledge'])->name('work-distribution.acknowledge');
+    Route::post('/work-distribution/{task}/reassign', [App\Http\Controllers\Admin\WorkDistributionController::class, 'reassign'])->name('work-distribution.reassign');
+    Route::post('/work-distribution/{task}/status', [App\Http\Controllers\Admin\WorkDistributionController::class, 'updateStatus'])->name('work-distribution.updateStatus');
+    Route::post('/work-distribution/{task}/comment', [App\Http\Controllers\Admin\WorkDistributionController::class, 'addComment'])->name('work-distribution.addComment');
+    Route::post('/work-distribution/{task}/feedback', [App\Http\Controllers\Admin\WorkDistributionController::class, 'submitFeedback'])->name('work-distribution.feedback');
+    Route::post('/work-distribution/{task}/review', [App\Http\Controllers\Admin\WorkDistributionController::class, 'submitReview'])->name('work-distribution.review');
     Route::resource('tasks', App\Http\Controllers\Admin\TaskController::class);
-    Route::get('/tasks/reports', [App\Http\Controllers\Admin\TaskController::class, 'reports'])->name('admin.tasks.reports');
-    Route::get('/tasks/create', [App\Http\Controllers\Admin\TaskController::class, 'create'])->name('admin.tasks.create');
-<<<<<<< HEAD
+    Route::get('/tasks/reports', [App\Http\Controllers\Admin\TaskController::class, 'reports'])->name('tasks.reports');
+    Route::get('/tasks/create', [App\Http\Controllers\Admin\TaskController::class, 'create'])->name('tasks.create');
     // Add admin reports routes
-    Route::get('/reports', [AdminDashboardController::class, 'reports'])->name('admin.reports');
-    Route::get('/reports/download', [AdminDashboardController::class, 'downloadReport'])->name('admin.reports.download');
-=======
-    Route::delete('/work-distribution/{task}', [App\Http\Controllers\Admin\WorkDistributionController::class, 'destroy'])->name('admin.work-distribution.destroy');
-    Route::get('/work-distribution/{task}/history', [App\Http\Controllers\Admin\WorkDistributionController::class, 'showHistory'])->name('admin.work-distribution.history');
-    Route::get('/work-distribution/report', [\App\Http\Controllers\Admin\WorkDistributionController::class, 'report'])->name('admin.work-distribution.report');
-    Route::get('/work-distribution/feedback/all', [App\Http\Controllers\Admin\WorkDistributionController::class, 'allFeedback'])->name('admin.work-distribution.allFeedback');
-    Route::get('/work-distribution/reviews/all', [App\Http\Controllers\Admin\WorkDistributionController::class, 'allReviews'])->name('admin.work-distribution.allReviews');
-});
-
-Route::prefix('admin')->middleware(['auth', 'role:administrator'])->name('admin.')->group(function () {
-    Route::resource('tasks', \App\Http\Controllers\Admin\TaskController::class);
->>>>>>> 53b55260038ec1088546a0789b7243a4938e5444
+    Route::get('/reports', [AdminDashboardController::class, 'reports'])->name('reports');
+    Route::get('/reports/download', [AdminDashboardController::class, 'downloadReport'])->name('reports.download');
+    Route::delete('/work-distribution/{task}', [App\Http\Controllers\Admin\WorkDistributionController::class, 'destroy'])->name('work-distribution.destroy');
+    Route::get('/work-distribution/{task}/history', [App\Http\Controllers\Admin\WorkDistributionController::class, 'showHistory'])->name('work-distribution.history');
+    Route::get('/work-distribution/report', [\App\Http\Controllers\Admin\WorkDistributionController::class, 'report'])->name('work-distribution.report');
+    Route::get('/work-distribution/feedback/all', [App\Http\Controllers\Admin\WorkDistributionController::class, 'allFeedback'])->name('work-distribution.allFeedback');
+    Route::get('/work-distribution/reviews/all', [App\Http\Controllers\Admin\WorkDistributionController::class, 'allReviews'])->name('work-distribution.allReviews');
 });
 
 // Vendor Routes
@@ -125,6 +118,9 @@ Route::middleware(['auth', 'role:vendor', 'redirect.role'])->prefix('vendor')->n
     });
     // Download report should NOT require a valid application
     Route::get('/reports/download', [VendorDashboardController::class, 'downloadReport'])->name('reports.download');
+
+    // Vendor Notifications Route
+    Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('notifications');
 });
 
 // Supplier Routes

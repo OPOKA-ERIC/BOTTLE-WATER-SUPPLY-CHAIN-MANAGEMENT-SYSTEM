@@ -301,4 +301,99 @@
     .welcome-icon { margin: 20px 0 0 0; }
 }
 </style>
+@push('js')
+@if(isset($forecastData) && count($forecastData) > 0)
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const labels = @json(array_column($forecastData, 'Date'));
+        const data = @json(array_map('intval', array_column($forecastData, 'Forecasted_Sales')));
+        const ctx = document.getElementById('forecastChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Forecasted Sales',
+                    data: data,
+                    borderColor: '#007bff',
+                    backgroundColor: 'rgba(0,123,255,0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#007bff',
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true },
+                    title: { display: false }
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Date' } },
+                    y: { title: { display: true, text: 'Forecasted Sales' }, beginAtZero: true }
+                }
+            }
+        });
+    });
+</script>
+@endif
+@if(isset($segmentsData) && count($segmentsData) > 0)
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Count customers per segment
+        const segments = @json(array_column($segmentsData, 'Segment'));
+        const segmentCounts = {};
+        segments.forEach(seg => { segmentCounts[seg] = (segmentCounts[seg] || 0) + 1; });
+        const labels = Object.keys(segmentCounts).map(s => 'Segment ' + s);
+        const data = Object.values(segmentCounts);
+        // Map segment keys to profiles
+        const segmentProfiles = @json($segmentProfiles);
+        const segmentKeys = Object.keys(segmentCounts);
+        const ctx = document.getElementById('segmentsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Number of Customers',
+                    data: data,
+                    backgroundColor: 'rgba(0,123,255,0.7)',
+                    borderColor: '#007bff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                // Get segment key (not label with 'Segment ' prefix)
+                                const idx = context.dataIndex;
+                                const segmentKey = segmentKeys[idx];
+                                const count = context.parsed.y;
+                                const profile = segmentProfiles[segmentKey] || '';
+                                return [
+                                    'Number of Customers: ' + count,
+                                    'Profile: ' + profile
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Segment' } },
+                    y: { title: { display: true, text: 'Number of Customers' }, beginAtZero: true }
+                }
+            }
+        });
+    });
+</script>
+@endif
+@endpush
 @endsection 

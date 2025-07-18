@@ -1,7 +1,23 @@
 @extends('layouts.app', ['activePage' => 'task-feedback', 'title' => 'All Task Feedback'])
 
 @section('content')
-<div class="container mt-5 pt-4">
+<style>
+    @media (min-width: 992px) {
+        .task-feedback-content-fix {
+            padding-left: 40px !important;
+        }
+    }
+    @media (max-width: 991px) {
+        .task-feedback-content-fix {
+            padding-left: 0 !important;
+        }
+    }
+    .task-feedback-content-fix {
+        margin-top: 70px !important;
+        min-height: 100vh;
+    }
+</style>
+<div class="container mt-5 pt-4 task-feedback-content-fix">
     <h2>All Task Feedback</h2>
     <div class="card mt-4">
         <div class="card-body p-0">

@@ -29,7 +29,7 @@
                                 $unreadCount = $chatData['unreadCount'];
                                 $recentMessage = $chatData['recentMessage'] ?? null;
                             @endphp
-                            <li class="list-group-item supplier-item chat-list-item" data-supplier-id="{{ $supplier->id }}" style="cursor:pointer; border:0; border-bottom:1px solid #f0f0f0; transition:background 0.2s;" onclick="openChat({{ $supplier->id }}, '{{ $supplier->name }}')">
+                            <li class="list-group-item supplier-item chat-list-item" data-supplier-id="{{ $supplier->id }}" data-supplier-name="{{ $supplier->name }}" style="cursor:pointer; border:0; border-bottom:1px solid #f0f0f0; transition:background 0.2s;">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
                                         <div class="fw-bold" style="font-size:1.08rem;">{{ $supplier->name }}</div>
@@ -249,7 +249,7 @@
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
-@push('js')
+@push('scripts')
 <script>
 $(document).ready(function() {
     // Ensure CSRF token is sent in AJAX headers
@@ -264,8 +264,6 @@ $(document).ready(function() {
 
     // Make openChat globally accessible
     window.openChat = function(supplierId, supplierName) {
-        alert('openChat called for supplierId: ' + supplierId);
-        console.log('openChat called for supplierId:', supplierId);
         currentSupplierId = supplierId;
         $('#chatUserName').text('Chat with ' + supplierName);
         $('#currentSupplierId').val(supplierId);
@@ -278,7 +276,6 @@ $(document).ready(function() {
         $('.supplier-item').removeClass('active');
         $(`.supplier-item[data-supplier-id='${supplierId}']`).addClass('active');
     }
-    console.log('openChat is', window.openChat);
 
     function loadMessages(supplierId) {
         $.ajax({
@@ -329,8 +326,6 @@ $(document).ready(function() {
 
     $('#messageForm').on('submit', function(e) {
         e.preventDefault();
-        alert('Message form submitted!');
-        console.log('Message form submitted!');
         const message = $('#messageInput').val().trim();
         const supplierId = $('#currentSupplierId').val();
         if (!message || !supplierId) return;
@@ -351,9 +346,15 @@ $(document).ready(function() {
             },
             error: function(xhr) {
                 alert('Error sending message. Please try again.');
-                console.log('AJAX error:', xhr);
             }
         });
+    });
+
+    // Use event delegation for supplier click
+    $('#suppliersList').on('click', '.supplier-item', function() {
+        const supplierId = $(this).data('supplier-id');
+        const supplierName = $(this).data('supplier-name');
+        openChat(supplierId, supplierName);
     });
 
     function startMessagePolling() {

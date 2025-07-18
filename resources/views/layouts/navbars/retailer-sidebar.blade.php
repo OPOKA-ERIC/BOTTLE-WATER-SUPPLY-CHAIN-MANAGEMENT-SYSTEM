@@ -56,19 +56,6 @@
                         <div class="nav-indicator"></div>
                     </a>
                 </li>
-                <!-- Notifications -->
-                <li class="nav-item @if($activePage == 'notifications') active @endif">
-                    <a class="nav-link" href="{{route('retailer.notifications')}}">
-                        <div class="nav-icon">
-                            <i class="nc-icon nc-bell-55"></i>
-                        </div>
-                        <div class="nav-content">
-                            <span class="nav-title">{{ __("Notifications") }}</span>
-                            <span class="nav-subtitle">System alerts</span>
-                        </div>
-                        <div class="nav-indicator"></div>
-                    </a>
-                </li>
             </ul>
         </div>
     </div>

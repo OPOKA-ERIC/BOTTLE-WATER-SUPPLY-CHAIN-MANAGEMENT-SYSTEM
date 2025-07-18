@@ -530,7 +530,7 @@
 }
 </style>
 
-@push('js')
+@push('scripts')
 <script>
 $(document).ready(function() {
     let currentManufacturerId = null;

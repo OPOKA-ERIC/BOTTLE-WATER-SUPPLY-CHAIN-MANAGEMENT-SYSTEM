@@ -40,7 +40,7 @@ class NotificationController extends Controller
             ]);
         }
         
-        return view('notifications.index', compact('notifications'));
+        return view('notifications.index', compact('notifications') + ['activePage' => 'notifications']);
     }
     
     public function getAdminNotifications()

@@ -99,9 +99,8 @@
                     </a>
                 </li>
 
-<<<<<<< HEAD
                 <!-- Task Reports -->
-                <li class="nav-item @if($activePage == 'task-reports') active @endif">
+                {{-- <li class="nav-item @if($activePage == 'task-reports') active @endif">
                     <a class="nav-link" href="{{ route('admin.tasks.reports') }}">
                         <div class="nav-icon">
                             <i class="nc-icon nc-chart-bar-32"></i>
@@ -112,7 +111,7 @@
                         </div>
                         <div class="nav-indicator"></div>
                     </a>
-                </li>
+                </li> --}}
 
                 <!-- Admin Reports (PDF Download) -->
                 <li class="nav-item @if($activePage == 'admin-reports') active @endif">
@@ -128,8 +127,6 @@
                     </a>
                 </li>
 
-=======
->>>>>>> 53b55260038ec1088546a0789b7243a4938e5444
                 <!-- Vendor Applications -->
                 <li class="nav-item @if($activePage == 'vendor-applications') active @endif">
                     <a class="nav-link" href="{{route('admin.vendors.applications')}}">
@@ -145,7 +142,7 @@
                     </li>
 
                 <!-- Notifications -->
-                <li class="nav-item @if($activePage == 'notifications') active @endif">
+                {{-- <li class="nav-item @if($activePage == 'notifications') active @endif">
                     <a class="nav-link" href="{{ route('admin.notifications') }}">
                         <div class="nav-icon">
                             <i class="nc-icon nc-bell-55"></i>
@@ -156,7 +153,7 @@
                         </div>
                         <div class="nav-indicator"></div>
                     </a>
-                </li>
+                </li> --}}
 
                 <!-- Demand Forecast -->
                 <li class="nav-item">

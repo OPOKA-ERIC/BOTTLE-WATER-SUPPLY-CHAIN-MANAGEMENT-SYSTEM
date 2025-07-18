@@ -48,7 +48,7 @@
 </div>
 @endsection
 
-@push('js')
+@push('scripts')
 @if(isset($forecastData) && count($forecastData) > 0)
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>

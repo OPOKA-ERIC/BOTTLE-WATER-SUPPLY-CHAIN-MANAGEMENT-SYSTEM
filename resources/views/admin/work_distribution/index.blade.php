@@ -1,7 +1,24 @@
 @extends('layouts.app', ['activePage' => 'work-distribution', 'title' => 'Work Distribution'])
 
 @section('content')
-<div class="container-fluid py-4">
+<style>
+    /* Ensure content is not blocked by sidebar or navbar */
+    @media (min-width: 992px) {
+        .work-distribution-content-fix {
+            padding-left: 40px !important; /* Even closer to sidebar */
+        }
+    }
+    @media (max-width: 991px) {
+        .work-distribution-content-fix {
+            padding-left: 0 !important;
+        }
+    }
+    .work-distribution-content-fix {
+        margin-top: 70px !important; /* Height of navbar */
+        min-height: 100vh;
+    }
+</style>
+<div class="container-fluid py-4 work-distribution-content-fix">
     <!-- Filter/Search Bar -->
     <div class="row mb-4 align-items-end">
         <div class="col-md-2">
