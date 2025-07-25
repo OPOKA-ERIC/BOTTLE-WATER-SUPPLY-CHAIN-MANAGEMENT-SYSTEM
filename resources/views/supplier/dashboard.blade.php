@@ -148,7 +148,6 @@
                                         <th>Type</th>
                                         <th>Status</th>
                                         <th>Date</th>
-                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -167,16 +166,10 @@
                                             </span>
                                         </td>
                                         <td>{{ $chat->created_at->format('M d, Y H:i') }}</td>
-                                        <td>
-                                            <a href="{{ route('supplier.chats.show', $chat->id) }}" class="action-btn">
-                                                <i class="nc-icon nc-zoom-split-in"></i>
-                                                <span>View Conversation</span>
-                                            </a>
-                                        </td>
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="6" class="text-center">No recent messages found</td>
+                                        <td colspan="5" class="text-center">No recent messages found</td>
                                     </tr>
                                     @endforelse
                                 </tbody>

@@ -27,7 +27,6 @@
                 <th>Status</th>
                 <th>Submitted</th>
                 <th>Scores (F/R/C/O)</th>
-                <th>Rejection Reason</th>
             </tr>
         </thead>
         <tbody>
@@ -35,10 +34,9 @@
             <tr>
                 <td>{{ $app->id }}</td>
                 <td>{{ $app->business_name }}</td>
-                <td>{{ ucfirst($app->status) }}</td>
+                <td>{{ $app->status === 'approved' ? 'Approved' : 'Rejected' }}</td>
                 <td>{{ $app->submitted_at ? $app->submitted_at->format('Y-m-d') : '-' }}</td>
                 <td>{{ (int) $app->financial_score }}/{{ (int) $app->reputation_score }}/{{ (int) $app->compliance_score }}/{{ (int) $app->overall_score }}</td>
-                <td>@if($app->status === 'rejected'){{ $app->rejection_reason ?? '-' }}@else - @endif</td>
             </tr>
         @endforeach
         </tbody>
@@ -48,7 +46,7 @@
         <ul>
             <li>Total Applications: {{ $applications->count() }}</li>
             <li>Approved: {{ $applications->where('status', 'approved')->count() }}</li>
-            <li>Rejected: {{ $applications->where('status', 'rejected')->count() }}</li>
+            <li>Rejected: {{ $applications->where('status', 'approved')->count() == 0 ? $applications->count() : $applications->count() - $applications->where('status', 'approved')->count() }}</li>
         </ul>
     </div>
     @else

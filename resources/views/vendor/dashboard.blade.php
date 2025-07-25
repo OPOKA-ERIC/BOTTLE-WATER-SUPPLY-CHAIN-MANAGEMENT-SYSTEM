@@ -50,20 +50,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
-                <div class="stats-card">
-                    <div class="stats-icon">
-                        <i class="nc-icon nc-simple-remove"></i>
-                    </div>
-                    <div class="stats-content">
-                        <h3 class="stats-number">{{ $stats['rejected_applications'] }}</h3>
-                        <p class="stats-label">Rejected</p>
-                        <div class="stats-footer">
-                            <i class="nc-icon nc-check-2"></i>
-                            <span>Failed validation criteria</span>
-                        </div>
-                    </div>
-                </div>
+            
             </div>
         </div>
 
@@ -476,7 +463,7 @@
     color: #2e7d32;
 }
 
-.status-rejected {
+.status-BWSCMS{
     background: rgba(211, 47, 47, 0.1);
     color: #d32f2f;
 }

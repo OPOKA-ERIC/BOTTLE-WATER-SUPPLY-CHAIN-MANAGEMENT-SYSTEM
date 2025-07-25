@@ -8,10 +8,11 @@
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                         <h4 class="mb-0">User Management</h4>
+                        <a href="{{ route('admin.user.create') }}" class="btn btn-success">Add User</a>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
+                            <table class="table table-hovera align-middle mb-0">
                                 <thead class="table-light">
                                     <tr>
                                         <th>Name</th>
@@ -35,9 +36,12 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <a href="#" class="btn btn-sm btn-info me-1" title="View"><i class="fa fa-eye"></i></a>
-                                                <a href="#" class="btn btn-sm btn-warning me-1" title="Edit"><i class="fa fa-edit"></i></a>
-                                                <a href="#" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></a>
+                                                <a href="{{ route('admin.user.edit', $user) }}" class="btn btn-sm btn-warning me-1" title="Edit"><i class="fa fa-edit"></i></a>
+                                                <form action="{{ route('admin.user.destroy', $user) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger" title="Delete"><i class="fa fa-trash"></i></button>
+                                                </form>
                                             </td>
                                         </tr>
                                     @empty

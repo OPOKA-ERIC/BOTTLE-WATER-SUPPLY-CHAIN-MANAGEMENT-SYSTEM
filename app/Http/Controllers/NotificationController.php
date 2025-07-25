@@ -14,9 +14,7 @@ class NotificationController extends Controller
     public function index(Request $request)
     {
         $user = auth()->user();
-        
         $query = $user->notifications();
-        
         // Filter by read status
         if ($request->has('status') && $request->status !== 'all') {
             if ($request->status === 'unread') {
@@ -25,22 +23,34 @@ class NotificationController extends Controller
                 $query->read();
             }
         }
-        
         // Filter by type
         if ($request->has('type') && $request->type !== 'all') {
             $query->byType($request->type);
         }
-        
         $notifications = $query->latest()->paginate(10);
-        
+        // Format notifications for the view and AJAX
+        $formatted = $notifications->map(function ($notification) {
+            return [
+                'type' => $notification->type ?? 'info',
+                'icon' => $this->getNotificationIcon($notification->type ?? 'info'),
+                'title' => $notification->title ?? 'Notification',
+                'text' => $notification->message ?? '',
+                'time' => $notification->created_at ? $notification->created_at->diffForHumans() : '',
+                'link' => $this->getNotificationLink($notification),
+            ];
+        });
         if ($request->ajax()) {
             return response()->json([
-                'notifications' => $notifications,
+                'notifications' => [
+                    'data' => $formatted,
+                ],
                 'stats' => $this->getNotificationStats($user)
             ]);
         }
-        
-        return view('notifications.index', compact('notifications') + ['activePage' => 'notifications']);
+        return view('notifications.index', [
+            'notifications' => $formatted,
+            'activePage' => 'notifications'
+        ]);
     }
     
     public function getAdminNotifications()
@@ -233,5 +243,25 @@ class NotificationController extends Controller
             'read' => $read,
             'avg_response_time' => round($avgResponseTime ?? 2.3, 1)
         ];
+    }
+
+    // Helper to get icon class
+    private function getNotificationIcon($type)
+    {
+        return [
+            'info' => 'nc-icon nc-chart-bar-32',
+            'success' => 'nc-icon nc-check-2',
+            'warning' => 'nc-icon nc-alert-circle-i',
+            'error' => 'nc-icon nc-simple-remove'
+        ][$type] ?? 'nc-icon nc-bell-55';
+    }
+
+    // Helper to get link (customize as needed)
+    private function getNotificationLink($notification)
+    {
+        if (isset($notification->data['order_id'])) {
+            return route('retailer.orders.track', $notification->data['order_id']);
+        }
+        return '#';
     }
 }

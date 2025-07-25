@@ -114,6 +114,7 @@
         <script src="/light-bootstrap/js/core/jquery.3.2.1.min.js"></script>
         <script src="/light-bootstrap/js/plugins/bootstrap-datepicker.js"></script>
         @stack('scripts')
+        @stack('js')
     </body>
         <!--   Core JS Files   -->
     <script src="{{ asset('light-bootstrap/js/core/popper.min.js') }}" type="text/javascript"></script>

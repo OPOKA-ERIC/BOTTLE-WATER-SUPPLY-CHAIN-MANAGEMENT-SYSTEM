@@ -61,6 +61,8 @@ Route::group(['middleware' => 'auth'], function () {
 Route::middleware(['auth', 'role:administrator', 'redirect.role'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::get('/users', [AdminDashboardController::class, 'userManagement'])->name('users.index');
+    // Add user resource routes for admin
+    Route::resource('user', 'App\\Http\\Controllers\\UserController', ['except' => ['show']]);
     Route::get('/orders', [AdminDashboardController::class, 'orders'])->name('orders.index');
     Route::get('/vendor-applications', [AdminDashboardController::class, 'vendorApplications'])->name('vendors.applications');
     Route::post('/vendor-applications/{id}/approve', [AdminDashboardController::class, 'approveVendorApplication'])->name('vendors.approve');

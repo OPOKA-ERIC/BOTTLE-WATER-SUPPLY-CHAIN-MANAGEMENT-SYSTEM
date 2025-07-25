@@ -742,6 +742,62 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         console.log('Admin notification button not found. User role might not be administrator.');
     }
+
+    // Real-time notification polling for retailer
+    @if(auth()->check() && auth()->user()->role === 'retailer')
+    function loadRetailerNotifications() {
+        const notificationList = document.getElementById('userNotificationList');
+        const notificationCount = document.getElementById('notificationCount');
+        const notificationCountText = document.getElementById('notificationCountText');
+        
+        if (!notificationList) return;
+        // Show loading state
+        notificationList.innerHTML = `
+            <div class="notification-loading">
+                <i class="nc-icon nc-refresh-69"></i>
+                <span>Loading notifications...</span>
+            </div>
+        `;
+        fetch('/retailer/notifications', {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+            let notifications = data.notifications && data.notifications.data ? data.notifications.data : [];
+            let count = notifications.length;
+            notificationCount.textContent = count;
+            notificationCountText.textContent = count + ' new';
+            if (count === 0) {
+                notificationCount.style.display = 'none';
+            } else {
+                notificationCount.style.display = 'block';
+            }
+            if (count > 0) {
+                // Show only the 5 most recent notifications
+                notificationList.innerHTML = notifications.slice(0, 5).map(notification => {
+                    let link = notification.link || '#';
+                    return `<a href="${link}" class="dropdown-item">
+                        ${notification.title}<br>
+                        <span style="font-size:0.95em;">${notification.text}</span><br>
+                        <small class="text-muted">${notification.time}</small>
+                    </a>`;
+                }).join('');
+            } else {
+                notificationList.innerHTML = `<span class="dropdown-item">No new notifications</span>`;
+            }
+        })
+        .catch(error => {
+            notificationList.innerHTML = `<span class="dropdown-item">Error loading notifications</span>`;
+        });
+    }
+    loadRetailerNotifications();
+    setInterval(loadRetailerNotifications, 30000);
+    @endif
 });
 
 function loadAdminNotifications() {

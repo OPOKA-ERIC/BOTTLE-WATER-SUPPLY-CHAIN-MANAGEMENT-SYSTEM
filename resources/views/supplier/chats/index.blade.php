@@ -536,6 +536,18 @@ $(document).ready(function() {
     let currentManufacturerId = null;
     let messagePollingInterval = null;
 
+    // Auto-open chat if manufacturer_id is in query string
+    const urlParams = new URLSearchParams(window.location.search);
+    const autoOpenManufacturerId = urlParams.get('manufacturer_id');
+    if (autoOpenManufacturerId) {
+        // Find the manufacturer name from the DOM
+        const manufacturerItem = $(`.manufacturer-item[onclick*="${autoOpenManufacturerId}"]`);
+        if (manufacturerItem.length) {
+            const manufacturerName = manufacturerItem.find('.manufacturer-name').text();
+            openChat(autoOpenManufacturerId, manufacturerName);
+        }
+    }
+
     // Show feedback
     function showFeedback(type, message) {
         const feedback = $(`<div class="alert alert-${type} alert-dismissible fade show" role="alert">${message}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>`);

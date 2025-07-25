@@ -8,7 +8,7 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h4 class="card-title">Chat with {{ $chat->manufacturer->name ?? 'Manufacturer' }}</h4>
+                            <h4 class="card-title">Chat with {{ $manufacturer->name ?? 'Manufacturer' }}</h4>
                             <p class="card-category">Conversation details</p>
                         </div>
                         <a href="{{ route('supplier.chats.index') }}" class="btn btn-secondary">
@@ -22,19 +22,24 @@
                         <div class="d-flex align-items-center">
                             <div class="avatar-lg bg-primary rounded-circle d-flex align-items-center justify-content-center me-3">
                                 <span class="text-white font-weight-bold" style="font-size: 24px;">
-                                    {{ substr($chat->manufacturer->name ?? 'M', 0, 1) }}
+                                    {{ substr($manufacturer->name ?? 'M', 0, 1) }}
                                 </span>
                             </div>
                             <div>
-                                <h5 class="mb-0">{{ $chat->manufacturer->name ?? 'Manufacturer' }}</h5>
-                                <p class="text-muted mb-0">{{ $chat->manufacturer->email ?? 'N/A' }}</p>
+                                <h5 class="mb-0">{{ $manufacturer->name ?? 'Manufacturer' }}</h5>
+                                <p class="text-muted mb-0">{{ $manufacturer->email ?? 'N/A' }}</p>
                                 <small class="text-muted">
-                                    @if($chat->is_read)
+                                    @php
+                                        $lastMessage = $messages->last();
+                                    @endphp
+                                    @if($lastMessage && $lastMessage->is_read)
                                         <span class="badge badge-success">Read</span>
                                     @else
                                         <span class="badge badge-warning">Unread</span>
                                     @endif
-                                    • Last updated: {{ $chat->updated_at->format('M d, Y H:i') }}
+                                    @if($lastMessage)
+                                        • Last updated: {{ $lastMessage->updated_at->format('M d, Y H:i') }}
+                                    @endif
                                 </small>
                             </div>
                         </div>
@@ -62,16 +67,16 @@
                     <div class="chat-reply">
                         <form action="{{ route('supplier.chats.store') }}" method="POST">
                             @csrf
-                            <input type="hidden" name="manufacturer_id" value="{{ $chat->manufacturer_id }}">
+                            <input type="hidden" name="manufacturer_id" value="{{ $manufacturer->id }}">
                             <div class="form-group">
-                                <label for="reply_message">Reply to {{ $chat->manufacturer->name ?? 'Manufacturer' }}</label>
+                                <label for="reply_message">Reply to {{ $manufacturer->name ?? 'Manufacturer' }}</label>
                                 <textarea class="form-control" id="reply_message" name="message" rows="4" placeholder="Type your reply here..." required></textarea>
                             </div>
                             <div class="mt-3">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="nc-icon nc-send"></i> Send Reply
                                 </button>
-                                <button type="button" class="btn btn-outline-secondary ml-2" onclick="markAsRead()">
+                                <button type="button" class="btn btn-outline-secondary ml-2" onclick="markAsRead()" id="markAsReadBtn">
                                     <i class="nc-icon nc-check-2"></i> Mark as Read
                                 </button>
                             </div>
@@ -169,7 +174,19 @@
 @push('js')
 <script>
 function markAsRead() {
-    fetch('{{ route("supplier.chats.read", $chat->id) }}', {
+    // Find the latest unread message from the manufacturer
+    var unreadMessageId = null;
+    @foreach($messages as $message)
+        @if(!$message->is_read && $message->manufacturer_id == $manufacturer->id)
+            unreadMessageId = {{ $message->id }};
+            @break
+        @endif
+    @endforeach
+    if (!unreadMessageId) {
+        alert('No unread messages to mark as read.');
+        return;
+    }
+    fetch('/supplier/chats/' + unreadMessageId + '/read', {
         method: 'PUT',
         headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}',

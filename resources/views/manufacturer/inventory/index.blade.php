@@ -60,7 +60,9 @@
                         <i class="nc-icon nc-check-2"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number">{{ $inventory->where('current_stock', '>', 'minimum_stock')->count() ?? 0 }}</h3>
+                        <h3 class="stats-number">
+                            {{ $inventory->filter(function($item) { return $item->current_stock > $item->minimum_stock * 1.5; })->count() }}
+                        </h3>
                         <p class="stats-label">In Stock</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
@@ -72,14 +74,16 @@
             <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-icon">
-                        <i class="nc-icon nc-alert-circle-i"></i>
+                        <i class="nc-icon nc-bell-55"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number">{{ $inventory->where('current_stock', '<=', 'minimum_stock')->count() ?? 0 }}</h3>
-                        <p class="stats-label">Low Stock</p>
+                        <h3 class="stats-number">
+                            {{ $inventory->filter(function($item) { return $item->current_stock > $item->minimum_stock && $item->current_stock <= $item->minimum_stock * 1.5; })->count() }}
+                        </h3>
+                        <p class="stats-label">Moderate</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
-                            <span>Needs attention</span>
+                            <span>Monitor</span>
                         </div>
                     </div>
                 </div>
@@ -87,14 +91,16 @@
             <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-icon">
-                        <i class="nc-icon nc-chart-bar-32"></i>
+                        <i class="nc-icon nc-alert-circle-i"></i>
                     </div>
                     <div class="stats-content">
-                        <h3 class="stats-number">{{ number_format($inventory->sum('current_stock') ?? 0) }}</h3>
-                        <p class="stats-label">Total Units</p>
+                        <h3 class="stats-number">
+                            {{ $inventory->filter(function($item) { return $item->current_stock <= $item->minimum_stock; })->count() }}
+                        </h3>
+                        <p class="stats-label">Low Stock</p>
                         <div class="stats-footer">
                             <i class="nc-icon nc-refresh-69"></i>
-                            <span>Available stock</span>
+                            <span>Needs attention</span>
                         </div>
                     </div>
                 </div>

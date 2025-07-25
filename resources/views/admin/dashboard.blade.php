@@ -65,21 +65,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 col-md-4 col-sm-6 mb-4">
-                <div class="stats-card">
-                    <div class="stats-icon">
-                        <i class="nc-icon nc-paper"></i>
-                    </div>
-                    <div class="stats-content">
-                        <h3 class="stats-number">{{ $stats['pending_vendor_applications'] }}</h3>
-                        <p class="stats-label">Pending Vendor Applications</p>
-                        <div class="stats-footer">
-                            <i class="nc-icon nc-refresh-69"></i>
-                            <span>Updated just now</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+           
             <div class="col-lg-4 col-md-4 col-sm-6 mb-4">
                 <div class="stats-card">
                     <div class="stats-icon task-stats">

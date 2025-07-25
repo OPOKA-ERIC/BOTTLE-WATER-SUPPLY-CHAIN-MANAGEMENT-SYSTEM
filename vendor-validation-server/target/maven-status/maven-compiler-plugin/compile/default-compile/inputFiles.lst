@@ -1,11 +1,4 @@
-<<<<<<< HEAD
 C:\xampp\htdocs\Bottle_Water_SCMS\vendor-validation-server\src\main\java\com\scms\model\ValidationResult.java
 C:\xampp\htdocs\Bottle_Water_SCMS\vendor-validation-server\src\main\java\com\scms\VendorValidationApplication.java
 C:\xampp\htdocs\Bottle_Water_SCMS\vendor-validation-server\src\main\java\com\scms\service\VendorValidationService.java
 C:\xampp\htdocs\Bottle_Water_SCMS\vendor-validation-server\src\main\java\com\scms\controller\VendorValidationController.java
-=======
-C:\Users\THE TRENDWORKS\Herd\BOTTLE-WATER-SUPPLY-CHAIN-MANAGEMENT-SYSTEM\vendor-validation-server\src\main\java\com\scms\controller\VendorValidationController.java
-C:\Users\THE TRENDWORKS\Herd\BOTTLE-WATER-SUPPLY-CHAIN-MANAGEMENT-SYSTEM\vendor-validation-server\src\main\java\com\scms\model\VendorApplication.java
-C:\Users\THE TRENDWORKS\Herd\BOTTLE-WATER-SUPPLY-CHAIN-MANAGEMENT-SYSTEM\vendor-validation-server\src\main\java\com\scms\service\VendorValidationService.java
-C:\Users\THE TRENDWORKS\Herd\BOTTLE-WATER-SUPPLY-CHAIN-MANAGEMENT-SYSTEM\vendor-validation-server\src\main\java\com\scms\VendorValidationApplication.java
->>>>>>> 53b55260038ec1088546a0789b7243a4938e5444

@@ -33,7 +33,6 @@
                                         <th>Status</th>
                                         <th>Submitted</th>
                                         <th>Scores (F/R/C/O)</th>
-                                        <th>Rejection Reason</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -42,13 +41,12 @@
                                         <td>{{ $app->id }}</td>
                                         <td>{{ $app->business_name }}</td>
                                         <td>
-                                            <span class="status-badge status-{{ $app->status }}">
-                                                {{ ucfirst($app->status) }}
+                                            <span class="status-badge status-{{ $app->status === 'approved' ? 'approved' : 'rejected' }}">
+                                                {{ $app->status === 'approved' ? 'Approved' : 'Rejected' }}
                                             </span>
                                         </td>
                                         <td>{{ $app->submitted_at ? $app->submitted_at->format('Y-m-d') : '-' }}</td>
                                         <td>{{ (int) $app->financial_score }}/{{ (int) $app->reputation_score }}/{{ (int) $app->compliance_score }}/{{ (int) $app->overall_score }}</td>
-                                        <td>@if($app->status === 'rejected'){{ $app->rejection_reason ?? '-' }}@else - @endif</td>
                                     </tr>
                                 @endforeach
                                 </tbody>
