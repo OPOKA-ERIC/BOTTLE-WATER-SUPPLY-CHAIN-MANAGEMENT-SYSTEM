@@ -25,10 +25,11 @@ WORKDIR /var/www/html
 # Install PHP dependencies
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
-RUN composer dump-autoload --optimize
 
-# Copy application code
+# Copy application code (must be before dump-autoload so artisan exists)
 COPY . .
+
+RUN composer dump-autoload --optimize
 
 # Copy built frontend assets from stage 1
 COPY --from=frontend /app/public/build/ public/build/
