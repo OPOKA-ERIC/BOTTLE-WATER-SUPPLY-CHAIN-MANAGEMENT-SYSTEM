@@ -34,10 +34,6 @@ RUN composer dump-autoload --optimize
 # Copy built frontend assets from stage 1
 COPY --from=frontend /app/public/build/ public/build/
 
-# Download TiDB Cloud CA certificate for SSL connections
-RUN mkdir -p /etc/ssl/tidb \
-    && curl -sL https://docs.tidbcloud.com/samples/tidb-cloud-ca-cert.pem -o /etc/ssl/tidb/tidb-cloud-ca.pem
-
 # Set permissions for storage and bootstrap/cache
 RUN mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views storage/app/public \
     && chown -R www-data:www-data /var/www/html \
