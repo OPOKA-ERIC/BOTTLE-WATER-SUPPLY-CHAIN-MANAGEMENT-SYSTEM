@@ -33,10 +33,11 @@ COPY . .
 # Copy built frontend assets from stage 1
 COPY --from=frontend /app/public/build/ public/build/
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+# Set permissions for storage and bootstrap/cache
+RUN mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views storage/app/public \
+    && chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache
 
 # Set Apache DocumentRoot
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
@@ -44,4 +45,9 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
     && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 EXPOSE 80
+
+# Healthcheck for Render
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost/ || exit 1
+
 CMD ["apache2-foreground"]
