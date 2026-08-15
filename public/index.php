@@ -1,55 +1,51 @@
 <?php
 
-use Illuminate\Contracts\Http\Kernel;
-use Illuminate\Http\Request;
+$uri = $_SERVER['REQUEST_URI'] ?? '/';
 
-define('LARAVEL_START', microtime(true));
-
-/*
-|--------------------------------------------------------------------------
-| Check If The Application Is Under Maintenance
-|--------------------------------------------------------------------------
-|
-| If the application is in maintenance / demo mode via the "down" command
-| we will load this file so that any pre-rendered content can be shown
-| instead of starting the framework, which could cause an exception.
-|
-*/
-
-if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
-    require $maintenance;
+// Raw health check - bypass Laravel entirely
+if ($uri === '/health' || $uri === '/health/') {
+    http_response_code(200);
+    header('Content-Type: text/plain');
+    echo 'OK';
+    exit(0);
 }
 
-/*
-|--------------------------------------------------------------------------
-| Register The Auto Loader
-|--------------------------------------------------------------------------
-|
-| Composer provides a convenient, automatically generated class loader for
-| this application. We just need to utilize it! We'll simply require it
-| into the script here so we don't need to manually load our classes.
-|
-*/
+// Debug endpoint - shows startup log
+if ($uri === '/debug' || $uri === '/debug/') {
+    $logFile = __DIR__ . '/../storage/logs/startup.log';
+    $phpErrors = __DIR__ . '/../storage/logs/php_errors.log';
+    header('Content-Type: text/plain');
+    echo "=== STARTUP LOG ===\n";
+    echo file_exists($logFile) ? file_get_contents($logFile) : "No startup log found\n";
+    echo "\n=== PHP ERRORS ===\n";
+    echo file_exists($phpErrors) ? file_get_contents($phpErrors) : "No PHP error log found\n";
+    echo "\n=== ENV TEST ===\n";
+    echo "APP_DEBUG: " . (getenv('APP_DEBUG') ?: 'NOT SET') . "\n";
+    echo "APP_KEY set: " . (getenv('APP_KEY') ? 'YES' : 'NO') . "\n";
+    echo "DB_HOST: " . (getenv('DB_HOST') ?: 'NOT SET') . "\n";
+    echo "DB_CONNECTION: " . (getenv('DB_CONNECTION') ?: 'NOT SET') . "\n";
+    exit(0);
+}
 
-require __DIR__.'/../vendor/autoload.php';
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/../storage/logs/php_errors.log');
 
-/*
-|--------------------------------------------------------------------------
-| Run The Application
-|--------------------------------------------------------------------------
-|
-| Once we have the application, we can handle the incoming request using
-| the application's HTTP kernel. Then, we will send the response back
-| to this client's browser, allowing them to enjoy our application.
-|
-*/
-
-$app = require_once __DIR__.'/../bootstrap/app.php';
-
-$kernel = $app->make(Kernel::class);
-
-$response = $kernel->handle(
-    $request = Request::capture()
-)->send();
-
-$kernel->terminate($request, $response);
+try {
+    require __DIR__.'/../vendor/autoload.php';
+    $app = require_once __DIR__.'/../bootstrap/app.php';
+    $kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+    $response = $kernel->handle(
+        $request = Illuminate\Http\Request::capture()
+    )->send();
+    $kernel->terminate($request, $response);
+} catch (\Throwable $e) {
+    error_log('FATAL: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+    error_log('TRACE: ' . $e->getTraceAsString());
+    http_response_code(500);
+    header('Content-Type: text/plain');
+    echo "500 Error: " . $e->getMessage() . "\n";
+    echo "File: " . $e->getFile() . ":" . $e->getLine() . "\n";
+    exit(1);
+}
