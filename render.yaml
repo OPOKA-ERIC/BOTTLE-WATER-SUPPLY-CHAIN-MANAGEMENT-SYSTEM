@@ -3,12 +3,12 @@ services:
     name: water-supply-system
     runtime: docker
     plan: free
-    healthCheckPath: /
+    healthCheckPath: /health
     envVars:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
-        value: "false"
+        value: "true"
       - key: APP_URL
         sync: false
       - key: APP_KEY
@@ -35,4 +35,4 @@ services:
         value: stack
       - key: LOG_LEVEL
         value: error
-    preDeployCommand: "php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan view:cache"
+    preDeployCommand: "php artisan migrate --force"

@@ -28,6 +28,10 @@ Route::get('/test-hello', function() {
     return 'Hello, world!';
 });
 
+Route::get('/health', function() {
+    return response('OK', 200);
+});
+
 Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
