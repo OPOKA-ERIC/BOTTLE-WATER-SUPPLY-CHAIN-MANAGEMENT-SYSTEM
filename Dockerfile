@@ -47,8 +47,11 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
 
 EXPOSE 80
 
-# Healthcheck for Render
+# Copy and set up entrypoint script
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost/ || exit 1
 
-CMD ["apache2-foreground"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
