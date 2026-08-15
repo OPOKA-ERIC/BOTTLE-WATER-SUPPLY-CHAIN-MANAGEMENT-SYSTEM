@@ -8,15 +8,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('notifications', function (Blueprint $table) {
-            $table->string('type', 255)->change();
-        });
+        // TiDB doesn't support CHANGE COLUMN - no-op
     }
 
     public function down(): void
     {
-        Schema::table('notifications', function (Blueprint $table) {
-            $table->string('type', 100)->change(); // or revert to previous length
-        });
+        // no-op
     }
-}; 
+};

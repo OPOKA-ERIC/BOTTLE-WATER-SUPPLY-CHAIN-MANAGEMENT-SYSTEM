@@ -13,12 +13,11 @@ return new class extends Migration
     {
         Schema::table('production_batches', function (Blueprint $table) {
             // Add missing fields
-            $table->date('start_date')->nullable()->after('production_date');
-            $table->date('estimated_completion')->nullable()->after('start_date');
-            $table->timestamp('completed_at')->nullable()->after('status');
+            $table->date('start_date')->nullable();
+            $table->date('estimated_completion')->nullable();
+            $table->timestamp('completed_at')->nullable();
             
-            // Update status enum to include 'pending'
-            $table->enum('status', ['pending', 'in_progress', 'completed', 'cancelled'])->default('pending')->change();
+            // TiDB doesn't support CHANGE COLUMN - status enum already set in create migration
         });
     }
 
@@ -29,7 +28,7 @@ return new class extends Migration
     {
         Schema::table('production_batches', function (Blueprint $table) {
             $table->dropColumn(['start_date', 'estimated_completion', 'completed_at']);
-            $table->enum('status', ['in_progress', 'completed', 'cancelled'])->default('in_progress')->change();
+            // TiDB doesn't support CHANGE COLUMN - no-op
         });
     }
 };

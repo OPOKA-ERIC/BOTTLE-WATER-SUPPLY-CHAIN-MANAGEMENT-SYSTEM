@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
             $table->integer('quantity');
             $table->date('production_date');
-            $table->enum('status', ['in_progress', 'completed', 'cancelled'])->default('in_progress');
+            $table->enum('status', ['pending', 'in_progress', 'completed', 'cancelled'])->default('pending');
             $table->text('notes')->nullable();
             $table->timestamps();
         });

@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->boolean('is_read')->default(false)->after('assignment_reason');
+            $table->boolean('is_read')->default(false);
         });
     }
 

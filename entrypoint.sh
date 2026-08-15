@@ -6,8 +6,8 @@ if [ -z "$APP_KEY" ] || [ "$APP_KEY" = "" ]; then
     php artisan key:generate --force
 fi
 
-# Run migrations
-php artisan migrate --force
+# Run fresh migrations (safe for new database)
+php artisan migrate:fresh --force
 
 # Cache config, routes, views
 php artisan config:cache

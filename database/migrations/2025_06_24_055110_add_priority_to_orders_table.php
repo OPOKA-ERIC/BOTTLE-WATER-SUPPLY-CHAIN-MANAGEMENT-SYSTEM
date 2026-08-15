@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('orders', function (Blueprint $table) {
             if (!Schema::hasColumn('orders', 'priority')) {
-                $table->enum('priority', ['low', 'medium', 'high'])->default('medium')->after('status');
+                $table->enum('priority', ['low', 'medium', 'high'])->default('medium');
             }
         });
     }

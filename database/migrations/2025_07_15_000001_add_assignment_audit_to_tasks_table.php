@@ -9,8 +9,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->string('assignment_method')->nullable()->after('status');
-            $table->string('assignment_reason')->nullable()->after('assignment_method');
+            $table->string('assignment_method')->nullable();
+            $table->string('assignment_reason')->nullable();
         });
     }
 

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('assigned_to')->nullable()->constrained('users')->onDelete('set null'); // User assigned to complete
             $table->enum('priority', ['low', 'medium', 'high', 'urgent'])->default('medium');
             $table->enum('status', ['pending', 'in_progress', 'completed', 'cancelled', 'on_hold'])->default('pending');
-            $table->enum('category', ['production', 'inventory', 'quality_control', 'delivery', 'maintenance', 'admin', 'customer_service', 'other'])->default('other');
+            $table->string('category', 64)->default('other');
             $table->dateTime('due_date')->nullable();
             $table->dateTime('start_date')->nullable();
             $table->dateTime('completed_at')->nullable();

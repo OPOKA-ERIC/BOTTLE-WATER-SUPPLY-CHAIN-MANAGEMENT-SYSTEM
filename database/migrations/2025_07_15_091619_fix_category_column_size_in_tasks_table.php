@@ -6,23 +6,13 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::table('tasks', function (Blueprint $table) {
-            $table->string('category', 64)->change();
-        });
+        // TiDB doesn't support CHANGE COLUMN - no-op
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('tasks', function (Blueprint $table) {
-            $table->string('category', 15)->change(); // revert to previous size if needed
-        });
+        // no-op
     }
 };

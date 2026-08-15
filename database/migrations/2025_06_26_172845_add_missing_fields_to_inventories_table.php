@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('inventories', function (Blueprint $table) {
-            $table->integer('current_stock')->default(0)->after('product_id');
-            $table->integer('minimum_stock')->default(0)->after('current_stock');
-            $table->string('unit', 20)->default('pieces')->after('minimum_stock');
-            $table->text('notes')->nullable()->after('unit');
-            $table->string('location')->nullable()->after('notes');
-            $table->string('batch_number')->nullable()->after('location');
+            $table->integer('current_stock')->default(0);
+            $table->integer('minimum_stock')->default(0);
+            $table->string('unit', 20)->default('pieces');
+            $table->text('notes')->nullable();
+            $table->string('location')->nullable();
+            $table->string('batch_number')->nullable();
         });
     }
 
