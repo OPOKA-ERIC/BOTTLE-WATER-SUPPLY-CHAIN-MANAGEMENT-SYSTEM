@@ -42,12 +42,6 @@ Route::get('/test', function () {
 // Authentication Routes
 Auth::routes();
 
-// Restore GET logout route for compatibility with old behavior
-Route::get('/logout', function () {
-    Auth::logout();
-    return redirect('/login');
-})->name('logout');
-
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::group(['middleware' => 'auth'], function () {
