@@ -6,16 +6,14 @@ if [ -z "$APP_KEY" ] || [ "$APP_KEY" = "" ]; then
     php artisan key:generate --force
 fi
 
-# Run migrations only (not fresh)
+# Clear ALL cached config - Render injects env vars at runtime
+rm -f bootstrap/cache/config.php
+rm -f bootstrap/cache/routes.php
+rm -f bootstrap/cache/routes-v7.php
+rm -f bootstrap/cache/views.php
+
+# Run migrations only
 php artisan migrate --force
-
-# Cache config, routes, views
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-
-# Seed demo users
-php artisan db:seed --force 2>/dev/null || true
 
 # Start Apache
 exec apache2-foreground

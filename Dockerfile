@@ -26,7 +26,8 @@ WORKDIR /var/www/html
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 
-# Copy application code (must be before dump-autoload so artisan exists)
+# Copy application code (cache bust: ${BUILD_DATE})
+ARG BUILD_DATE=1
 COPY . .
 
 RUN composer dump-autoload --optimize
